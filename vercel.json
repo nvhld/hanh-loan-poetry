@@ -1,0 +1,7 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/poem/:slug", "destination": "/reader.html?id=:slug" },
+    { "source": "/lab", "destination": "/topology.html" }
+  ]
+}

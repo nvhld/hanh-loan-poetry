@@ -1,65 +1,144 @@
-import Image from "next/image";
+'use client'
+
+// ============================================================
+// MAIN PAGE — Entry point
+// Scene 1 → Scene 2 flow. The prototype.
+// ============================================================
+
+import { useState, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import dynamic from 'next/dynamic'
+import type { Poem } from '@/types/poem'
+import { PROTOTYPE_POEMS, PROTOTYPE_EDGES } from '@/data/prototype'
+import Monolith from '@/components/ritual/Monolith'
+
+// Lazy-load Dream Layer — it's heavy and only needed after Scene 1
+const DreamField = dynamic(() => import('@/components/dream/DreamField'), {
+  ssr: false,
+  loading: () => null,
+})
+
+type Scene = 'singularity' | 'dream'
+
+// Emotion filter options
+const FILTERS = [
+  { label: 'Thiên văn', value: 'thien_van' },
+  { label: 'Khoảng cách', value: 'khoang_cach' },
+  { label: 'Ký ức', value: 'ky_uc' },
+  { label: 'Nữ quyền', value: 'nu_quyen' },
+  { label: 'Phi trường', value: 'phi_truong' },
+]
 
 export default function Home() {
+  const [scene, setScene] = useState<Scene>('singularity')
+  const [selectedPoem, setSelectedPoem] = useState<Poem | null>(null)
+  const [activeFilter, setActiveFilter] = useState<string | null>(null)
+  const [engravingVersion, setEngravingVersion] = useState(0)
+
+  const enterDream = useCallback(() => {
+    setScene('dream')
+  }, [])
+
+  const handlePoemSelect = useCallback((poem: Poem) => {
+    setSelectedPoem(poem)
+  }, [])
+
+  const handleClose = useCallback(() => {
+    setSelectedPoem(null)
+  }, [])
+
+  const handleEngraved = useCallback((poemId: string) => {
+    setEngravingVersion(v => v + 1)
+  }, [])
+
+  const handleFilterToggle = useCallback((value: string) => {
+    setActiveFilter(prev => prev === value ? null : value)
+  }, [])
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main style={{ position: 'fixed', inset: 0, background: '#04040c' }}>
+      {/* ─── SCENE 1: SINGULARITY ─── */}
+      <AnimatePresence>
+        {scene === 'singularity' && (
+          <motion.div
+            key="singularity"
+            className="singularity"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, filter: 'blur(6px)', scale: 1.04 }}
+            transition={{ duration: 0.7, ease: [0.4, 0, 0.6, 1] }}
+            onClick={enterDream}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+            {/* Background grain — CSS only, no JS */}
+            <div
+              aria-hidden
+              style={{
+                position: 'fixed', inset: 0,
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E")`,
+                pointerEvents: 'none', zIndex: 1,
+              }}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+            {/* The only text that matters */}
+            <p className="singularity-line">
+              Thế giới 8 tỷ người<br />
+              Sao em chỉ nhớ mình anh?
+            </p>
+
+            <p className="singularity-subtitle">
+              Thơ Nguyễn Thị Hạnh Loan &nbsp;·&nbsp; chạm vào hạnh loan
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ─── SCENE 2: DREAM FIELD ─── */}
+      <AnimatePresence>
+        {scene === 'dream' && (
+          <motion.div
+            key="dream"
+            className="dream-layer"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
           >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+            {/* Field UI — author mark + filters */}
+            <div className="field-ui">
+              <span className="author-mark">Hạnh Loan</span>
+              <div className="filter-pills">
+                {FILTERS.map(f => (
+                  <button
+                    key={f.value}
+                    className={`pill ${activeFilter === f.value ? 'active' : ''}`}
+                    onClick={() => handleFilterToggle(f.value)}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* The emotional gravity field */}
+            <DreamField
+              poems={PROTOTYPE_POEMS}
+              edges={PROTOTYPE_EDGES}
+              onPoemSelect={handlePoemSelect}
+              activeFilter={activeFilter}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ─── SCENE 3: MONOLITH ─── */}
+      <Monolith
+        poem={selectedPoem}
+        onClose={handleClose}
+        onEngraved={handleEngraved}
+      />
+
+      {/* Dandatto mark — a trace, not a logo */}
+      <p className="dandatto-mark" aria-hidden>
+        All designed by Dandatto (C)
+      </p>
+    </main>
+  )
 }

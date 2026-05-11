@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emotional Field Curator — Hạnh Loan Poetry</title>
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #141416;
+    --border: #222228;
+    --text: #c8c8d0;
+    --text-dim: #5a5a66;
+    --text-bright: #e8e8f0;
+    --accent: #4a8fff;
+    --accent-dim: #1a3a7a;
+    --ok: #3a9a5c;
+    --warn: #c47a20;
+    --danger: #a03030;
+
+    /* field colors */
+    --col-longing: #3a6aaa;
+    --col-entropy: #8a8aaa;
+    --col-eros: #aa3a5a;
+    --col-warmth: #aa7a30;
+    --col-ambiguity: #5a8a7a;
+    --col-transcendence: #7a3aaa;
+    --col-isolation: #4a6a6a;
+    --col-memory: #9a8a5a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Courier New', monospace; font-size: 13px; }
+
+  /* LAYOUT */
+  #app { display: grid; grid-template-columns: 280px 1fr 360px; height: 100vh; overflow: hidden; }
+
+  /* ── PANEL: poem list ── */
+  #list-panel {
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  #list-header {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  #list-header h1 { font-size: 11px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; }
+  #list-controls { display: flex; gap: 6px; margin-top: 8px; }
+  #list-controls select, #list-controls input {
+    background: var(--bg); border: 1px solid var(--border); color: var(--text);
+    padding: 4px 6px; font-size: 11px; font-family: inherit; flex: 1;
+  }
+  #progress-bar {
+    padding: 6px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px; color: var(--text-dim);
+  }
+  #progress-fill { height: 3px; background: var(--border); margin-top: 4px; }
+  #progress-fill-inner { height: 100%; background: var(--ok); transition: width 0.3s; }
+  #poem-list { overflow-y: auto; flex: 1; }
+  .poem-item {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .poem-item:hover { background: var(--surface); }
+  .poem-item.active { background: var(--accent-dim); border-left: 2px solid var(--accent); }
+  .poem-item.curated { opacity: 0.5; }
+  .poem-item .item-title { color: var(--text-bright); font-size: 12px; line-height: 1.4; }
+  .poem-item .item-meta { margin-top: 3px; font-size: 10px; color: var(--text-dim); display: flex; justify-content: space-between; }
+  .poem-item .conf-badge {
+    font-size: 9px; padding: 1px 4px; border-radius: 2px;
+  }
+  .conf-low { background: var(--danger); color: #fff; }
+  .conf-mid { background: var(--warn); color: #000; }
+  .conf-high { background: var(--ok); color: #fff; }
+  .curated-mark { color: var(--ok); font-size: 10px; }
+  .stub-mark { color: var(--text-dim); font-size: 10px; }
+
+  /* ── PANEL: poem body ── */
+  #poem-panel {
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow: hidden;
+    padding: 20px;
+    gap: 16px;
+  }
+  #poem-title {
+    font-size: 18px; color: var(--text-bright); letter-spacing: 1px;
+    border-bottom: 1px solid var(--border); padding-bottom: 12px;
+  }
+  #poem-date { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+  #poem-body {
+    overflow-y: auto; flex: 1;
+    line-height: 2.0; color: var(--text);
+    white-space: pre-wrap; font-size: 13px;
+    padding-right: 8px;
+  }
+  /* Dominant field indicator */
+  #dominant-bar {
+    display: flex; gap: 4px; flex-wrap: wrap;
+  }
+  .dom-chip {
+    padding: 3px 8px; font-size: 10px; border-radius: 2px; letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  #ai-notes {
+    font-size: 11px; color: var(--warn);
+    border-left: 2px solid var(--warn);
+    padding-left: 8px;
+    line-height: 1.5;
+  }
+
+  /* ── PANEL: curator controls ── */
+  #curator-panel {
+    display: flex; flex-direction: column; overflow-y: auto;
+    padding: 16px;
+    gap: 14px;
+  }
+  #curator-panel h2 { font-size: 10px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; }
+
+  /* Field sliders */
+  .field-group { display: flex; flex-direction: column; gap: 8px; }
+  .field-row { display: flex; align-items: center; gap: 8px; }
+  .field-label { width: 100px; font-size: 11px; color: var(--text-dim); }
+  .field-slider-wrap { flex: 1; position: relative; }
+  input[type=range] {
+    width: 100%; height: 4px; appearance: none; background: var(--border);
+    border-radius: 2px; cursor: pointer; outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    appearance: none; width: 12px; height: 12px; border-radius: 50%;
+    background: var(--accent); cursor: pointer;
+  }
+  .field-val { width: 36px; text-align: right; font-size: 11px; color: var(--text-bright); font-variant-numeric: tabular-nums; }
+  .ai-val { width: 36px; text-align: right; font-size: 10px; color: var(--text-dim); }
+
+  /* Dominant field selector */
+  #dominant-select {
+    background: var(--bg); border: 1px solid var(--border); color: var(--text-bright);
+    padding: 6px; font-family: inherit; font-size: 12px; width: 100%;
+  }
+
+  /* Action buttons */
+  #action-bar { display: flex; flex-direction: column; gap: 8px; }
+  .btn {
+    padding: 10px; font-family: inherit; font-size: 12px; cursor: pointer;
+    border: 1px solid var(--border); letter-spacing: 1px; text-transform: uppercase;
+    transition: all 0.15s;
+  }
+  .btn-accept { background: var(--ok); color: #fff; border-color: var(--ok); }
+  .btn-accept:hover { background: #4ab06c; }
+  .btn-reset { background: transparent; color: var(--text-dim); }
+  .btn-reset:hover { color: var(--text); border-color: var(--text-dim); }
+  .btn-export { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+  .btn-export:hover { background: var(--accent); color: #fff; }
+
+  /* Motif chips */
+  #motif-grid { display: flex; flex-wrap: wrap; gap: 4px; }
+  .motif-chip {
+    padding: 2px 6px; font-size: 10px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 2px; color: var(--text-dim);
+  }
+  .motif-chip strong { color: var(--text); }
+
+  /* Z-score deviation bars */
+  .deviation-row { display: flex; align-items: center; gap: 6px; font-size: 10px; }
+  .deviation-label { width: 100px; color: var(--text-dim); }
+  .deviation-bar-wrap { flex: 1; height: 6px; background: var(--border); position: relative; }
+  .deviation-bar { height: 100%; position: absolute; top: 0; }
+  .deviation-pos { background: var(--ok); left: 50%; }
+  .deviation-neg { background: var(--danger); right: 50%; }
+  .deviation-val { width: 40px; text-align: right; color: var(--text-dim); }
+
+  /* Topology preview */
+  #topo-canvas { width: 100%; height: 180px; background: var(--surface); border: 1px solid var(--border); }
+
+  /* gravity/decay */
+  .meta-row { display: flex; gap: 8px; align-items: center; }
+  .meta-row label { font-size: 11px; color: var(--text-dim); width: 80px; }
+  .meta-row input[type=range] { flex: 1; }
+  .meta-row .field-val { width: 40px; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 0; }
+  ::-webkit-scrollbar-thumb:hover { background: #383840; }
+
+  /* smooth scrolling for all panels */
+  #poem-list, #curator-panel, #poem-body { scroll-behavior: smooth; }
+
+  /* text selection — comfortable but not garish */
+  ::selection { background: var(--accent-dim); color: var(--text-bright); }
+
+  /* focus states — subtle, no rounded corners, keeps raw vibe */
+  input[type=range]:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+  select:focus-visible { outline: 1px solid var(--accent); outline-offset: 1px; }
+  .btn:focus-visible { outline: 1px solid var(--accent); outline-offset: 2px; }
+  .poem-item:focus-visible { outline: 1px solid var(--border); outline-offset: -1px; }
+
+  /* poem-item keyboard target — scroll-margin so active item isn't clipped */
+  .poem-item { scroll-margin-top: 4px; scroll-margin-bottom: 4px; }
+
+  /* poem body: more breathing room, better reading rhythm */
+  #poem-body {
+    line-height: 2.2;
+    letter-spacing: 0.01em;
+    padding-right: 16px;
+    /* Subtle indent for each stanza line */
+    white-space: pre-wrap;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- LEFT: poem list -->
+  <div id="list-panel">
+    <div id="list-header">
+      <h1>Emotional Field Curator</h1>
+      <div id="list-controls">
+        <select id="filter-dom" onchange="renderList()">
+          <option value="">Tất cả</option>
+          <option value="longing">Nỗi nhớ</option>
+          <option value="eros">Eros</option>
+          <option value="entropy">Tan rã</option>
+          <option value="memory">Ký ức</option>
+          <option value="distance">Xa cách</option>
+          <option value="ecstasy">Xuất thần</option>
+        </select>
+        <select id="filter-status" onchange="renderList()">
+          <option value="">Tất cả</option>
+          <option value="pending">Chưa duyệt</option>
+          <option value="curated">Đã duyệt</option>
+          <option value="low">Cần xem lại</option>
+        </select>
+        <select id="sort-by" onchange="renderList()" title="Sắp xếp">
+          <option value="conf-asc">↑ Conf thấp</option>
+          <option value="seq">Thứ tự gốc</option>
+          <option value="conf-desc">↓ Conf cao</option>
+          <option value="mass-desc">↓ Trọng lượng</option>
+        </select>
+      </div>
+    </div>
+    <div id="progress-bar">
+      <span id="progress-text">0 / 103 curated</span>
+      <div id="progress-fill"><div id="progress-fill-inner" style="width:0%"></div></div>
+    </div>
+    <div id="poem-list"></div>
+  </div>
+
+  <!-- CENTER: poem text -->
+  <div id="poem-panel">
+    <div>
+      <div id="poem-title">← select a poem</div>
+      <div id="poem-date"></div>
+    </div>
+    <div id="dominant-bar"></div>
+    <div id="poem-body" style="color:var(--text-dim); font-style:italic;">
+Select a poem from the left panel to begin curation.
+
+Curated data is saved in your browser session.
+Use "Export JSON" when done to save the final file.
+    </div>
+    <div id="ai-notes" style="display:none;"></div>
+    <canvas id="topo-canvas" title="Emotional field radar"></canvas>
+  </div>
+
+  <!-- RIGHT: curator controls -->
+  <div id="curator-panel">
+    <h2>Đề xuất của AI</h2>
+
+    <div id="field-sliders" class="field-group">
+      <!-- generated by JS -->
+    </div>
+
+    <div>
+      <h2 style="margin-bottom:8px;">Trường chủ đạo</h2>
+      <select id="dominant-select">
+        <option value="longing">Nỗi nhớ — khoảng cách, khao khát</option>
+        <option value="eros">Eros — sinh lực, thăng hoa</option>
+        <option value="entropy">Tan rã — thời gian, mất mát</option>
+        <option value="memory">Ký ức — chiêm bao, dư âm</option>
+        <option value="distance">Xa cách — phi trường, cô đơn</option>
+        <option value="ecstasy">Xuất thần — đỉnh điểm cảm xúc</option>
+      </select>
+    </div>
+
+    <div>
+      <h2 style="margin-bottom:8px;">Khối lượng & Phân rã</h2>
+      <div class="meta-row">
+        <label>mass</label>
+        <input type="range" id="gravity-slider" min="0.5" max="3.0" step="0.1" oninput="onGravityChange(this.value)">
+        <span class="field-val" id="gravity-val">1.0</span>
+      </div>
+      <div class="meta-row" style="margin-top:6px;">
+        <label>decay</label>
+        <input type="range" id="decay-slider" min="0.01" max="0.10" step="0.005" oninput="onDecayChange(this.value)">
+        <span class="field-val" id="decay-val">0.05</span>
+      </div>
+    </div>
+
+    <div>
+      <h2 style="margin-bottom:8px;">Motif phát hiện</h2>
+      <div id="motif-grid"></div>
+    </div>
+
+    <div>
+      <h2 style="margin-bottom:4px;">Lệch quỹ đạo</h2>
+      <p style="font-size:10px; color:var(--text-dim); margin-bottom:8px; font-style:italic;">rare within this constellation</p>
+      <div id="deviation-rows"></div>
+    </div>
+
+    <div id="action-bar">
+      <button class="btn btn-accept" onclick="acceptSuggestion()">✓ Chấp nhận AI  [a]</button>
+      <button class="btn btn-accept" style="background: var(--accent-dim); color:var(--accent); border-color:var(--accent)" onclick="saveOverride()">↑ Lưu chỉnh tay  [s]</button>
+      <button class="btn btn-reset" onclick="resetToAI()">↺ Trở về AI  [r]</button>
+    </div>
+
+    <div>
+      <h2 style="margin-bottom:8px;">Xuất dữ liệu</h2>
+      <button class="btn btn-export" onclick="exportJSON()">⬇ Xuất poems-curated.json</button>
+      <div id="export-info" style="margin-top:6px; font-size:10px; color:var(--text-dim);"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA (embedded inline) ──────────────────────────────────────────────────
+</script>
+<script src="curator_data_inline.js"></script>
+<script>
+// Fallback if no external data (standalone mode)
+if (typeof POEMS_DATA === 'undefined') {
+  alert('No poem data found. Please run the inference pipeline first.');
+}
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+const FIELDS = ['longing','entropy','eros','warmth','ambiguity','transcendence','isolation','memoryPressure'];
+const FIELD_LABELS = {
+  longing:'Nỗi nhớ', entropy:'Tan rã', eros:'Eros', warmth:'Ấm áp',
+  ambiguity:'Lưỡng lự', transcendence:'Siêu thoát', isolation:'Cô lập', memoryPressure:'Ký ức đè'
+};
+const FIELD_COLORS = {
+  longing:'#3a6aaa', entropy:'#8a8aaa', eros:'#aa3a5a', warmth:'#aa7a30',
+  ambiguity:'#5a8a7a', transcendence:'#7a3aaa', isolation:'#4a6a6a', memoryPressure:'#9a8a5a'
+};
+const DOM_COLORS = {
+  longing:'#3a6aaa', eros:'#aa3a5a', entropy:'#8a8aaa',
+  memory:'#9a8a5a', distance:'#4a6a6a', ecstasy:'#aa7a30'
+};
+const DOM_LABELS = {
+  longing:'Nỗi nhớ', eros:'Eros', entropy:'Tan rã',
+  memory:'Ký ức', distance:'Xa cách', ecstasy:'Xuất thần'
+};
+
+let poems = POEMS_DATA ? JSON.parse(JSON.stringify(POEMS_DATA)) : [];
+
+// Load any saved curation from localStorage
+const STORAGE_KEY = 'hanh-loan-curation-v1';
+function loadSaved() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const savedMap = JSON.parse(saved);
+      poems.forEach(p => {
+        if (savedMap[p.id]) {
+          p.curatorOverride = savedMap[p.id].curatorOverride;
+          p.curated = savedMap[p.id].curated;
+        }
+      });
+    }
+  } catch(e) {}
+}
+
+function saveState() {
+  const map = {};
+  poems.forEach(p => {
+    if (p.curated || p.curatorOverride) {
+      map[p.id] = { curatorOverride: p.curatorOverride, curated: p.curated };
+    }
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
+}
+
+let currentIdx = null;
+let currentSliderValues = {};
+
+// ── RENDER LIST ─────────────────────────────────────────────────────────────
+function renderList() {
+  const filterDom = document.getElementById('filter-dom').value;
+  const filterStatus = document.getElementById('filter-status').value;
+
+  let filtered = poems.filter(p => {
+    const dom = effectiveSuggestion(p).dominantField;
+    if (filterDom && dom !== filterDom) return false;
+    if (filterStatus === 'pending' && p.curated) return false;
+    if (filterStatus === 'curated' && !p.curated) return false;
+    if (filterStatus === 'low' && (p.aiSuggestion?.confidence || 0) >= 0.4) return false;
+    return true;
+  });
+
+  // Sort — driven by #sort-by select
+  const sortBy = document.getElementById('sort-by')?.value || 'conf-asc';
+  filtered.sort((a, b) => {
+    const ca = a.aiSuggestion?.confidence || 0;
+    const cb = b.aiSuggestion?.confidence || 0;
+    const ma = effectiveSuggestion(a).gravityMass || 0;
+    const mb = effectiveSuggestion(b).gravityMass || 0;
+    if (sortBy === 'conf-asc')  return ca - cb;
+    if (sortBy === 'conf-desc') return cb - ca;
+    if (sortBy === 'mass-desc') return mb - ma;
+    // 'seq' — original pdfSeq
+    return (a.pdfSeq || 999) - (b.pdfSeq || 999);
+  });
+
+  const listEl = document.getElementById('poem-list');
+  listEl.innerHTML = '';
+
+  filtered.forEach(p => {
+    const conf = p.aiSuggestion?.confidence || 0;
+    const confClass = conf < 0.4 ? 'conf-low' : conf < 0.7 ? 'conf-mid' : 'conf-high';
+    const dom = effectiveSuggestion(p).dominantField;
+    const domColor = DOM_COLORS[dom] || '#666';
+
+    const div = document.createElement('div');
+    div.className = `poem-item${p.curated ? ' curated' : ''}${currentIdx === poems.indexOf(p) ? ' active' : ''}`;
+    div.dataset.poemId = p.id;
+    div.tabIndex = 0;
+    div.innerHTML = `
+      <div class="item-title">${p.title}</div>
+      <div class="item-meta">
+        <span style="color:${domColor}">${DOM_LABELS[dom] || dom}</span>
+        <span>
+          ${p.curated ? '<span class="curated-mark">✓ curated</span>' : ''}
+          ${p.isStub ? '<span class="stub-mark">[stub]</span>' : ''}
+          <span class="conf-badge ${confClass}">${(conf*100).toFixed(0)}%</span>
+        </span>
+      </div>
+    `;
+    div.onclick = () => {
+      currentIdx = poems.indexOf(p);
+      renderPoem(p);
+      // Update active state
+      document.querySelectorAll('.poem-item').forEach(el => el.classList.remove('active'));
+      div.classList.add('active');
+    };
+    listEl.appendChild(div);
+  });
+
+  // Update progress
+  const curated = poems.filter(p => p.curated).length;
+  const total = poems.length;
+  document.getElementById('progress-text').textContent = `${curated} / ${total} curated`;
+  document.getElementById('progress-fill-inner').style.width = `${(curated/total)*100}%`;
+}
+
+// ── EFFECTIVE SUGGESTION ─────────────────────────────────────────────────────
+function effectiveSuggestion(p) {
+  return p.curatorOverride || p.aiSuggestion || {};
+}
+
+// ── RENDER POEM ─────────────────────────────────────────────────────────────
+function renderPoem(p) {
+  document.getElementById('poem-title').textContent = p.title;
+  document.getElementById('poem-date').textContent = p.date || '';
+
+  // Body text — use full body from cleaned source
+  const body = p.body || p.excerpt || '(no text — stub poem)';
+  document.getElementById('poem-body').textContent = body;
+
+  const eff = effectiveSuggestion(p);
+  const ai  = p.aiSuggestion || {};
+
+  // Dominant bar
+  const dom = eff.dominantField || 'entropy';
+  const domEl = document.getElementById('dominant-bar');
+  domEl.innerHTML = `
+    <span class="dom-chip" style="background:${DOM_COLORS[dom] || '#333'}22; color:${DOM_COLORS[dom] || '#888'}; border:1px solid ${DOM_COLORS[dom] || '#333'}44">
+      ${DOM_LABELS[dom] || dom}
+    </span>
+    ${p.curated ? '<span class="dom-chip" style="background:var(--ok)22;color:var(--ok);border:1px solid var(--ok)44">✓ curated</span>' : ''}
+    ${p.isStub ? '<span class="dom-chip" style="background:#33333322;color:var(--text-dim);border:1px solid var(--border)">stub — no text</span>' : ''}
+    <span class="dom-chip" style="background:#11111155;color:var(--text-dim);border:1px solid var(--border)44">
+      conf: ${((ai.confidence||0)*100).toFixed(0)}%
+    </span>
+  `;
+
+  // AI notes
+  const notesEl = document.getElementById('ai-notes');
+  if (ai.notes && ai.notes !== 'Inference stable.') {
+    notesEl.style.display = 'block';
+    notesEl.textContent = ai.notes;
+  } else {
+    notesEl.style.display = 'none';
+  }
+
+  // Sliders
+  const ef = eff.emotionalField || {};
+  const aiEf = ai.emotionalField || {};
+  currentSliderValues = { ...ef };
+
+  const slidersEl = document.getElementById('field-sliders');
+  slidersEl.innerHTML = '';
+
+  FIELDS.forEach(field => {
+    const val = ef[field] !== undefined ? ef[field] : 0.5;
+    const aiVal = aiEf[field] !== undefined ? aiEf[field] : 0;
+    const color = FIELD_COLORS[field];
+
+    const row = document.createElement('div');
+    row.className = 'field-row';
+    row.innerHTML = `
+      <span class="field-label" style="color:${color}" title="${field}">${FIELD_LABELS[field] || field}</span>
+      <div class="field-slider-wrap">
+        <input type="range" min="0" max="1" step="0.01" value="${val}"
+          style="accent-color:${color}"
+          oninput="onSliderChange('${field}', parseFloat(this.value), this)">
+      </div>
+      <span class="field-val" id="fv-${field}">${val.toFixed(2)}</span>
+      <span class="ai-val" title="AI: ${field}">${aiVal.toFixed(2)}</span>
+    `;
+    slidersEl.appendChild(row);
+  });
+
+  // Dominant select
+  document.getElementById('dominant-select').value = eff.dominantField || 'entropy';
+
+  // Gravity / decay
+  document.getElementById('gravity-slider').value = eff.gravityMass || 1.0;
+  document.getElementById('gravity-val').textContent = (eff.gravityMass || 1.0).toFixed(1);
+  document.getElementById('decay-slider').value = eff.decayRate || 0.05;
+  document.getElementById('decay-val').textContent = (eff.decayRate || 0.05).toFixed(3);
+
+  // Motifs
+  const motifs = ai.motifs || {};
+  const motifEl = document.getElementById('motif-grid');
+  motifEl.innerHTML = Object.entries(motifs)
+    .sort((a,b) => b[1]-a[1])
+    .map(([k,v]) => `<span class="motif-chip"><strong>${k}</strong> ${v.toFixed(2)}</span>`)
+    .join('') || '<span style="color:var(--text-dim);font-size:11px;">no motifs detected</span>';
+
+  // Corpus deviation
+  const dev = ai.corpusDeviation || {};
+  const devEl = document.getElementById('deviation-rows');
+
+  // Find the highest positive z-score for whisper
+  let maxZ = 0, maxField = null;
+  FIELDS.forEach(f => {
+    const z = dev[f] || 0;
+    if (z > maxZ) { maxZ = z; maxField = f; }
+  });
+
+  devEl.innerHTML = FIELDS.map(f => {
+    const z = dev[f] || 0;
+    const isPos = z >= 0;
+    const pct = Math.min(50, Math.abs(z) * 12);
+    const color = FIELD_COLORS[f];
+    const labelVi = FIELD_LABELS[f] || f;
+    return `
+      <div class="deviation-row">
+        <span class="deviation-label" style="color:${color}" title="${f}">${labelVi}</span>
+        <div class="deviation-bar-wrap">
+          <div class="deviation-bar ${isPos ? 'deviation-pos' : 'deviation-neg'}"
+            style="width:${pct}%; background:${color}${isPos ? 'bb' : '66'}"></div>
+        </div>
+        <span class="deviation-val">${z > 0 ? '+' : ''}${z.toFixed(2)}</span>
+      </div>
+    `;
+  }).join('') + (maxField && maxZ > 0.5 ? `
+    <p class="whisper" style="margin-top:10px; color:var(--text-dim); font-size:10px; font-style:italic; line-height:1.6; letter-spacing:0.3px;">
+      bài này hơi lệch khỏi quỹ đạo chung của tập thơ
+    </p>
+  ` : '');
+
+  // Draw radar
+  drawRadar(ef);
+}
+
+// ── RADAR CANVAS — field oscilloscope, not dashboard ─────────────────────────
+function drawRadar(ef) {
+  const canvas = document.getElementById('topo-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth, H = canvas.offsetHeight;
+  canvas.width = W; canvas.height = H;
+
+  const cx = W/2, cy = H/2;
+  const r  = Math.min(W, H) * 0.36;
+  const n  = FIELDS.length;
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Precompute field values and point positions
+  const vals  = FIELDS.map(f => ef[f] || 0);
+  const pts   = FIELDS.map((f, i) => {
+    const angle = (i/n) * Math.PI * 2 - Math.PI/2;
+    const val   = vals[i];
+    return {
+      x: cx + Math.cos(angle) * r * val,
+      y: cy + Math.sin(angle) * r * val,
+      axX: cx + Math.cos(angle) * r,
+      axY: cy + Math.sin(angle) * r,
+      lx:  cx + Math.cos(angle) * (r + 15),
+      ly:  cy + Math.sin(angle) * (r + 15),
+      val,
+      color: FIELD_COLORS[f],
+      label: FIELD_LABELS[f] || f,
+    };
+  });
+
+  // Axis lines — brightness weighted by field value
+  pts.forEach(pt => {
+    const alpha = Math.max(0.08, pt.val * 0.55);
+    const hex   = Math.round(alpha * 255).toString(16).padStart(2,'0');
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(pt.axX, pt.axY);
+    ctx.strokeStyle = pt.color + hex;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Label — brightness follows value
+    const labelAlpha = Math.max(0.25, pt.val * 0.9);
+    ctx.fillStyle = pt.color + Math.round(labelAlpha * 255).toString(16).padStart(2,'0');
+    ctx.font = '9px Courier New';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(pt.label.slice(0, 6), pt.lx, pt.ly);
+  });
+
+  // Faint connecting thread between dots
+  ctx.beginPath();
+  pts.forEach((pt, i) => i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y));
+  ctx.closePath();
+  ctx.strokeStyle = '#ffffff18';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Dots at each field position — size and brightness by value
+  pts.forEach(pt => {
+    if (pt.val < 0.02) return;
+    const dotR = 2 + pt.val * 4;
+    const alpha = 0.4 + pt.val * 0.6;
+    const hex   = Math.round(alpha * 255).toString(16).padStart(2,'0');
+
+    // Glow halo
+    const grd = ctx.createRadialGradient(pt.x, pt.y, 0, pt.x, pt.y, dotR * 2.5);
+    grd.addColorStop(0, pt.color + hex);
+    grd.addColorStop(1, pt.color + '00');
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, dotR * 2.5, 0, Math.PI * 2);
+    ctx.fillStyle = grd;
+    ctx.fill();
+
+    // Dot core
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, dotR * 0.65, 0, Math.PI * 2);
+    ctx.fillStyle = pt.color + hex;
+    ctx.fill();
+  });
+
+  // Center origin mark
+  ctx.beginPath();
+  ctx.arc(cx, cy, 1.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff22';
+  ctx.fill();
+}
+
+// ── SLIDER EVENTS ─────────────────────────────────────────────────────────────
+function onSliderChange(field, val, el) {
+  currentSliderValues[field] = val;
+  document.getElementById(`fv-${field}`).textContent = val.toFixed(2);
+  drawRadar(currentSliderValues);
+}
+function onGravityChange(val) {
+  document.getElementById('gravity-val').textContent = parseFloat(val).toFixed(1);
+}
+function onDecayChange(val) {
+  document.getElementById('decay-val').textContent = parseFloat(val).toFixed(3);
+}
+
+// ── ACTIONS ──────────────────────────────────────────────────────────────────
+function acceptSuggestion() {
+  if (currentIdx === null) return;
+  const p = poems[currentIdx];
+  p.curatorOverride = JSON.parse(JSON.stringify(p.aiSuggestion));
+  p.curated = true;
+  saveState();
+  renderList();
+  renderPoem(p);
+  // Advance to next uncurated
+  advanceToNext();
+}
+
+function saveOverride() {
+  if (currentIdx === null) return;
+  const p = poems[currentIdx];
+  const ef = {};
+  FIELDS.forEach(f => { ef[f] = currentSliderValues[f] || 0; });
+  p.curatorOverride = {
+    emotionalField: ef,
+    dominantField: document.getElementById('dominant-select').value,
+    gravityMass: parseFloat(document.getElementById('gravity-slider').value),
+    decayRate: parseFloat(document.getElementById('decay-slider').value),
+    motifs: p.aiSuggestion?.motifs || {},
+    tags: p.aiSuggestion?.tags || {},
+    confidence: 1.0,
+    notes: 'Manual curator override.',
+  };
+  p.curated = true;
+  saveState();
+  renderList();
+  renderPoem(p);
+  advanceToNext();
+}
+
+function resetToAI() {
+  if (currentIdx === null) return;
+  const p = poems[currentIdx];
+  p.curatorOverride = null;
+  p.curated = false;
+  saveState();
+  renderList();
+  renderPoem(p);
+}
+
+function advanceToNext() {
+  // Find next uncurated poem
+  const start = (currentIdx || 0) + 1;
+  for (let i = start; i < poems.length; i++) {
+    if (!poems[i].curated) {
+      currentIdx = i;
+      renderPoem(poems[i]);
+      // Scroll list item into view
+      const item = document.querySelector(`[data-poem-id="${poems[i].id}"]`);
+      if (item) item.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      return;
+    }
+  }
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────────
+function exportJSON() {
+  const output = poems.map(p => {
+    const eff = effectiveSuggestion(p);
+    return {
+      id: p.id,
+      title: p.title,
+      date: p.date,
+      year: p.year,
+      pdfSeq: p.pdfSeq,
+      isStub: p.isStub || false,
+      curated: p.curated || false,
+      emotionalField: eff.emotionalField || null,
+      dominantField: eff.dominantField || null,
+      gravityMass: eff.gravityMass || 1.0,
+      decayRate: eff.decayRate || 0.05,
+      motifs: eff.motifs || {},
+      tags: eff.tags || {},
+      confidence: eff.confidence || 0,
+      // Flag AI-only vs curator-approved
+      source: p.curatorOverride ? 'curator' : 'ai-suggestion',
+    };
+  });
+
+  const json = JSON.stringify(output, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'poems-curated.json';
+  a.click();
+  URL.revokeObjectURL(url);
+
+  const curated = output.filter(p => p.source === 'curator').length;
+  const aiOnly  = output.filter(p => p.source === 'ai-suggestion').length;
+  document.getElementById('export-info').textContent =
+    `Exported ${output.length} poems: ${curated} curator-approved, ${aiOnly} AI-only.`;
+}
+
+// ── KEYBOARD SHORTCUTS ────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.key === 'a') acceptSuggestion();
+  if (e.key === 's') saveOverride();
+  if (e.key === 'r') resetToAI();
+  if (e.key === 'ArrowDown') {
+    if (currentIdx !== null && currentIdx < poems.length-1) {
+      currentIdx++;
+      renderPoem(poems[currentIdx]);
+    }
+  }
+  if (e.key === 'ArrowUp') {
+    if (currentIdx !== null && currentIdx > 0) {
+      currentIdx--;
+      renderPoem(poems[currentIdx]);
+    }
+  }
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+loadSaved();
+renderList();
+
+// Select first low-confidence poem
+const firstLow = poems.find(p => (p.aiSuggestion?.confidence || 0) < 0.4);
+const firstPoem = firstLow || poems[0];
+if (firstPoem) {
+  currentIdx = poems.indexOf(firstPoem);
+  renderPoem(firstPoem);
+}
+</script>
+</body>
+</html>

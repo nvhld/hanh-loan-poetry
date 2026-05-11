@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='55' cy='45' r='6' fill='%23e4e4eb' opacity='0.3'/></svg>">
+  <link rel="apple-touch-icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'><rect width='256' height='256' fill='%230a0a0c'/><circle cx='135' cy='115' r='8' fill='%23111'/></svg>">
+  <meta property="og:title" content="Hạnh Loan">
+  <meta property="og:description" content="bởi vì em yêu anh...">
+  <meta property="og:image" content="https://hanhloan.com/og-image.jpg">
+  <title>Hạnh Loan - Thư Viện Đêm</title>
+  <meta name="description" content="Thư viện lưu trữ những bài thơ.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&family=Playfair+Display:ital,wght@0,400..700;1,400..700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0c;
+      --text-main: rgba(220, 219, 227, 0.7);
+      --text-dim: rgba(220, 219, 227, 0.35);
+      --text-meta: rgba(220, 219, 227, 0.5);
+      --hover: rgba(245, 242, 235, 0.82);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: 'Playfair Display', serif;
+      -webkit-font-smoothing: antialiased;
+      opacity: 0;
+      /* for fade in */
+      transition: background-color 1.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+      min-height: 100dvh;
+      overflow-y: scroll;
+      overscroll-behavior-y: none;
+    }
+
+    body.cluster-active {
+      background-color: #030304; /* ~4% darker, pressure shift */
+    }
+
+    body.loaded {
+      opacity: 1;
+    }
+
+    /* Smooth scrollbar for desktop */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 10dvh 40px 20dvh 40px;
+    }
+
+    /* ── Header / Search ── */
+    header {
+      margin-bottom: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 30px 0;
+      background: var(--bg);
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--bg), transparent);
+      pointer-events: none;
+    }
+
+    .nav-lab {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--text-dim);
+      text-decoration: none;
+      text-transform: lowercase;
+      transition: color 0.3s;
+    }
+
+    .nav-lab:hover,
+    .nav-lab:focus-visible {
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .search-wrapper {
+      position: relative;
+      width: 200px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 200;
+      letter-spacing: 1px;
+      padding: 8px 30px 8px 0;
+      transition: border-color 0.3s;
+    }
+
+    .search-count {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      color: var(--text-meta);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .search-count.visible {
+      opacity: 1;
+    }
+
+
+    input[type="text"]:focus {
+      outline: none;
+      border-bottom-color: rgba(255, 255, 255, 0.3);
+    }
+
+    input[type="text"]::placeholder {
+      color: var(--text-dim);
+      text-transform: lowercase;
+    }
+
+    /* ── Group & List ── */
+    .poem-group {
+      margin-bottom: 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 16px;
+    }
+
+    .group-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--text-meta);
+      margin-bottom: 0;
+      padding: 16px 0;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: color 0.3s;
+    }
+    .poem-group.expanded .group-title,
+    .group-title:hover {
+      color: var(--group-color, var(--text-main));
+    }
+    .group-count {
+      opacity: 0.5;
+    }
+
+    .group-content {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .group-inner {
+      overflow: hidden;
+      padding-top: 0;
+      transition: padding 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+      opacity: 0;
+    }
+    .poem-group.expanded .group-content {
+      grid-template-rows: 1fr;
+    }
+    .poem-group.expanded .group-inner {
+      padding-top: 24px;
+      opacity: 1;
+    }
+
+    .poem-row {
+      display: block;
+      text-decoration: none;
+      margin-bottom: 36px;
+      opacity: 1;
+      filter: blur(0px);
+      transition: opacity 0.6s ease, filter 0.6s ease;
+      cursor: pointer;
+    }
+
+    .poem-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .poem-row:focus-visible {
+      outline: 1px solid rgba(255, 255, 255, 0.15);
+      outline-offset: 8px;
+    }
+
+    .poem-row.dimmed {
+      display: none !important;
+    }
+
+    .p-title {
+      font-size: 24px;
+      line-height: 1.4;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      transition: color 1.2s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 1.2s ease;
+    }
+
+    .p-excerpt {
+      font-size: 15px;
+      color: var(--text-dim);
+      line-height: 1.6;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      transition: color 1.2s ease;
+    }
+
+    .poem-row:hover .p-title {
+      color: var(--dynamic-color, var(--hover));
+    }
+
+    .poem-row:hover .p-excerpt {
+      color: rgba(220, 219, 227, 0.45);
+    }
+
+    /* Constellation Awareness / Pressure Zones */
+    body.cluster-active .poem-row.cluster-node {
+      opacity: 1;
+      filter: blur(0px);
+    }
+    body.cluster-active .poem-row.cluster-node .p-title {
+      color: rgba(255, 255, 255, 0.95);
+      letter-spacing: 0.3px;
+      text-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+    }
+    body.cluster-active .poem-row.cluster-node .p-excerpt {
+      color: rgba(220, 219, 227, 0.6);
+    }
+    body.cluster-active .poem-row.cluster-dim {
+      opacity: 0.25;
+      filter: blur(1.5px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body, .poem-row, .p-title {
+        transition: none !important;
+      }
+      .poem-row.dimmed {
+        opacity: 0.2;
+        filter: none;
+      }
+    }
+
+    /* Return Memory */
+    .poem-row.lingered .p-title {
+      color: rgba(245, 242, 235, 0.95);
+    }
+    .poem-row.lingered .p-excerpt {
+      color: rgba(220, 219, 227, 0.55);
+    }
+
+    @media print {
+      body { background: #fff !important; color: #000 !important; }
+      header { display: none !important; }
+      .group-title { color: #000 !important; background: transparent !important; page-break-after: avoid; border-bottom: 1px solid #ccc; }
+      .poem-row { margin-bottom: 24px !important; page-break-inside: avoid; text-decoration: none !important; }
+      .p-title { color: #000 !important; font-weight: bold; }
+      .p-excerpt { color: #333 !important; }
+      body::after { content: "hanhloan.com"; display: block; margin-top: 40px; font-size: 10px; font-family: 'Outfit', sans-serif; color: #999; }
+    }
+
+    /* ── COSMOS CANVAS ── */
+    #cosmos {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 1;
+    }
+    main { position: relative; z-index: 1; }
+
+    @media (max-width: 640px) {
+      main {
+        padding: 8dvh 24px 16dvh 24px;
+      }
+
+      header {
+        flex-direction: column-reverse;
+        gap: 32px;
+        margin-bottom: 60px;
+      }
+
+      .search-wrapper {
+        width: 100%;
+      }
+
+      .p-title {
+        font-size: 20px;
+      }
+
+      .p-excerpt {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="cosmos"></canvas>
+
+  <main>
+    <header>
+      <a href="/" class="nav-lab" id="btn-lab">quay lại vũ trụ</a>
+      <div class="search-wrapper">
+        <input type="text" id="search" placeholder="lọc ký ức..." aria-label="Tìm kiếm thơ" autocomplete="off" spellcheck="false">
+        <span id="search-count" class="search-count"></span>
+      </div>
+    </header>
+    <div id="archive-container"></div>
+  </main>
+
+  <script src="pending-modal.js"></script>
+  <script src="curator_data_inline.js"></script>
+  <script>
+    const isLocalFile = window.location.protocol === 'file:' || window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
+    if (isLocalFile) {
+      document.getElementById('btn-lab').href = 'reader.html';
+    }
+    // ── DATA SETUP ────────────────────────────────────────────────────────
+    const poems = JSON.parse(JSON.stringify(POEMS_DATA));
+
+    // Sync curator & memory state
+    try {
+      const saved = localStorage.getItem('hanh-loan-curation-v1');
+      if (saved) {
+        const m = JSON.parse(saved);
+        poems.forEach(p => { if (m[p.id]) Object.assign(p, m[p.id]); });
+      }
+    } catch (e) { }
+
+    // ── PRESSURE ZONES ENGINE ──────────────────────────────────────────
+    let motifClusters = [];
+    fetch('motif_clusters.json')
+      .then(r => r.json())
+      .then(d => { motifClusters = d.motif_clusters; })
+      .catch(e => {
+        // Fallback if running locally without server
+        motifClusters = [
+          { id: "mc-01", poems: ["2023-082-mua-he-o-boston", "2023-102-thang-12-cho-em", "2022-038-binh-minh-em-va-hoang-hon-anh"] },
+          { id: "mc-02", poems: ["2016-008-vui", "2022-032-tra-anh-ve-phia-binh-minh", "2023-083-bon-mua-co-con-nhau"] },
+          { id: "mc-03", poems: ["2023-074-nang-i", "2022-067-ben-nay-ben-kia", "2022-040-hai-mien-thang-5", "2020-020-boi-vi-em-yeu-anh"] },
+          { id: "mc-04", poems: ["2023-078-thoi-gian-va-tinh-yeu", "2023-082-mua-he-o-boston", "2022-047-bay-gio-thang-tam-roi-anh"] }
+        ];
+      });
+
+    window.setCosmosWeather = window.setCosmosWeather || function(){};
+
+    function activateCluster(clusterId, relatedPoems) {
+      document.body.classList.add('cluster-active');
+      window.setCosmosWeather(clusterId);
+      // Pass cluster weather to Reader via sessionStorage
+      try { sessionStorage.setItem('hl-inherited-cluster', clusterId); } catch(e) {}
+      
+      rowElements.forEach(r => {
+        if (relatedPoems.includes(r._poemId)) {
+          r.classList.add('cluster-node');
+          r.classList.remove('cluster-dim');
+          // Không gian tự động mở ra để hiển thị bài thơ bị giấu
+          r.closest('.poem-group').classList.add('expanded');
+        } else {
+          r.classList.add('cluster-dim');
+          r.classList.remove('cluster-node');
+        }
+      });
+    }
+
+    function deactivateCluster() {
+      document.body.classList.remove('cluster-active');
+      window.setCosmosWeather(null);
+      // Don't clear sessionStorage here — the Reader needs it after navigation
+      
+      rowElements.forEach(r => {
+        r.classList.remove('cluster-node', 'cluster-dim');
+      });
+    }
+
+    let MEM = {};
+    try { MEM = JSON.parse(localStorage.getItem('hanh-loan-reader-v1') || '{}'); } catch (e) { }
+
+    function getEff(p) { return p.curatorOverride || p.aiSuggestion || {}; }
+
+    const DOM_COLORS = {
+      anchor12: '#c8a96e', // warm amber-gold — curated landmark
+      longing:  '#6a8fa8', eros: '#c45a3a', entropy: '#6b5f7a',
+      memory: '#b8862a', distance: '#3d5a7a', ecstasy: '#8a7a3a'
+    };
+    function nodeColor(p) { return DOM_COLORS[getEff(p).dominantField] || '#6a6879'; }
+
+    // ── 12 ANCHOR POEM IDs (docs/12-anchor-poems.md) ────────────────────────
+    const ANCHOR_12_IDS = new Set([
+      '2016-008-vui',
+      '2023-078-thoi-gian-va-tinh-yeu',
+      '2022-038-binh-minh-em-va-hoang-hon-anh',
+      '2020-020-boi-vi-em-yeu-anh',
+      '2023-083-bon-mua-co-con-nhau',
+      '2023-074-nang-i',
+      '2022-040-hai-mien-thang-5',
+      '2022-067-ben-nay-ben-kia',
+      '2022-032-tra-anh-ve-phia-binh-minh',
+      '2023-102-thang-12-cho-em',
+      '2022-047-bay-gio-thang-tam-roi-anh',
+      '2023-082-mua-he-o-boston'
+    ]);
+
+    // ── GROUPING ────────────────────────────────────────────────────────
+    // anchor12 phải đứng đầu để Object.entries() render nó trước
+    const GROUP_NAMES = {
+      anchor12: '12 bài tiêu biểu',
+      memory: 'những bài ở lại rất lâu',
+      distance: 'những khoảng cách',
+      entropy: 'những thứ không còn nguyên vẹn',
+      longing: 'những chờ đợi',
+      eros: 'những lần rất gần nhau',
+      ecstasy: 'sự tan biến',
+      other: 'những mảnh vụn'
+    };
+
+    const groups = {
+      anchor12: [], memory: [], distance: [], entropy: [], longing: [], eros: [], ecstasy: [], other: []
+    };
+
+    poems.forEach(p => {
+      // anchor12: bài nằm trong danh sách 12 tiêu biểu → luôn đưa vào nhóm này
+      if (ANCHOR_12_IDS.has(p.id)) {
+        groups.anchor12.push(p);
+        return;
+      }
+      // Các bài còn lại: dùng dominantField như cũ
+      const eff = getEff(p);
+      let dom = eff.dominantField || 'other';
+      if (!groups[dom]) dom = 'other';
+      groups[dom].push(p);
+    });
+
+    // Extract a 1-2 line excerpt
+    function getExcerpt(body) {
+      if (!body) return '';
+      const lines = body.split('\n').map(l => l.trim()).filter(l => l.length > 5);
+      if (lines.length === 0) return '';
+      return lines.slice(0, 2).join('<br>');
+    }
+
+    // Render DOM
+    const container = document.getElementById('archive-container');
+    const rowElements = [];
+
+    // ── SEARCH (FILTER) ────────────────────────────────────────────────
+    Object.entries(GROUP_NAMES).forEach(([key, name]) => {
+      const list = groups[key];
+      if (!list || list.length === 0) return;
+
+      // Chronological order by default (assuming array order is chronological)
+      const section = document.createElement('section');
+      section.className = 'poem-group'; // Start collapsed
+
+      const titleWrapper = document.createElement('div');
+      titleWrapper.className = 'group-title';
+      titleWrapper.innerHTML = `<span>${name}</span> <span class="group-count">${list.length}</span>`;
+      titleWrapper.style.setProperty('--group-color', DOM_COLORS[key] || '#8e8b9b');
+
+      titleWrapper.addEventListener('click', () => {
+        section.classList.toggle('expanded');
+      });
+
+      const contentWrapper = document.createElement('div');
+      contentWrapper.className = 'group-content';
+      
+      const innerWrapper = document.createElement('div');
+      innerWrapper.className = 'group-inner';
+
+      list.forEach(p => {
+        const row = document.createElement('a');
+        row.href = isLocalFile ? `reader.html?id=${p.id}` : `/poem/${p.id}`;
+        row.className = 'poem-row';
+
+        const title = document.createElement('div');
+        title.className = 'p-title';
+        title.textContent = p.title;
+
+        const excerpt = document.createElement('div');
+        excerpt.className = 'p-excerpt';
+        excerpt.innerHTML = getExcerpt(p.body);
+
+        row.appendChild(title);
+        row.appendChild(excerpt);
+
+        // Apply dynamic color for hover
+        row.style.setProperty('--dynamic-color', nodeColor(p) + 'e6'); // e6 = 90% opacity for archive brightness
+
+        // Store raw text for searching
+        row._searchText = p.title + ' ' + (p.body || '');
+        row._poemId = p.id;
+
+        // Return Memory: highlight lingered poems
+        const linger = MEM[p.id] ? (MEM[p.id].linger || 0) : 0;
+        if (linger > 20) { // approx 20s linger time
+          row.classList.add('lingered');
+        }
+
+        // Hover awareness for Pressure Zones
+        let hoverTimeout;
+        row.addEventListener('mouseenter', () => {
+          hoverTimeout = setTimeout(() => {
+            const cluster = motifClusters.find(c => c.poems.includes(p.id));
+            if (cluster) activateCluster(cluster.id, cluster.poems);
+          }, 350); // requires intentional linger
+        });
+        row.addEventListener('mouseleave', () => {
+          clearTimeout(hoverTimeout);
+          deactivateCluster();
+        });
+
+        // Intercept navigation: gate non-anchor poems via PendingModal
+        row.addEventListener('click', e => {
+          if (typeof PendingModal !== 'undefined' && !PendingModal.isAnchor(p.id)) {
+            e.preventDefault();
+            PendingModal.show(p.id, p.title);
+            return;
+          }
+          // Anchor poem: smooth exit as before
+          e.preventDefault();
+          document.body.style.opacity = '0';
+          setTimeout(() => { window.location.href = row.href; }, 1200);
+        });
+
+        innerWrapper.appendChild(row);
+        rowElements.push(row);
+      });
+
+      contentWrapper.appendChild(innerWrapper);
+      section.appendChild(titleWrapper);
+      section.appendChild(contentWrapper);
+      container.appendChild(section);
+    });
+
+    const searchInput = document.getElementById('search');
+    const searchCount = document.getElementById('search-count');
+    searchInput.addEventListener('input', e => {
+      const queryStr = e.target.value.trim();
+      if (!queryStr) {
+        rowElements.forEach(r => r.classList.remove('dimmed'));
+        document.querySelectorAll('.poem-group').forEach(group => {
+          group.style.display = '';
+        });
+        searchCount.classList.remove('visible');
+        return;
+      }
+
+      // Escape query for regex and construct whole-word, tone-sensitive, case-insensitive regex
+      const safeQuery = queryStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(^|[^\\p{L}\\p{N}_])(${safeQuery})([^\\p{L}\\p{N}_]|$)`, 'iu');
+
+      let matchCount = 0;
+      rowElements.forEach(row => {
+        if (regex.test(row._searchText)) {
+          row.classList.remove('dimmed');
+          // Automatically expand group when searching
+          row.closest('.poem-group').classList.add('expanded');
+          matchCount++;
+        } else {
+          row.classList.add('dimmed');
+        }
+      });
+
+      searchCount.textContent = matchCount;
+      searchCount.classList.add('visible');
+
+      // Hide empty groups during search
+      document.querySelectorAll('.poem-group').forEach(group => {
+        const hasVisible = Array.from(group.querySelectorAll('.poem-row')).some(r => !r.classList.contains('dimmed'));
+        group.style.display = hasVisible ? '' : 'none';
+      });
+    });
+
+    // ── ENTRY TRANSITION ──────────────────────────────────────────────────
+    window.addEventListener('load', () => {
+      document.body.classList.add('loaded');
+    });
+
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) {
+        document.body.style.opacity = '1';
+      }
+    });
+
+    // Handle nav-lab smooth exit
+    document.getElementById('btn-lab').addEventListener('click', e => {
+      e.preventDefault();
+      document.body.style.opacity = '0';
+      setTimeout(() => { window.location.href = e.target.href; }, 1200);
+    });
+  </script>
+  <script>
+    // ── COSMOS ENGINE — archive.html ──────────────────────────────────────────
+    // Multi-color emotional dust + celestial events.
+    (function() {
+      const cv = document.getElementById('cosmos');
+      const ctx = cv.getContext('2d');
+      const isMob = window.innerWidth <= 640 || 'ontouchstart' in window;
+      const COLORS = ['#6a8fa8','#c45a3a','#6b5f7a','#b8862a','#3d5a7a','#8a7a3a'];
+      function hexA(a) { return Math.min(255,Math.max(0,Math.round(a*255))).toString(16).padStart(2,'0'); }
+      function resize() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
+      window.addEventListener('resize', resize); resize();
+
+      // Cosmic current — slow galactic wind, full rotation ~10 min
+      let cosmosAngle = Math.random() * Math.PI * 2;
+      let cosmosDX = 0, cosmosDY = 0;
+
+      // Weather state for Constellations
+      window.activeWeather = null;
+      window.setCosmosWeather = function(id) { window.activeWeather = id; };
+      let cwSpeed = 1, cwDensity = 1, cwAlpha = 0.22;
+
+      // Dust pool
+      const dust = [];
+      function spawnDust() {
+        const W = cv.width, H = cv.height;
+        const baseBatch = isMob ? 3 : 6;
+        const batch = Math.floor(baseBatch * cwDensity);
+        const remainder = (baseBatch * cwDensity) - batch;
+        const spawnCount = batch + (Math.random() < remainder ? 1 : 0);
+
+        for (let i = 0; i < spawnCount; i++) {
+          const col = COLORS[Math.floor(Math.random() * COLORS.length)];
+          let px, py, vx, vy;
+          // 55% edge-spawn: particles flow visibly across screen
+          if (Math.random() < 0.55) {
+            const edge = Math.floor(Math.random() * 4);
+            if (edge === 0)      { px = Math.random() * W; py = -4; }
+            else if (edge === 1) { px = Math.random() * W; py = H + 4; }
+            else if (edge === 2) { px = -4; py = Math.random() * H; }
+            else                 { px = W + 4; py = Math.random() * H; }
+            const toCenter = Math.atan2(H * 0.5 - py, W * 0.5 - px);
+            const spread = (Math.random() - 0.5) * 1.1;
+            const sp = 0.45 + Math.random() * 1.4;
+            vx = Math.cos(toCenter + spread) * sp + cosmosDX * 0.7;
+            vy = Math.sin(toCenter + spread) * sp + cosmosDY * 0.7;
+          } else {
+            px = Math.random() * W; py = Math.random() * H;
+            const ang = Math.random() * Math.PI * 2;
+            const sp = 0.22 + Math.random() * 0.70;
+            vx = Math.cos(ang) * sp + cosmosDX;
+            vy = Math.sin(ang) * sp + cosmosDY;
+          }
+          dust.push({
+            x: px, y: py, vx, vy,
+            gravity: (Math.random() - 0.5) * 0.0003,
+            life: 0.45 + Math.random() * 0.55,
+            decay: 0.0012 + Math.random() * 0.0022,
+            color: col, r: 0.3 + Math.random() * 1.3
+          });
+        }
+        while (dust.length > (isMob ? 260 : 500)) dust.shift();
+      }
+
+      // Celestial event — colored stream
+      let cevTimer = 0, cevActive = false, cevDust = [];
+      function stepCelestial() {
+        cevTimer++;
+        if (!cevActive && cevTimer > (isMob ? 420 : 280) + Math.random() * 500) {
+          cevActive = true; cevTimer = 0; cevDust = [];
+          const sy = 0.06 + Math.random() * 0.88;
+          const sx = Math.random() < 0.5 ? -14 : cv.width + 14;
+          const dir = sx < 0 ? 1 : -1;
+          const count = 9 + Math.floor(Math.random() * 12);
+          const c1 = COLORS[Math.floor(Math.random() * COLORS.length)];
+          const c2 = COLORS[Math.floor(Math.random() * COLORS.length)];
+          for (let k = 0; k < count; k++) {
+            cevDust.push({
+              x: sx + dir * k * 15, y: cv.height * sy + (Math.random()-0.5) * 22,
+              vx: dir * (1.2 + Math.random() * 1.4), vy: (Math.random()-0.5) * 0.35,
+              life: 1, decay: 0.0012 + Math.random() * 0.0009,
+              r: 0.6 + Math.random() * 1.1,
+              color: k % 2 === 0 ? c1 : c2
+            });
+          }
+        }
+        if (cevActive) {
+          cevDust.forEach(d => { d.x += d.vx; d.y += d.vy; d.life -= d.decay; });
+          if (cevDust.every(d => d.life <= 0)) cevActive = false;
+        }
+      }
+
+      let _si = 0;
+      function frame() {
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        
+        // Atmosphere Weather Interpolation
+        let tSpeed = 1, tDen = 1, tAlpha = 0.22;
+        if (window.activeWeather === 'mc-01') { // cold drop, sparse
+          tSpeed = 0.6; tDen = 0.35; tAlpha = 0.12;
+        } else if (window.activeWeather === 'mc-02') { // heavy friction
+          tSpeed = 0.08; tDen = 1.3; tAlpha = 0.15;
+        } else if (window.activeWeather === 'mc-03') { // surface tension, deep compression
+          tSpeed = 0.3; tDen = 2.2; tAlpha = 0.35;
+        } else if (window.activeWeather === 'mc-04') { // void resonance
+          tSpeed = 0.15; tDen = 0.5; tAlpha = 0.08;
+        }
+        cwSpeed += (tSpeed - cwSpeed) * 0.03;
+        cwDensity += (tDen - cwDensity) * 0.03;
+        cwAlpha += (tAlpha - cwAlpha) * 0.03;
+
+        cosmosAngle += 0.011 / 60;
+        cosmosDX = Math.cos(cosmosAngle) * 0.28;
+        cosmosDY = Math.sin(cosmosAngle) * 0.13;
+        
+        dust.forEach(d => { 
+          d.x += d.vx * cwSpeed; 
+          d.y += d.vy * cwSpeed; 
+          d.vy += (d.gravity * cwSpeed); 
+          d.life -= d.decay; 
+        });
+        
+        stepCelestial();
+        _si++;
+        if (_si % 2 === 0) spawnDust();
+        
+        dust.forEach(d => {
+          if (d.life <= 0) return;
+          ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+          // Scale opacity based on current weather alpha
+          ctx.fillStyle = d.color + hexA(d.life * cwAlpha);
+          ctx.fill();
+        });
+        
+        // Draw celestial
+        if (cevActive) {
+          cevDust.forEach(d => {
+            if (d.life <= 0) return;
+            ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+            ctx.fillStyle = d.color + hexA(d.life * Math.min(1, cwAlpha * 3));
+            ctx.fill();
+          });
+        }
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+
+</html>
