@@ -57,6 +57,7 @@
     'heavy top, sparse bottom':      'density concentrated at entry, sparse at terminal',
     'static temporal hold':          'mass stays fixed across time',
     'anchored wait':                 'mass stays fixed across time',
+    'steady downward shift':         'mass moves steadily downward',
     'high gravity anchoring at locational nouns': 'place-names act as weight centers',
   };
 
@@ -113,6 +114,21 @@
     "delayed semantic closure via 'vùi' repetition":    'verb repetition delays semantic closure',
     'long-line reading friction':                        'extended line length increases reading resistance',
     "interrogative pause":                               'question structure suspends forward motion',
+  };
+
+  const UNRESOLVED_CADENCE_MAP = {
+    "delayed return at 'xa xăm'": 'terminal state remains open',
+    'hanging interrogative state': 'question structure holds cadence open',
+    'circular unresolved loop at end': 'motion loops without terminal closure',
+    'conditional loop closure': 'terminal cadence remains conditionally open',
+    'final imperative introduces sudden halt': 'abrupt structural stop at terminal',
+    'hanging query': 'cadence suspends on interrogative',
+    'spatial division at end': 'terminal state splits structurally',
+    'open spatial wait': 'cadence holds in empty space',
+    "conditional 'Nếu' ending creates unresolved state": 'conditional marker suspends closure',
+    'isolated syllables hanging in void': 'terminal syllables detach from main structure',
+    'suspended terminal cadence': 'cadence halts without resolving',
+    'cyclical unresolved return': 'terminal loops back without closure',
   };
 
   const ABSENCE_MAP_SUPPRESSED  = 'introduced early, absent from terminal field';
@@ -176,7 +192,8 @@
     if (semDec.length) lines.push(sentence(semDec[0]));
 
     const uc = sp.unresolvedCadence || [];
-    if (uc.length) lines.push(sentence(uc[0]));
+    const translatedUc = renderList(uc, UNRESOLVED_CADENCE_MAP);
+    if (translatedUc.length) lines.push(sentence(translatedUc[0]));
 
     return lines;
   }
