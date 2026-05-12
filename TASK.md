@@ -1,39 +1,34 @@
-# ⚡ LIVE STATE
+# ⚡ LIVE STATE: ARCHITECTURE FREEZE
 
 > **LUẬT CHO AGENT:** Luôn đọc file này đầu tiên. Cập nhật trước khi kết thúc. Giữ dưới 80 dòng.
 
-**🎯 Mục tiêu hiện tại:**
-**INSTRUMENT MODAL v0** — MRI extraction + Instrument Layer hoàn thành.
-
-**✅ Vừa hoàn thành (2026-05-11) — MRI FREEZE + INSTRUMENT MODAL v0:**
-- `anchor_mri.json` — MRI v1 frozen (12 poems). Schema: `temporalBehavior`, `fieldDynamics`, `motifPhysics`, `structuralWeather`, `silenceProfile`, `driftSignature`, `pressureNotes`, `absenceProfile`, `confidence`, `sourceRefs`.
-- `instrument_translator.js` — Template-based MRI→text translator. 6 token maps. No free prose. Outputs `{ drift[], pressure[], absence[] }`.
-- `anchor_mri_inline.js` — Pre-compiled inline JS version cho file:// mode.
-- `reader.html` — Injected: CSS `#im-overlay` + `#im-box`, `InstrumentModal` IIFE, whisper-note click handler (anchor gated), `<script>` tags.
-
-**Flow đã hoạt động:**
-```
-Lens → Whisper (earned) → click Whisper → Instrument Modal (900ms fade)
-```
-
-**Lab Mode rules được tuân thủ:**
-- Chỉ anchor poems trigger modal. Non-anchor: cursor không thay đổi, onclick = null.
-- MRI fetch 1 lần (cache). file:// mode dùng `window.ANCHOR_MRI_DATA` từ inline JS.
-- No charts, no metrics, no interpretation — 3 sections: `drift`, `pressure`, `absence`.
+**🎯 Mục tiêu hiện tại:** Dừng mọi tính năng mới. Triển khai cấu trúc 4-PR siêu nhỏ để giảm nợ kỹ thuật (Tech Debt), đồng nhất kiến trúc Next.js và Freeze Baseline.
 
 ---
 
-**✅ Hoàn thành trước đó:**
-- Phases 1–6: Whisper Gate, Cluster Transit, Archive/Reader Cosmos Engine, Motif Weather.
-- 12 Anchor Poems: Critical Lens notes, Curator Overrides, Motif Clusters.
+## 🚀 KẾ HOẠCH 4 PR (MICRO-BATCHING)
+
+**▶️ PR 1: FREEZE PHENOMENOLOGY & GUARDRAILS (Đang làm)**
+- [x] Tạo `PHENOMENOLOGY_BASELINE.md` (Ghi nhận fading, drift, sequences).
+- [ ] Script validation (`scripts/validate_hygiene.py`): JSON parse, duplicate file detection, missing assets, schema verification.
+- [ ] Thêm GitHub Actions (Install, Build, Lint non-blocking, Validation).
+- *Strict Rule:* Không sửa logic physics, không move file, không migrate Next.js.
+
+**⏳ PR 2: TOPOLOGY PHYSICS FREEZE**
+- [ ] Sửa `fieldClusterForce` & lifecycle `computeClusterCenters()` trong Next.
+- [ ] Đảm bảo 6 cluster regions ổn định, resize không sập.
+- [ ] Thêm debug mode `?debug=physics` (visualize centers, attraction vectors).
+
+**⏳ PR 3: CANONICAL TEXT INTEGRITY**
+- [ ] Sửa triệt để bug escape `\N` tại nguồn (`parse_poems.py`).
+- [ ] Freeze canonical schema, IDs, slugs.
+- [ ] Xóa các code workaround (như `.replace('\\N')`). Rebuild toàn bộ JSON.
+
+**⏳ PR 4: STATIC RUNTIME CLEANUP + NEXT BRIDGE**
+- [ ] Dời HTML tĩnh sang `/public/literary/`. Xóa rác ở root.
+- [ ] Tạo Next Bridge Skeleton (`/app/poem/[slug]/page.tsx`).
+- [ ] Setup Metadata per poem, sitemap/robots.
 
 ---
-
-**⚠️ BLOCKER / CẦN KIỂM TRA:**
-- `structuralDeceleration` / `semanticDeceleration` split phụ thuộc vào các tokens đã được map trong `instrument_translator.js`. Cần chạy thực tế để xác nhận các token trong MRI có match đủ với các map không.
-- `confidence` block hiện chưa được dùng trong Modal UI — dành cho Instrument Layer v1 (dim/blur unstable findings).
-
-**⏭️ NEXT:**
-- Kiểm tra Modal trên browser (file:// hoặc localhost). Mở 1 anchor poem, bật Lens, đợi Whisper, click.
-- Nếu cần: bổ sung token vào MOTION_MAP / DENSITY_MAP cho các giá trị chưa được map.
-- Phase 7: MVP Lockdown (archive/topology chỉ 12 bài), Onboarding, Payload Optimization.
+**⏭️ NEXT ACTION (PR 1 Only):**
+Mở terminal, khởi tạo script `scripts/validate_hygiene.py` để check JSON (lỗi escape `\N`, validate schema cơ bản), check mồ côi (ảnh/audio), và setup file `.github/workflows/validation.yml`.
