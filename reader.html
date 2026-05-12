@@ -2,6 +2,11 @@
 <html lang="vi">
 
 <head>
+  <script>
+    if (window.location.protocol !== 'file:') {
+      document.write('<base href="/">');
+    }
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#000000">
@@ -2162,13 +2167,15 @@
         render(_mriCache[poemId] || null);
         return;
       }
-      // Fetch once; guard against file:// CORS
-      if (isLocalFile) {
-        // In local file mode, try the inline global if pre-loaded, else silently skip
-        const inline = window.ANCHOR_MRI_DATA;
-        if (inline) { _mriCache = inline; render(inline[poemId] || null); }
+      
+      const inline = typeof window !== 'undefined' ? window.ANCHOR_MRI_DATA : null;
+      if (inline) {
+        _mriCache = inline; 
+        render(inline[poemId] || null);
         return;
       }
+      
+      if (isLocalFile) return; // Prevent CORS error locally
       fetch('anchor_mri.json')
         .then(r => r.json())
         .then(data => { _mriCache = data; render(data[poemId] || null); })
