@@ -150,7 +150,7 @@ async function applyViewport(client, sessionId, width, height, mobile) {
 
 async function evaluateSummary(client, sessionId) {
   const expression = `
-    JSON.stringify(await (async () => {
+    (async () => JSON.stringify(await (async () => {
       async function readBattery() {
         if (!navigator.getBattery) {
           return { supported: false, charging: null, level: null };
@@ -283,7 +283,7 @@ async function evaluateSummary(client, sessionId) {
           jsHeapSizeLimit: performance.memory.jsHeapSizeLimit,
         } : null,
       };
-    })())
+    })()))()
   `
   const result = await client.call(
     'Runtime.evaluate',
