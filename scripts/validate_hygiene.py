@@ -357,6 +357,9 @@ def validate_instrument_modal() -> tuple[bool, list[str]]:
         "deriveCadence",
         "familiarityLevel",
         "falseRecognition",
+        "SECTION_LIMITS",
+        "BANNED_CADENCE",
+        "countWords",
     ):
         if needle not in translator_text:
             errors.append(f"❌ Instrument translator contract missing: {needle}")

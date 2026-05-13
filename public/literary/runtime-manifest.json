@@ -1,7 +1,7 @@
 {
   "version": "pr4-runtime-1",
   "runtimeVersion": "2026.05.13-atmospheric-freeze",
-  "generatedAt": "2026-05-13T08:26:47.061686+00:00",
+  "generatedAt": "2026-05-13T08:47:56.215138+00:00",
   "runtimeRoot": "/literary/",
   "entries": {
     "reader": {
@@ -79,7 +79,7 @@
     },
     {
       "path": "instrument_translator.js",
-      "sha256": "17cb2885f85e12eda7eefe48365a47dc6c93e8e40a0fed07b012ffd9287ecd41"
+      "sha256": "a57d36abd04c10d45f66af6a99515c453c4848f5506e880654376c174e407224"
     },
     {
       "path": "motif_clusters.json",

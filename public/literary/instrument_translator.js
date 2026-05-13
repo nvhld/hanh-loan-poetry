@@ -5,7 +5,7 @@
  * Rules:
  *   - Template-based mappings only. No generative prose.
  *   - No interpretation. No sentiment. No literary claim.
- *   - Output: short, quiet, observatory sentences.
+ *   - Output: compressed observational fragments.
  *   - Lab mode: 12 anchor poems only.
  */
 
@@ -15,125 +15,138 @@
   // ── TRANSLATION MAPS ──────────────────────────────────────────────────────
 
   const MOTION_MAP = {
-    'continuous deceleration':       'forward motion gradually reduces',
-    'inward collapse':               'image field contracts inward',
-    'erratic pacing':                'motion shifts without consistent interval',
-    'sudden elongation':             'line duration extends unexpectedly',
-    'circular sweep':                'motion traces a closed path',
-    'sustained orbital motion':      'forward drift stays in a bounded loop',
-    'binary oscillation':            'motion alternates between two fixed states',
-    'rapid reset':                   'motion returns to start without accumulation',
-    'sequential progression':        'motion advances step by step',
-    'linear decay':                  'motion reduces at a steady rate',
-    'stagnant hovering':             'motion holds without advancing',
-    'internal churning':             'internal motion detected beneath surface stillness',
-    'erratic disturbance':           'motion is periodically interrupted',
-    'binary split':                  'field divides into two opposing vectors',
-    'spatial widening':              'field expands outward',
-    'delayed bridging':              'connection is deferred',
-    'downward release':              'trajectory moves toward lower mass',
-    'fading trajectory':             'motion reduces toward zero',
-    'vertical descent':              'motion follows a downward vertical path',
-    'abrupt truncation':             'motion stops without transitional decay',
-    'circular questioning':          'cadence loops without forward resolution',
-    'static anticipation':           'motion holds in a pre-event state',
-    'lateral drift across memory':   'motion moves sideways through accumulated image field',
-    'locational density anchoring':  'motion slows at place-name nodes',
-    'heavy grounding':               'motion slows at place-name nodes',
+    'continuous deceleration':       'forward motion reduces',
+    'inward collapse':               'image field contracts',
+    'erratic pacing':                'interval instability detected',
+    'sudden elongation':             'line duration extends',
+    'circular sweep':                'closed-path motion detected',
+    'sustained orbital motion':      'bounded loop persists',
+    'binary oscillation':            'two-state oscillation detected',
+    'rapid reset':                   'motion resets without accumulation',
+    'sequential progression':        'stepwise progression holds',
+    'linear decay':                  'linear decay detected',
+    'stagnant hovering':             'motion hold detected',
+    'internal churning':             'subsurface motion detected',
+    'erratic disturbance':           'motion interruption detected',
+    'binary split':                  'field vector splits',
+    'spatial widening':              'field width increases',
+    'delayed bridging':              'connection delay detected',
+    'downward release':              'downward release detected',
+    'fading trajectory':             'trajectory fades',
+    'vertical descent':              'vertical descent detected',
+    'abrupt truncation':             'motion truncates',
+    'circular questioning':          'cadence loop persists',
+    'static anticipation':           'pre-event hold detected',
+    'lateral drift across memory':   'lateral memory drift',
+    'locational density anchoring':  'place-node drag',
+    'heavy grounding':               'grounding drag persists',
   };
 
   const GRAVITY_MAP = {
-    'downward compression':          'weight accumulates toward lower zones',
-    'sustained drag':                'resistance persists across field',
-    'mid-stanza density drop':       'field density reduces at midpoint',
-    'horizontal drift':              'mass distributes laterally',
-    'shallow drop':                  'gravity present but low intensity',
-    'heavy localized compression':   'mass concentrates at fixed point',
-    'lateral tension':               'opposing forces pull horizontally',
-    'low gravity, distance scaling': 'gravity weakens as distance increases',
-    'structural reduction':          'field loses mass progressively',
-    'loss of mass':                  'field loses mass progressively',
-    'descending drop':               'mass falls without return',
-    'heavy top, sparse bottom':      'density concentrated at entry, sparse at terminal',
-    'static temporal hold':          'mass stays fixed across time',
-    'anchored wait':                 'mass stays fixed across time',
-    'steady downward shift':         'mass moves steadily downward',
-    'high gravity anchoring at locational nouns': 'place-names act as weight centers',
+    'downward compression':          'lower-zone weight increases',
+    'sustained drag':                'field resistance persists',
+    'mid-stanza density drop':       'midpoint density drops',
+    'horizontal drift':              'lateral mass distribution',
+    'shallow drop':                  'low-intensity gravity',
+    'heavy localized compression':   'fixed-point compression',
+    'lateral tension':               'lateral tension detected',
+    'low gravity, distance scaling': 'distance weakens gravity',
+    'structural reduction':          'mass loss progresses',
+    'loss of mass':                  'mass loss progresses',
+    'descending drop':               'one-way descent',
+    'heavy top, sparse bottom':      'entry density elevated',
+    'static temporal hold':          'temporal mass holds',
+    'anchored wait':                 'temporal mass holds',
+    'steady downward shift':         'downward shift persists',
+    'high gravity anchoring at locational nouns': 'place-name gravity elevated',
   };
 
   const DENSITY_MAP = {
-    'heavy layering':        'density stacks across the full field',
-    'uneven compression':    'density is inconsistent between zones',
-    'even distribution':     'density spreads without clustering',
-    'sparse arrangement':    'density remains low throughout',
-    'structured fading':     'density reduces in measurable steps',
-    'high internal density': 'density concentrates inward',
-    'fragmented':            'density distributes in isolated clusters',
-    'low density spread':    'density covers area at low concentration',
-    'emptying state':        'density decreases without recovery',
-    'funneling down':        'density converges toward terminal zone',
-    'moderate density':      'density holds at mid-range',
-    'dense narrative blocks':'density clusters in long continuous units',
+    'heavy layering':        'field density stacked',
+    'uneven compression':    'zone compression uneven',
+    'even distribution':     'density evenly distributed',
+    'sparse arrangement':    'density remains low',
+    'structured fading':     'density fades by steps',
+    'high internal density': 'internal density elevated',
+    'fragmented':            'density fragments',
+    'low density spread':    'low-density spread',
+    'emptying state':        'density drains',
+    'funneling down':        'terminal density convergence',
+    'moderate density':      'mid-density hold',
+    'dense narrative blocks':'long-block density elevated',
   };
 
   const THERMAL_MAP = {
-    'gradual thermal reduction':    'thermal state reduces at slow rate',
-    'rapid thermal reduction':      'thermal state drops sharply',
-    'sustained thermal state':      'thermal level holds without shift',
-    'sustained warmth':             'thermal level holds without shift',
-    'neutral thermal fluctuation':  'thermal state moves without fixed direction',
-    'compressed thermal field':     'thermal range is narrow',
-    'high thermal volatility':      'thermal state shifts rapidly',
-    'low thermal persistence':      'thermal level does not hold',
-    'unstable thermal retention':   'thermal state holds intermittently',
-    'cooling nostalgia':            'thermal state reduces at slow rate',
-    'deep freeze':                  'thermal state drops sharply',
-    'suppressed heat':              'thermal range is narrow',
-    'chilled stabilization':        'thermal level holds without shift',
+    'gradual thermal reduction':    'slow thermal reduction',
+    'rapid thermal reduction':      'rapid thermal drop',
+    'sustained thermal state':      'thermal level holds',
+    'sustained warmth':             'thermal level holds',
+    'neutral thermal fluctuation':  'thermal drift neutral',
+    'compressed thermal field':     'thermal range compressed',
+    'high thermal volatility':      'thermal volatility elevated',
+    'low thermal persistence':      'thermal persistence low',
+    'unstable thermal retention':   'thermal retention unstable',
+    'cooling nostalgia':            'slow thermal reduction',
+    'deep freeze':                  'rapid thermal drop',
+    'suppressed heat':              'thermal range compressed',
+    'chilled stabilization':        'thermal level holds',
   };
 
   const STRUCTURAL_DEC_MAP = {
-    'ellipsis terminal marker':       'ellipsis holds the line open at terminal',
-    'parenthetical isolation':        'parenthetical separates a segment from the main field',
-    'parenthetical containment':      'parenthetical contains an isolated sub-field',
-    'vertical line breaks':           'line breaks extend vertical spacing',
-    'spacing drag':                   'spacing slows reading pace',
-    'parenthetical opening':          'opening parenthetical isolates the first field',
-    'ellipsis elongation':            'ellipsis extends pause duration',
-    'irregular line breaking':        'line breaks occur at irregular intervals',
+    'ellipsis terminal marker':       'terminal ellipsis active',
+    'parenthetical isolation':        'parenthetical isolation detected',
+    'parenthetical containment':      'sub-field contained',
+    'vertical line breaks':           'vertical spacing elevated',
+    'spacing drag':                   'spacing drag detected',
+    'parenthetical opening':          'opening parenthetical isolates field',
+    'ellipsis elongation':            'pause duration extends',
+    'irregular line breaking':        'line-break interval irregular',
   };
 
   const SEMANTIC_DEC_MAP = {
-    'image accumulation':                                'image density increases without release',
-    'repeated address':                                  'direct address recurs at intervals',
-    "repeated address 'Nàng'":                           'subject address repeats, anchoring structural weight',
-    "repeated address 'Xin tháng 5'":                   'month-address repeats as structural anchor',
-    "repeated address 'tháng Tám'":                     'month-address repeats at entry and midfield',
-    'unresolved object return':                          'object introduced but does not complete return path',
-    'delayed semantic closure':                          'semantic resolution is deferred toward terminal',
-    "delayed semantic closure via 'vùi' repetition":    'verb repetition delays semantic closure',
-    'long-line reading friction':                        'extended line length increases reading resistance',
-    "interrogative pause":                               'question structure suspends forward motion',
+    'image accumulation':                                'image density increases',
+    'repeated address':                                  'address recurrence detected',
+    "repeated address 'Nàng'":                           'address recurrence elevated',
+    "repeated address 'Xin tháng 5'":                   'month-address recurrence',
+    "repeated address 'tháng Tám'":                     'month-address recurrence',
+    'unresolved object return':                          'object return incomplete',
+    'delayed semantic closure':                          'semantic closure delayed',
+    "delayed semantic closure via 'vùi' repetition":    'verb repetition drag',
+    'long-line reading friction':                        'line friction elevated',
+    "interrogative pause":                               'interrogative suspension',
   };
 
   const UNRESOLVED_CADENCE_MAP = {
-    "delayed return at 'xa xăm'": 'terminal state remains open',
-    'hanging interrogative state': 'question structure holds cadence open',
-    'circular unresolved loop at end': 'motion loops without terminal closure',
-    'conditional loop closure': 'terminal cadence remains conditionally open',
-    'final imperative introduces sudden halt': 'abrupt structural stop at terminal',
-    'hanging query': 'cadence suspends on interrogative',
-    'spatial division at end': 'terminal state splits structurally',
-    'open spatial wait': 'cadence holds in empty space',
-    "conditional 'Nếu' ending creates unresolved state": 'conditional marker suspends closure',
-    'isolated syllables hanging in void': 'terminal syllables detach from main structure',
-    'suspended terminal cadence': 'cadence halts without resolving',
-    'cyclical unresolved return': 'terminal loops back without closure',
+    "delayed return at 'xa xăm'": 'terminal aperture open',
+    'hanging interrogative state': 'interrogative hold',
+    'circular unresolved loop at end': 'terminal loop unresolved',
+    'conditional loop closure': 'conditional closure pending',
+    'final imperative introduces sudden halt': 'terminal halt abrupt',
+    'hanging query': 'query suspension',
+    'spatial division at end': 'terminal split detected',
+    'open spatial wait': 'spatial wait open',
+    "conditional 'Nếu' ending creates unresolved state": 'conditional marker suspended',
+    'isolated syllables hanging in void': 'terminal syllables detached',
+    'suspended terminal cadence': 'terminal cadence suspended',
+    'cyclical unresolved return': 'cyclic return unresolved',
   };
 
-  const ABSENCE_MAP_SUPPRESSED  = 'introduced early, absent from terminal field';
-  const ABSENCE_MAP_MISSING     = 'trajectory initiated, not completed';
-  const ABSENCE_MAP_CONTINUITY  = 'sequence broken before reaching endpoint';
+  const ABSENCE_MAP_SUPPRESSED  = 'late absence detected';
+  const ABSENCE_MAP_MISSING     = 'return incomplete';
+  const ABSENCE_MAP_CONTINUITY  = 'sequence break';
+  const SECTION_LIMITS = {
+    drift: 11,
+    pressure: 14,
+    absence: 12,
+  };
+  const BANNED_CADENCE = [
+    /\bwhile\b/i,
+    /\bas if\b/i,
+    /\bmaintaining\b/i,
+    /\bdrifting toward\b/i,
+    /\bcontinues\b/i,
+    /\bremembers\b/i,
+  ];
   const HUMILITY_BLOCKLIST = [
     /\bsymboli[sz]es?\b/i,
     /\brepresents?\b/i,
@@ -162,14 +175,28 @@
   }
 
   function passesHumilityFilter(line) {
-    return !!line && !HUMILITY_BLOCKLIST.some(pattern => pattern.test(line));
+    return !!line
+      && !HUMILITY_BLOCKLIST.some(pattern => pattern.test(line))
+      && !BANNED_CADENCE.some(pattern => pattern.test(line));
   }
 
-  function filterHumility(lines, limit = 4) {
+  function countWords(line) {
+    return String(line).trim().split(/\s+/).filter(Boolean).length;
+  }
+
+  function enforceWordLimit(line, maxWords) {
+    const words = String(line).trim().split(/\s+/).filter(Boolean);
+    if (words.length <= maxWords) return line;
+    return words.slice(0, maxWords).join(' ').replace(/[,.]*$/, '') + '.';
+  }
+
+  function filterHumility(lines, lineLimit = 4, wordLimit = 14) {
     return lines
       .map(line => line.trim())
       .filter(passesHumilityFilter)
-      .slice(0, limit);
+      .map(line => enforceWordLimit(line, wordLimit))
+      .filter(line => countWords(line) <= wordLimit)
+      .slice(0, lineLimit);
   }
 
   function hashPoemId(poemId) {
@@ -221,8 +248,8 @@
     const tb = mri.temporalBehavior || {};
 
     const motions = renderList(fd.motionTrend || [], MOTION_MAP);
-    if (motions.length === 1) lines.push(sentence(motions[0]));
-    else if (motions.length >= 2) lines.push(sentence(motions[0] + ', while ' + motions[1]));
+    if (motions[0]) lines.push(sentence(motions[0]));
+    if (motions[1]) lines.push(sentence(motions[1]));
 
     const gravities = renderList(fd.gravityBehavior || [], GRAVITY_MAP);
     if (gravities.length) lines.push(sentence(gravities[0]));
@@ -230,7 +257,7 @@
     if (tb.entryState)       lines.push(sentence('entry: ' + tb.entryState));
     if (tb.terminalBehavior) lines.push(sentence('terminal: ' + tb.terminalBehavior));
 
-    return filterHumility(lines, cadence.maxLines);
+    return filterHumility(lines, cadence.maxLines, SECTION_LIMITS.drift);
   }
 
   /** SECTION B — pressure: structural weather + silence */
@@ -255,7 +282,7 @@
     const translatedUc = renderList(uc, UNRESOLVED_CADENCE_MAP);
     if (translatedUc.length) lines.push(sentence(translatedUc[0]));
 
-    return filterHumility(lines, cadence.maxLines);
+    return filterHumility(lines, cadence.maxLines, SECTION_LIMITS.pressure);
   }
 
   /** SECTION C — absence: voids and dropped continuities */
@@ -264,20 +291,20 @@
     const ab = mri.absenceProfile || {};
 
     (ab.suppressedObjects || []).forEach(obj => {
-      lines.push(sentence(`'${obj}' — ${ABSENCE_MAP_SUPPRESSED}`));
+      lines.push(sentence(`'${obj}' ${ABSENCE_MAP_SUPPRESSED}`));
     });
     (ab.missingReturns || []).forEach(ret => {
-      lines.push(sentence(`'${ret}' — ${ABSENCE_MAP_MISSING}`));
+      lines.push(sentence(`'${ret}' ${ABSENCE_MAP_MISSING}`));
     });
     (ab.droppedContinuities || []).forEach(cont => {
-      lines.push(sentence(`${cont} — ${ABSENCE_MAP_CONTINUITY}`));
+      lines.push(sentence(`${cont} ${ABSENCE_MAP_CONTINUITY}`));
     });
 
     if (instability.driftFragment && !familiar) {
       return [instability.message];
     }
 
-    const filtered = filterHumility(lines, cadence.maxLines);
+    const filtered = filterHumility(lines, cadence.maxLines, SECTION_LIMITS.absence);
     return silenceHeavy ? filtered.slice(0, 1) : filtered;
   }
 

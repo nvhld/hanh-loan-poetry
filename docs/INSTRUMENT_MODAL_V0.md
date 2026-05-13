@@ -72,6 +72,15 @@ No React takeover. No iframe. No topology dependency.
 - Rare false recognition is session-seeded and limited to one poem per session.
 - No profile surface, reading count, badge, streak, or recommendation UI is allowed.
 
+## Linguistic Compression
+
+- Translator output uses section word limits.
+- `FIELD MOTION`: `<= 11` words.
+- `STRUCTURAL WEATHER`: `<= 14` words.
+- `ABSENCE`: `<= 12` words.
+- One clause per line.
+- Prefer compressed structural fragments over crafted sentences.
+
 ## Non-Goals
 
 - No new visual system.
@@ -82,3 +91,4 @@ No React takeover. No iframe. No topology dependency.
 - No modal stacking.
 - No glitch, corrupted text, fake terminal, scanline, CRT, or hacker aesthetic.
 - No gamification or profile layer.
+- No prose-poetry translator cadence.
