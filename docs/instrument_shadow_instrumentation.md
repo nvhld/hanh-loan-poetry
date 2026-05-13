@@ -1,11 +1,14 @@
 # Instrument Shadow Instrumentation
 
 Date: `2026-05-13`
-Status: `SINGLE-SYSTEM DESIGN ONLY`
+Status: `OBSERVE-ONLY IMPLEMENTED`
 
-This document scopes the first Shadow Mode instrumentation target to Instrument Modal only. It does not implement hooks, logging, scheduling, suppression, delay, ownership, or arbitration.
+This document scopes the first Shadow Mode instrumentation target to Instrument Modal only. It implements debug-gated observation records, but no scheduling, suppression, delay, ownership, or arbitration.
 
-Reference stub: `src/runtime/debug/instrument-shadow.ts`
+Reference types:
+
+- `src/runtime/debug/instrument-shadow.ts`
+- `src/runtime/debug/instrument-shadow-runtime.ts`
 
 ## Why Instrument First
 
@@ -39,7 +42,7 @@ Design only:
 
 ```ts
 emitInstrumentShadow({
-  phase: 'scan-start',
+  eventType: 'scan-start',
   attemptedAt: performance.now(),
   activeOwner: 'instrument',
   decision: 'WOULD_ALLOW',
@@ -168,6 +171,21 @@ Before any implementation:
 - no sessionStorage writes
 - no remote telemetry
 
+## Self-Contamination Check
+
+Implementation must remain lighter than the atmosphere it observes.
+
+- Log append does not trigger layout.
+- No synchronous DOM reads.
+- No `getBoundingClientRect()`.
+- No computed-style reads.
+- No RAF participation.
+- No extra timers.
+- No persistence writes.
+- No console output during append.
+- Spam clicking is bounded by cap `80`, with oldest records dropped silently.
+- Records contain coarse phase timestamps only.
+
 ## Debug Exposure
 
 Instrument Shadow output follows global Shadow Mode exposure:
@@ -175,13 +193,13 @@ Instrument Shadow output follows global Shadow Mode exposure:
 - enabled only by `?debug=shadow` or `window.__HL_DEBUG_SHADOW = true`
 - memory-only
 - capped ring buffer
-- optional console dump
+- pull-based dump via `window.__HL_SHADOW.dump()`
 - no overlay
 - no public UI
 
 ## Non-Implementation Checklist
 
-This design does not add:
+This implementation does not add:
 
 - global shadow bus
 - centralized registry
@@ -197,4 +215,3 @@ This design does not add:
 ## Expansion Rule
 
 Do not instrument Transit Ghost, Threshold, Inheritance, Archive, or Whisper until Instrument Shadow has been observed for log density, collision frequency, silence impact, and cadence contamination.
-

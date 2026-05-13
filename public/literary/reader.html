@@ -2185,6 +2185,47 @@
     let _activePoemId = null;
     let _activeOpenTrace = null;
     let _openHistory = [];
+    const INSTRUMENT_SHADOW_CAP = 80;
+    const _instrumentShadowRecords = [];
+
+    function isInstrumentShadowEnabled() {
+      if (window.__HL_DEBUG_SHADOW === true) return true;
+      try {
+        return new URLSearchParams(window.location.search).get('debug') === 'shadow';
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function instrumentShadowNow() {
+      return window.performance && typeof performance.now === 'function'
+        ? performance.now()
+        : Date.now();
+    }
+
+    function emitInstrumentShadow(eventType) {
+      if (!isInstrumentShadowEnabled()) return null;
+      const record = {
+        source: 'instrument',
+        eventType,
+        attemptedAt: instrumentShadowNow(),
+        decision: 'WOULD_ALLOW',
+        activeOwner: 'instrument',
+        silenceWindowActive: false,
+      };
+      _instrumentShadowRecords.push(record);
+      while (_instrumentShadowRecords.length > INSTRUMENT_SHADOW_CAP) {
+        _instrumentShadowRecords.shift();
+      }
+      return record;
+    }
+
+    window.__HL_SHADOW = Object.assign(window.__HL_SHADOW || {}, {
+      enabled: isInstrumentShadowEnabled,
+      recordInstrument: emitInstrumentShadow,
+      dump: () => _instrumentShadowRecords.slice(),
+      clear: () => { _instrumentShadowRecords.length = 0; },
+    });
 
     function getOverlay() {
       return _overlayEl || (_overlayEl = document.getElementById('im-overlay'));
@@ -2351,6 +2392,7 @@
     function dismiss() {
       const ov = getOverlay();
       if (!ov) return;
+      emitInstrumentShadow('dismiss-start');
       clearPhaseTimers();
       recordClose();
       _activePoemId = null;
@@ -2378,6 +2420,7 @@
 
     function render(mriEntry, context = {}) {
       if (!mriEntry) return false;
+      emitInstrumentShadow('modal-open-attempt');
       const translator = window.InstrumentTranslator;
       if (!translator) return false;
       const fatigue = recordScanFatigue();
@@ -2398,12 +2441,19 @@
         document.removeEventListener('keydown', _escHandler);
         _escHandler = null;
       }
+      emitInstrumentShadow('residue-start');
       renderResidue();
       recordOpen(context.poemId);
       ov.classList.remove('im-visible'); // reset if already open
       requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('im-visible')));
-      schedulePhase(() => renderScan(scanMessage), residueMs);
-      schedulePhase(() => renderInstrument(blocks), residueMs + scanMs);
+      schedulePhase(() => {
+        emitInstrumentShadow('scan-start');
+        renderScan(scanMessage);
+      }, residueMs);
+      schedulePhase(() => {
+        emitInstrumentShadow('reading-start');
+        renderInstrument(blocks);
+      }, residueMs + scanMs);
 
       // Close: outside click
       ov.onclick = (e) => { if (!e.target.closest('#im-box')) dismiss(); };

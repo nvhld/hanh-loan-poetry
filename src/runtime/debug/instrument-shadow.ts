@@ -22,7 +22,7 @@ export type InstrumentShadowPhase =
 
 export type InstrumentShadowObservation = {
   source: 'instrument'
-  phase: InstrumentShadowPhase
+  eventType: InstrumentShadowPhase
   attemptedAt: number
   activeOwner: AtmosphereSource | null
   decision: ShadowDecision
