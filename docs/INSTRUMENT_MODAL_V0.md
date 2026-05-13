@@ -54,6 +54,15 @@ No React takeover. No iframe. No topology dependency.
 - translator keeps its template-only export contract.
 - translator keeps a text humility filter for over-confident interpretive phrasing.
 
+## Temporal Residue v0.5
+
+- MRI drift fragments are deterministic from `poemId` hash; no runtime randomness.
+- A bounded minority of anchor poems may end with a degraded `ABSENCE` signal.
+- Entropy-heavy context may omit `STRUCTURAL WEATHER`.
+- Silence-heavy MRI data shortens `ABSENCE`.
+- Whisper cadence is passed into the translator so sparse whispers reduce clauses and slow the reveal.
+- Scan fatigue applies after repeated modal opens within `2min`; the scan phase lengthens and says `field residue unstable...`.
+
 ## Non-Goals
 
 - No new visual system.
@@ -62,3 +71,4 @@ No React takeover. No iframe. No topology dependency.
 - No full critical essay surface yet.
 - No non-anchor modal expansion.
 - No modal stacking.
+- No glitch, corrupted text, fake terminal, scanline, CRT, or hacker aesthetic.

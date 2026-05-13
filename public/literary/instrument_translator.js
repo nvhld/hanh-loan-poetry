@@ -165,17 +165,56 @@
     return !!line && !HUMILITY_BLOCKLIST.some(pattern => pattern.test(line));
   }
 
-  function filterHumility(lines) {
+  function filterHumility(lines, limit = 4) {
     return lines
       .map(line => line.trim())
       .filter(passesHumilityFilter)
-      .slice(0, 4);
+      .slice(0, limit);
+  }
+
+  function hashPoemId(poemId) {
+    let hash = 2166136261;
+    String(poemId || '').split('').forEach(ch => {
+      hash ^= ch.charCodeAt(0);
+      hash = Math.imul(hash, 16777619);
+    });
+    return hash >>> 0;
+  }
+
+  function deriveCadence(context) {
+    const whisper = String(context.whisperText || '');
+    const compactWhisper = whisper.trim().split(/\s+/).filter(Boolean).length <= 9;
+    const slowWhisper = /đứng yên|im lặng|lâu|chậm|nín|đợi/i.test(whisper);
+    const slow = compactWhisper || slowWhisper;
+    return {
+      maxLines: slow ? 2 : 4,
+      scanDelayMs: slow ? 520 : 0,
+      sectionStaggerMs: slow ? 420 : 280,
+      sectionFadeMs: slow ? 1400 : 1100,
+    };
+  }
+
+  function deriveInstability(poemId) {
+    const score = hashPoemId(poemId) % 100;
+    return {
+      score,
+      driftFragment: score < 14,
+      message: score % 2 === 0
+        ? 'signal continuity partially lost...'
+        : 'structural residue degraded before scan completion.',
+    };
+  }
+
+  function isSilenceHeavy(mri) {
+    const sw = mri.structuralWeather || {};
+    const sp = mri.silenceProfile || {};
+    return !!sw.silenceType || (sp.structuralDeceleration || []).length > 0 || (sp.unresolvedCadence || []).length > 0;
   }
 
   // ── SECTION BUILDERS ──────────────────────────────────────────────────────
 
   /** SECTION A — drift: field motion + temporal arc */
-  function buildDrift(mri) {
+  function buildDrift(mri, cadence) {
     const lines = [];
     const fd = mri.fieldDynamics || {};
     const tb = mri.temporalBehavior || {};
@@ -190,11 +229,11 @@
     if (tb.entryState)       lines.push(sentence('entry: ' + tb.entryState));
     if (tb.terminalBehavior) lines.push(sentence('terminal: ' + tb.terminalBehavior));
 
-    return filterHumility(lines);
+    return filterHumility(lines, cadence.maxLines);
   }
 
   /** SECTION B — pressure: structural weather + silence */
-  function buildPressure(mri) {
+  function buildPressure(mri, cadence) {
     const lines = [];
     const sw = mri.structuralWeather || {};
     const sp = mri.silenceProfile || {};
@@ -215,11 +254,11 @@
     const translatedUc = renderList(uc, UNRESOLVED_CADENCE_MAP);
     if (translatedUc.length) lines.push(sentence(translatedUc[0]));
 
-    return filterHumility(lines);
+    return filterHumility(lines, cadence.maxLines);
   }
 
   /** SECTION C — absence: voids and dropped continuities */
-  function buildAbsence(mri) {
+  function buildAbsence(mri, cadence, instability, silenceHeavy) {
     const lines = [];
     const ab = mri.absenceProfile || {};
 
@@ -233,7 +272,12 @@
       lines.push(sentence(`${cont} — ${ABSENCE_MAP_CONTINUITY}`));
     });
 
-    return filterHumility(lines);
+    if (instability.driftFragment) {
+      return [instability.message];
+    }
+
+    const filtered = filterHumility(lines, cadence.maxLines);
+    return silenceHeavy ? filtered.slice(0, 1) : filtered;
   }
 
   // ── PUBLIC API ────────────────────────────────────────────────────────────
@@ -243,12 +287,29 @@
    * @param {Object} mriData — one poem entry from anchor_mri.json
    * @returns {{ drift: string[], pressure: string[], absence: string[] }}
    */
-  function translateMRI(mriData) {
-    if (!mriData) return { drift: [], pressure: [], absence: [] };
+  function translateMRI(mriData, context = {}) {
+    if (!mriData) return { drift: [], pressure: [], absence: [], meta: {} };
+    const cadence = deriveCadence(context);
+    const instability = deriveInstability(context.poemId);
+    const entropyHeavy = context.dominantField === 'entropy' || Number(context.entropy || 0) >= 0.72;
+    const silenceHeavy = isSilenceHeavy(mriData);
+    const omittedSections = entropyHeavy ? ['pressure'] : [];
+
     return {
-      drift:    buildDrift(mriData),
-      pressure: buildPressure(mriData),
-      absence:  buildAbsence(mriData),
+      drift:    buildDrift(mriData, cadence),
+      pressure: omittedSections.includes('pressure') ? [] : buildPressure(mriData, cadence),
+      absence:  buildAbsence(mriData, cadence, instability, silenceHeavy),
+      meta: {
+        omittedSections,
+        scanMessage: instability.driftFragment
+          ? 'structural residue degraded before scan completion.'
+          : 'structural compression stabilizing...',
+        scanDelayMs: cadence.scanDelayMs,
+        residueDelayMs: context.scanFatigueLevel ? 180 : 0,
+        sectionStaggerMs: cadence.sectionStaggerMs,
+        sectionFadeMs: cadence.sectionFadeMs,
+        instabilityScore: instability.score,
+      },
     };
   }
 

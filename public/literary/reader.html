@@ -692,7 +692,7 @@
     .im-section {
       opacity: 0;
       margin-bottom: 0;
-      transition: opacity 1100ms ease;
+      transition: opacity var(--im-section-fade-ms, 1100ms) ease;
     }
     .im-final.im-stage-visible .im-section {
       opacity: 1;
@@ -1747,9 +1747,15 @@
         whisperEl.textContent = note.text;
         // Instrument Modal: Lab Mode stays anchor-only and data-backed.
         const hasInstrumentSignal = window.InstrumentModal && InstrumentModal.hasSignal(p.id);
+        const instrumentContext = {
+          poemId: p.id,
+          whisperText: note.text,
+          dominantField,
+          entropy: ((getEff(p).emotionalField || {}).entropy || 0),
+        };
         whisperEl.style.cursor = hasInstrumentSignal ? 'pointer' : '';
         whisperEl.onclick = hasInstrumentSignal
-          ? () => InstrumentModal.open(p.id)
+          ? () => InstrumentModal.open(p.id, instrumentContext)
           : null;
         if (note.motif && note.motif.length > 0) {
           note.motif.forEach(m => {
@@ -2161,12 +2167,14 @@
     const RESIDUE_MS = 1200;
     const SCAN_MS = 1800;
     const MODAL_CLEAR_MS = 920;
+    const FATIGUE_WINDOW_MS = 120000;
     let _mriCache = null;        // loaded once
     let _overlayEl = null;       // #im-overlay
     let _escHandler = null;
     let _phaseTimers = [];
     let _clearContentTimer = null;
     let _activePoemId = null;
+    let _openHistory = [];
 
     function getOverlay() {
       return _overlayEl || (_overlayEl = document.getElementById('im-overlay'));
@@ -2191,16 +2199,19 @@
     }
 
     function buildHTML(blocks) {
+      const omitted = new Set((blocks.meta && blocks.meta.omittedSections) || []);
+      const staggerMs = Math.max(0, (blocks.meta && blocks.meta.sectionStaggerMs) || 280);
+      const fadeMs = Math.max(400, (blocks.meta && blocks.meta.sectionFadeMs) || 1100);
       const sections = [
-        { label: 'FIELD MOTION',        lines: blocks.drift },
-        { label: 'STRUCTURAL WEATHER',  lines: blocks.pressure },
-        { label: 'ABSENCE',             lines: blocks.absence },
-      ];
-      return sections.map(s => {
+        { key: 'drift', label: 'FIELD MOTION',        lines: blocks.drift },
+        { key: 'pressure', label: 'STRUCTURAL WEATHER',  lines: blocks.pressure },
+        { key: 'absence', label: 'ABSENCE',             lines: blocks.absence },
+      ].filter(section => !omitted.has(section.key));
+      return sections.map((s, index) => {
         const items = s.lines.length
           ? s.lines.map(l => `<li>${escapeHTML(l)}</li>`).join('')
           : `<li class="im-empty">no signal detected</li>`;
-        return `<div class="im-section">
+        return `<div class="im-section" style="--im-section-fade-ms:${fadeMs}ms; transition-delay:${index * staggerMs}ms;">
   <span class="im-label">${s.label}</span>
   <ul class="im-body">${items}</ul>
 </div>`;
@@ -2218,10 +2229,10 @@
       return true;
     }
 
-    function renderScan() {
+    function renderScan(message) {
       const box = getOverlay().querySelector('#im-box');
       if (!box) return;
-      box.innerHTML = '<div class="im-scan">structural compression stabilizing...</div>';
+      box.innerHTML = `<div class="im-scan">${escapeHTML(message || 'structural compression stabilizing...')}</div>`;
       requestAnimationFrame(() => requestAnimationFrame(() => {
         const scan = box.querySelector('.im-scan');
         if (scan) scan.classList.add('im-stage-visible');
@@ -2252,11 +2263,28 @@
       }, MODAL_CLEAR_MS);
     }
 
-    function render(mriEntry) {
+    function recordScanFatigue() {
+      const now = Date.now();
+      _openHistory = _openHistory.filter(t => now - t <= FATIGUE_WINDOW_MS);
+      _openHistory.push(now);
+      if (_openHistory.length >= 5) {
+        return { level: 2, extraScanMs: 1000, message: 'field residue unstable...' };
+      }
+      if (_openHistory.length >= 4) {
+        return { level: 1, extraScanMs: 520, message: 'field residue unstable...' };
+      }
+      return { level: 0, extraScanMs: 0, message: null };
+    }
+
+    function render(mriEntry, context = {}) {
       if (!mriEntry) return false;
       const translator = window.InstrumentTranslator;
       if (!translator) return false;
-      const blocks = translator.translateMRI(mriEntry);
+      const fatigue = recordScanFatigue();
+      const blocks = translator.translateMRI(mriEntry, { ...context, scanFatigueLevel: fatigue.level });
+      const scanMs = SCAN_MS + ((blocks.meta && blocks.meta.scanDelayMs) || 0) + fatigue.extraScanMs;
+      const residueMs = RESIDUE_MS + ((blocks.meta && blocks.meta.residueDelayMs) || 0);
+      const scanMessage = fatigue.message || (blocks.meta && blocks.meta.scanMessage) || 'structural compression stabilizing...';
       const ov = getOverlay();
       clearPhaseTimers();
       if (_clearContentTimer) {
@@ -2270,8 +2298,8 @@
       renderResidue();
       ov.classList.remove('im-visible'); // reset if already open
       requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('im-visible')));
-      schedulePhase(renderScan, RESIDUE_MS);
-      schedulePhase(() => renderInstrument(blocks), RESIDUE_MS + SCAN_MS);
+      schedulePhase(() => renderScan(scanMessage), residueMs);
+      schedulePhase(() => renderInstrument(blocks), residueMs + scanMs);
 
       // Close: outside click
       ov.onclick = (e) => { if (!e.target.closest('#im-box')) dismiss(); };
@@ -2293,7 +2321,7 @@
       return !!(data && data[poemId]);
     }
 
-    function open(poemId) {
+    function open(poemId, context = {}) {
       if (typeof PendingModal !== 'undefined' && !PendingModal.isAnchor(poemId)) {
         return false;
       }
@@ -2304,13 +2332,13 @@
 
       const cached = cache();
       if (cached) {
-        return render(cached[poemId] || null);
+        return render(cached[poemId] || null, { ...context, poemId });
       }
       
       if (isLocalFile) return false; // Prevent CORS error locally
       fetch('anchor_mri.json')
         .then(r => r.json())
-        .then(data => { _mriCache = data; render(data[poemId] || null); })
+        .then(data => { _mriCache = data; render(data[poemId] || null, { ...context, poemId }); })
         .catch(() => {});
       return true;
     }

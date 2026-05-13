@@ -340,7 +340,7 @@ def validate_instrument_modal() -> tuple[bool, list[str]]:
     reader_text = reader_path.read_text(encoding="utf-8")
     for needle in (
         "InstrumentModal.hasSignal(p.id)",
-        "InstrumentModal.open(p.id)",
+        "InstrumentModal.open(p.id, instrumentContext)",
         "window.InstrumentModal = { open, dismiss, hasSignal };",
     ):
         if needle not in reader_text:
@@ -353,6 +353,8 @@ def validate_instrument_modal() -> tuple[bool, list[str]]:
         "No interpretation.",
         "HUMILITY_BLOCKLIST",
         "filterHumility",
+        "deriveInstability",
+        "deriveCadence",
     ):
         if needle not in translator_text:
             errors.append(f"❌ Instrument translator contract missing: {needle}")
