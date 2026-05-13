@@ -16,11 +16,11 @@
 
   const MOTION_MAP = {
     'continuous deceleration':       'forward motion gradually reduces',
-    'inward collapse':               'imagery contracts inward',
+    'inward collapse':               'image field contracts inward',
     'erratic pacing':                'motion shifts without consistent interval',
     'sudden elongation':             'line duration extends unexpectedly',
     'circular sweep':                'motion traces a closed path',
-    'sustained orbital motion':      'forward drift remains in low orbit',
+    'sustained orbital motion':      'forward drift stays in a bounded loop',
     'binary oscillation':            'motion alternates between two fixed states',
     'rapid reset':                   'motion returns to start without accumulation',
     'sequential progression':        'motion advances step by step',
@@ -37,7 +37,7 @@
     'abrupt truncation':             'motion stops without transitional decay',
     'circular questioning':          'cadence loops without forward resolution',
     'static anticipation':           'motion holds in a pre-event state',
-    'lateral drift across memory':   'motion moves sideways through accumulated imagery',
+    'lateral drift across memory':   'motion moves sideways through accumulated image field',
     'locational density anchoring':  'motion slows at place-name nodes',
     'heavy grounding':               'motion slows at place-name nodes',
   };
@@ -98,13 +98,13 @@
     'parenthetical containment':      'parenthetical contains an isolated sub-field',
     'vertical line breaks':           'line breaks extend vertical spacing',
     'spacing drag':                   'spacing slows reading pace',
-    'parenthetical opening':          'poem opens inside a parenthetical',
+    'parenthetical opening':          'opening parenthetical isolates the first field',
     'ellipsis elongation':            'ellipsis extends pause duration',
     'irregular line breaking':        'line breaks occur at irregular intervals',
   };
 
   const SEMANTIC_DEC_MAP = {
-    'image accumulation':                                'imagery density increases without release',
+    'image accumulation':                                'image density increases without release',
     'repeated address':                                  'direct address recurs at intervals',
     "repeated address 'Nàng'":                           'subject address repeats, anchoring structural weight',
     "repeated address 'Xin tháng 5'":                   'month-address repeats as structural anchor',
@@ -183,7 +183,8 @@
 
   function deriveCadence(context) {
     const whisper = String(context.whisperText || '');
-    const compactWhisper = whisper.trim().split(/\s+/).filter(Boolean).length <= 9;
+    const whisperWords = whisper.trim().split(/\s+/).filter(Boolean);
+    const compactWhisper = whisperWords.length > 0 && whisperWords.length <= 9;
     const slowWhisper = /đứng yên|im lặng|lâu|chậm|nín|đợi/i.test(whisper);
     const slow = compactWhisper || slowWhisper;
     return {
@@ -258,7 +259,7 @@
   }
 
   /** SECTION C — absence: voids and dropped continuities */
-  function buildAbsence(mri, cadence, instability, silenceHeavy) {
+  function buildAbsence(mri, cadence, instability, silenceHeavy, familiar) {
     const lines = [];
     const ab = mri.absenceProfile || {};
 
@@ -272,7 +273,7 @@
       lines.push(sentence(`${cont} — ${ABSENCE_MAP_CONTINUITY}`));
     });
 
-    if (instability.driftFragment) {
+    if (instability.driftFragment && !familiar) {
       return [instability.message];
     }
 
@@ -291,19 +292,25 @@
     if (!mriData) return { drift: [], pressure: [], absence: [], meta: {} };
     const cadence = deriveCadence(context);
     const instability = deriveInstability(context.poemId);
+    const familiar = Number(context.familiarityLevel || 0) >= 0.15;
     const entropyHeavy = context.dominantField === 'entropy' || Number(context.entropy || 0) >= 0.72;
     const silenceHeavy = isSilenceHeavy(mriData);
     const omittedSections = entropyHeavy ? ['pressure'] : [];
+    const scanMessage = context.falseRecognition
+      ? 'field signature weakly recognized...'
+      : familiar
+        ? 'field signature partially recognized...'
+        : instability.driftFragment
+          ? 'structural residue degraded before scan completion.'
+          : 'structural compression stabilizing...';
 
     return {
       drift:    buildDrift(mriData, cadence),
       pressure: omittedSections.includes('pressure') ? [] : buildPressure(mriData, cadence),
-      absence:  buildAbsence(mriData, cadence, instability, silenceHeavy),
+      absence:  buildAbsence(mriData, cadence, instability, silenceHeavy, familiar),
       meta: {
         omittedSections,
-        scanMessage: instability.driftFragment
-          ? 'structural residue degraded before scan completion.'
-          : 'structural compression stabilizing...',
+        scanMessage,
         scanDelayMs: cadence.scanDelayMs,
         residueDelayMs: context.scanFatigueLevel ? 180 : 0,
         sectionStaggerMs: cadence.sectionStaggerMs,

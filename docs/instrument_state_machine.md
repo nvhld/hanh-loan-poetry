@@ -59,6 +59,15 @@ The Instrument Modal is a temporal reading instrument, not a generic UI componen
 - Fatigue phrase: `field residue unstable...`
 - Fatigue does not block access or punish the reader.
 
+## Residual Familiarity
+
+- Memory is local-only and per poem.
+- Familiarity can emerge after repeated openings or long linger.
+- Familiarity shortens residue and scan phases.
+- Familiarity decays after roughly `14 days`.
+- Rare false recognition is session-seeded and capped at one poem per session.
+- Persistence must never expose profile, progress, or recommendation UI.
+
 ## Modal Lifecycle Guards
 
 - repeated clicks on the same visible modal serialize to the current modal
@@ -66,6 +75,7 @@ The Instrument Modal is a temporal reading instrument, not a generic UI componen
 - stale content-clear timers clear before a new render
 - Escape handler is removed before a new one is attached
 - non-anchor poems and poems without MRI data cannot open the modal
+- open/close traces update only local residual memory
 
 ## Forbidden Effects
 

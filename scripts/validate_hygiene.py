@@ -341,7 +341,7 @@ def validate_instrument_modal() -> tuple[bool, list[str]]:
     for needle in (
         "InstrumentModal.hasSignal(p.id)",
         "InstrumentModal.open(p.id, instrumentContext)",
-        "window.InstrumentModal = { open, dismiss, hasSignal };",
+        "window.InstrumentModal = { open, dismiss, hasSignal, familiarity };",
     ):
         if needle not in reader_text:
             errors.append(f"❌ Instrument Modal reader guard missing: {needle}")
@@ -355,6 +355,8 @@ def validate_instrument_modal() -> tuple[bool, list[str]]:
         "filterHumility",
         "deriveInstability",
         "deriveCadence",
+        "familiarityLevel",
+        "falseRecognition",
     ):
         if needle not in translator_text:
             errors.append(f"❌ Instrument translator contract missing: {needle}")

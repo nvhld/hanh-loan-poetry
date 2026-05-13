@@ -63,6 +63,15 @@ No React takeover. No iframe. No topology dependency.
 - Whisper cadence is passed into the translator so sparse whispers reduce clauses and slow the reveal.
 - Scan fatigue applies after repeated modal opens within `2min`; the scan phase lengthens and says `field residue unstable...`.
 
+## Quiet Persistence
+
+- Instrument memory is local-only and per poem.
+- Familiarity can emerge after repeated openings or long modal linger.
+- Familiar readings shorten residue and scan timing.
+- Familiarity decays after approximately `14 days`.
+- Rare false recognition is session-seeded and limited to one poem per session.
+- No profile surface, reading count, badge, streak, or recommendation UI is allowed.
+
 ## Non-Goals
 
 - No new visual system.
@@ -72,3 +81,4 @@ No React takeover. No iframe. No topology dependency.
 - No non-anchor modal expansion.
 - No modal stacking.
 - No glitch, corrupted text, fake terminal, scanline, CRT, or hacker aesthetic.
+- No gamification or profile layer.

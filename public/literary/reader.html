@@ -623,6 +623,9 @@
       opacity: 0.55;
       /* subtler than first-time 1.0 */
     }
+    body.instrument-familiar.whisper-heard-before.lens-on.whisper-earned #whisper-note {
+      opacity: 0.6;
+    }
 
     .lens-motif {
       transition: opacity 1.5s ease, color 1.5s ease, border-bottom 1.5s ease;
@@ -860,7 +863,7 @@
 
     function resetLens() {
       _lensOn = false;
-      document.body.classList.remove('lens-on', 'has-lens');
+      document.body.classList.remove('lens-on', 'has-lens', 'instrument-familiar');
     }
 
     // ── SOUND ENGINE — default OFF ─────────────────────────────────────────────
@@ -1753,6 +1756,8 @@
           dominantField,
           entropy: ((getEff(p).emotionalField || {}).entropy || 0),
         };
+        const instrumentFamiliar = hasInstrumentSignal && InstrumentModal.familiarity(p.id).isFamiliar;
+        document.body.classList.toggle('instrument-familiar', instrumentFamiliar);
         whisperEl.style.cursor = hasInstrumentSignal ? 'pointer' : '';
         whisperEl.onclick = hasInstrumentSignal
           ? () => InstrumentModal.open(p.id, instrumentContext)
@@ -2168,12 +2173,17 @@
     const SCAN_MS = 1800;
     const MODAL_CLEAR_MS = 920;
     const FATIGUE_WINDOW_MS = 120000;
+    const MEMORY_KEY = 'hanh-loan-instrument-memory-v1';
+    const SESSION_KEY = 'hanh-loan-instrument-session-v1';
+    const MEMORY_DECAY_MS = 14 * 24 * 60 * 60 * 1000;
+    const FAMILIAR_LINGER_MS = 12000;
     let _mriCache = null;        // loaded once
     let _overlayEl = null;       // #im-overlay
     let _escHandler = null;
     let _phaseTimers = [];
     let _clearContentTimer = null;
     let _activePoemId = null;
+    let _activeOpenTrace = null;
     let _openHistory = [];
 
     function getOverlay() {
@@ -2188,6 +2198,95 @@
     function schedulePhase(fn, delay) {
       const timer = setTimeout(fn, delay);
       _phaseTimers.push(timer);
+    }
+
+    function hashString(value) {
+      let hash = 2166136261;
+      String(value || '').split('').forEach(ch => {
+        hash ^= ch.charCodeAt(0);
+        hash = Math.imul(hash, 16777619);
+      });
+      return hash >>> 0;
+    }
+
+    function loadMemory() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(MEMORY_KEY) || '{}');
+        if (!parsed || parsed.version !== 1 || !parsed.poems) return { version: 1, poems: {} };
+        return parsed;
+      } catch (e) {
+        return { version: 1, poems: {} };
+      }
+    }
+
+    function saveMemory(memory) {
+      try { localStorage.setItem(MEMORY_KEY, JSON.stringify(memory)); } catch (e) {}
+    }
+
+    function memoryEntry(memory, poemId) {
+      if (!memory.poems[poemId]) {
+        memory.poems[poemId] = { opens: 0, totalOpenMs: 0, lastOpenedAt: 0 };
+      }
+      return memory.poems[poemId];
+    }
+
+    function familiarity(poemId) {
+      const memory = loadMemory();
+      const entry = memory.poems[poemId];
+      if (!entry || !entry.lastOpenedAt) return { isFamiliar: false, level: 0, stale: false };
+      const age = Math.max(0, Date.now() - entry.lastOpenedAt);
+      if (age >= MEMORY_DECAY_MS) return { isFamiliar: false, level: 0, stale: true };
+      const earned = entry.opens >= 2 || entry.totalOpenMs >= FAMILIAR_LINGER_MS;
+      if (!earned) return { isFamiliar: false, level: 0, stale: false };
+      const level = Math.max(0, Math.min(1, 1 - age / MEMORY_DECAY_MS));
+      return { isFamiliar: level >= 0.15, level, stale: false };
+    }
+
+    function recordOpen(poemId) {
+      const memory = loadMemory();
+      const entry = memoryEntry(memory, poemId);
+      entry.opens += 1;
+      entry.lastOpenedAt = Date.now();
+      saveMemory(memory);
+      _activeOpenTrace = { poemId, startedAt: Date.now() };
+    }
+
+    function recordClose() {
+      if (!_activeOpenTrace) return;
+      const elapsed = Math.max(0, Date.now() - _activeOpenTrace.startedAt);
+      const memory = loadMemory();
+      const entry = memoryEntry(memory, _activeOpenTrace.poemId);
+      entry.totalOpenMs = Math.min(10 * FAMILIAR_LINGER_MS, (entry.totalOpenMs || 0) + elapsed);
+      entry.lastOpenedAt = Date.now();
+      saveMemory(memory);
+      _activeOpenTrace = null;
+    }
+
+    function sessionSeed() {
+      try {
+        let session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || '{}');
+        if (!session.seed) {
+          session = {
+            seed: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`,
+            falseRecognitionUsed: false,
+          };
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        }
+        return session;
+      } catch (e) {
+        return { seed: 'file-session', falseRecognitionUsed: true };
+      }
+    }
+
+    function claimFalseRecognition(poemId, familiar) {
+      if (familiar.isFamiliar) return false;
+      const session = sessionSeed();
+      if (session.falseRecognitionUsed) return false;
+      if (hashString(`${session.seed}:${poemId}`) % 100 >= 3) return false;
+      session.falseRecognitionUsed = true;
+      session.falseRecognitionPoemId = poemId;
+      try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch (e) {}
+      return true;
     }
 
     function escapeHTML(value) {
@@ -2253,6 +2352,7 @@
       const ov = getOverlay();
       if (!ov) return;
       clearPhaseTimers();
+      recordClose();
       _activePoemId = null;
       ov.classList.remove('im-visible');
       if (_escHandler) { document.removeEventListener('keydown', _escHandler); _escHandler = null; }
@@ -2282,8 +2382,11 @@
       if (!translator) return false;
       const fatigue = recordScanFatigue();
       const blocks = translator.translateMRI(mriEntry, { ...context, scanFatigueLevel: fatigue.level });
-      const scanMs = SCAN_MS + ((blocks.meta && blocks.meta.scanDelayMs) || 0) + fatigue.extraScanMs;
-      const residueMs = RESIDUE_MS + ((blocks.meta && blocks.meta.residueDelayMs) || 0);
+      const familiar = Number(context.familiarityLevel || 0) >= 0.15;
+      const baseResidueMs = familiar ? 700 : RESIDUE_MS;
+      const baseScanMs = familiar ? 1200 : SCAN_MS;
+      const scanMs = baseScanMs + ((blocks.meta && blocks.meta.scanDelayMs) || 0) + fatigue.extraScanMs;
+      const residueMs = baseResidueMs + ((blocks.meta && blocks.meta.residueDelayMs) || 0);
       const scanMessage = fatigue.message || (blocks.meta && blocks.meta.scanMessage) || 'structural compression stabilizing...';
       const ov = getOverlay();
       clearPhaseTimers();
@@ -2296,6 +2399,7 @@
         _escHandler = null;
       }
       renderResidue();
+      recordOpen(context.poemId);
       ov.classList.remove('im-visible'); // reset if already open
       requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('im-visible')));
       schedulePhase(() => renderScan(scanMessage), residueMs);
@@ -2329,21 +2433,29 @@
         return true;
       }
       _activePoemId = poemId;
+      const familiar = familiarity(poemId);
+      const falseRecognition = claimFalseRecognition(poemId, familiar);
+      const enrichedContext = {
+        ...context,
+        poemId,
+        familiarityLevel: familiar.level,
+        falseRecognition,
+      };
 
       const cached = cache();
       if (cached) {
-        return render(cached[poemId] || null, { ...context, poemId });
+        return render(cached[poemId] || null, enrichedContext);
       }
       
       if (isLocalFile) return false; // Prevent CORS error locally
       fetch('anchor_mri.json')
         .then(r => r.json())
-        .then(data => { _mriCache = data; render(data[poemId] || null, { ...context, poemId }); })
+        .then(data => { _mriCache = data; render(data[poemId] || null, enrichedContext); })
         .catch(() => {});
       return true;
     }
 
-    window.InstrumentModal = { open, dismiss, hasSignal };
+    window.InstrumentModal = { open, dismiss, hasSignal, familiarity };
   })();
   </script>
 </body>
