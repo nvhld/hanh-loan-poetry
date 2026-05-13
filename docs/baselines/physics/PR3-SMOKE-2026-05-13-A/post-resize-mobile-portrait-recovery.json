@@ -1,0 +1,660 @@
+{
+  "schemaVersion": "pr3-physics-probe-v1",
+  "targetId": "A8ADC6F3EE810E62E52088CFB458B0A7",
+  "browser": {
+    "name": "Chrome/148.0.7778.97",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+    "protocolVersion": "1.3"
+  },
+  "sampling": {
+    "cadence": "recovery-curve",
+    "sampleCount": 4,
+    "intervalMs": null,
+    "recoveryOffsetsMs": [
+      0,
+      1000,
+      2000,
+      5000
+    ],
+    "settleThresholdPxPerFrameVariance": 0.08,
+    "settleConsecutiveSamples": 2,
+    "settledAtMs": 2001
+  },
+  "summary": {
+    "elapsedMs": 5001,
+    "sampledAtMs": 2594019.7,
+    "href": "http://127.0.0.1:3000/lab?debug=physics",
+    "hidden": false,
+    "viewport": {
+      "width": 375,
+      "height": 812,
+      "devicePixelRatio": 1
+    },
+    "deviceContext": {
+      "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+      "osPlatform": "MacIntel",
+      "refreshRateHz": 59.99520038394247,
+      "batteryState": {
+        "supported": true,
+        "charging": false,
+        "level": 0.8
+      },
+      "powerMode": "unknown",
+      "inAppBrowser": false,
+      "hardwareConcurrency": 10,
+      "deviceMemoryGb": 16,
+      "maxTouchPoints": 0
+    },
+    "nodeCount": 99,
+    "springCount": 99,
+    "dustCount": 0,
+    "finiteCenters": 6,
+    "totalCenters": 6,
+    "centerTrajectorySnapshot": [
+      {
+        "field": "distance",
+        "x": 115.5,
+        "y": 633.36,
+        "normalizedX": 0.308,
+        "normalizedY": 0.78,
+        "observedX": 476.3294544571433,
+        "observedY": 540.6554962874512,
+        "observedNormalizedX": 1.2702118785523822,
+        "observedNormalizedY": 0.6658318919796198,
+        "observedDistancePx": 372.54801061397393,
+        "nodeCount": 14
+      },
+      {
+        "field": "ecstasy",
+        "x": 307.5,
+        "y": 292.32,
+        "normalizedX": 0.82,
+        "normalizedY": 0.36,
+        "observedX": 410.64366272000063,
+        "observedY": 568.0594624862719,
+        "observedNormalizedX": 1.095049767253335,
+        "observedNormalizedY": 0.699580618825458,
+        "observedDistancePx": 294.3991615672765,
+        "nodeCount": 10
+      },
+      {
+        "field": "entropy",
+        "x": 187.5,
+        "y": 451.472,
+        "normalizedX": 0.5,
+        "normalizedY": 0.5559999999999999,
+        "observedX": 458.77419345185257,
+        "observedY": 478.6239542013152,
+        "observedNormalizedX": 1.2233978492049402,
+        "observedNormalizedY": 0.589438367242999,
+        "observedDistancePx": 272.6296327435876,
+        "nodeCount": 27
+      },
+      {
+        "field": "eros",
+        "x": 259.5,
+        "y": 633.36,
+        "normalizedX": 0.692,
+        "normalizedY": 0.78,
+        "observedX": 418.5972030857147,
+        "observedY": 643.1942826874513,
+        "observedNormalizedX": 1.1162592082285725,
+        "observedNormalizedY": 0.7921111855756789,
+        "observedDistancePx": 159.4008567909026,
+        "nodeCount": 14
+      },
+      {
+        "field": "longing",
+        "x": 67.5,
+        "y": 292.32,
+        "normalizedX": 0.18,
+        "normalizedY": 0.36,
+        "observedX": 365.99765656000056,
+        "observedY": 620.2727132369919,
+        "observedNormalizedX": 0.9759937508266682,
+        "observedNormalizedY": 0.7638826517696944,
+        "observedDistancePx": 443.4566868267031,
+        "nodeCount": 10
+      },
+      {
+        "field": "memory",
+        "x": 187.5,
+        "y": 178.64,
+        "normalizedX": 0.5,
+        "normalizedY": 0.21999999999999997,
+        "observedX": 451.58545996666703,
+        "observedY": 491.25124533631987,
+        "observedNormalizedX": 1.2042278932444455,
+        "observedNormalizedY": 0.6049892183944826,
+        "observedDistancePx": 409.22722401684234,
+        "nodeCount": 24
+      }
+    ],
+    "maxVelocity": 0,
+    "avgVelocity": 0,
+    "hasNaNState": false,
+    "centerDrift": 359.7498997131147,
+    "activeRegion": "none",
+    "silenceLevel": 1,
+    "memoryPressure": {
+      "usedJSHeapSize": 4868524,
+      "totalJSHeapSize": 7901044,
+      "jsHeapSizeLimit": 4294967296
+    },
+    "centerVelocityVariance": {
+      "unit": "px/frame variance",
+      "meanPxPerFrame": 0,
+      "variancePxPerFrame": 0,
+      "samples": 6
+    }
+  },
+  "samples": [
+    {
+      "elapsedMs": 0,
+      "sampledAtMs": 2589020.1000000006,
+      "href": "http://127.0.0.1:3000/lab?debug=physics",
+      "hidden": false,
+      "viewport": {
+        "width": 375,
+        "height": 812,
+        "devicePixelRatio": 1
+      },
+      "deviceContext": {
+        "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+        "osPlatform": "MacIntel",
+        "refreshRateHz": 60.081711127119455,
+        "batteryState": {
+          "supported": true,
+          "charging": false,
+          "level": 0.8
+        },
+        "powerMode": "unknown",
+        "inAppBrowser": false,
+        "hardwareConcurrency": 10,
+        "deviceMemoryGb": 16,
+        "maxTouchPoints": 0
+      },
+      "nodeCount": 99,
+      "springCount": 99,
+      "dustCount": 0,
+      "finiteCenters": 6,
+      "totalCenters": 6,
+      "centerTrajectorySnapshot": [
+        {
+          "field": "distance",
+          "x": 115.5,
+          "y": 633.36,
+          "normalizedX": 0.308,
+          "normalizedY": 0.78,
+          "observedX": 476.3294544571433,
+          "observedY": 540.6554962874512,
+          "observedNormalizedX": 1.2702118785523822,
+          "observedNormalizedY": 0.6658318919796198,
+          "observedDistancePx": 372.54801061397393,
+          "nodeCount": 14
+        },
+        {
+          "field": "ecstasy",
+          "x": 307.5,
+          "y": 292.32,
+          "normalizedX": 0.82,
+          "normalizedY": 0.36,
+          "observedX": 410.64366272000063,
+          "observedY": 568.0594624862719,
+          "observedNormalizedX": 1.095049767253335,
+          "observedNormalizedY": 0.699580618825458,
+          "observedDistancePx": 294.3991615672765,
+          "nodeCount": 10
+        },
+        {
+          "field": "entropy",
+          "x": 187.5,
+          "y": 451.472,
+          "normalizedX": 0.5,
+          "normalizedY": 0.5559999999999999,
+          "observedX": 458.77419345185257,
+          "observedY": 478.6239542013152,
+          "observedNormalizedX": 1.2233978492049402,
+          "observedNormalizedY": 0.589438367242999,
+          "observedDistancePx": 272.6296327435876,
+          "nodeCount": 27
+        },
+        {
+          "field": "eros",
+          "x": 259.5,
+          "y": 633.36,
+          "normalizedX": 0.692,
+          "normalizedY": 0.78,
+          "observedX": 418.5972030857147,
+          "observedY": 643.1942826874513,
+          "observedNormalizedX": 1.1162592082285725,
+          "observedNormalizedY": 0.7921111855756789,
+          "observedDistancePx": 159.4008567909026,
+          "nodeCount": 14
+        },
+        {
+          "field": "longing",
+          "x": 67.5,
+          "y": 292.32,
+          "normalizedX": 0.18,
+          "normalizedY": 0.36,
+          "observedX": 365.99765656000056,
+          "observedY": 620.2727132369919,
+          "observedNormalizedX": 0.9759937508266682,
+          "observedNormalizedY": 0.7638826517696944,
+          "observedDistancePx": 443.4566868267031,
+          "nodeCount": 10
+        },
+        {
+          "field": "memory",
+          "x": 187.5,
+          "y": 178.64,
+          "normalizedX": 0.5,
+          "normalizedY": 0.21999999999999997,
+          "observedX": 451.58545996666703,
+          "observedY": 491.25124533631987,
+          "observedNormalizedX": 1.2042278932444455,
+          "observedNormalizedY": 0.6049892183944826,
+          "observedDistancePx": 409.22722401684234,
+          "nodeCount": 24
+        }
+      ],
+      "maxVelocity": 0,
+      "avgVelocity": 0,
+      "hasNaNState": false,
+      "centerDrift": 359.7498997131147,
+      "activeRegion": "none",
+      "silenceLevel": 1,
+      "memoryPressure": {
+        "usedJSHeapSize": 3993137,
+        "totalJSHeapSize": 8425333,
+        "jsHeapSizeLimit": 4294967296
+      },
+      "centerVelocityVariance": null
+    },
+    {
+      "elapsedMs": 1001,
+      "sampledAtMs": 2590019.4000000004,
+      "href": "http://127.0.0.1:3000/lab?debug=physics",
+      "hidden": false,
+      "viewport": {
+        "width": 375,
+        "height": 812,
+        "devicePixelRatio": 1
+      },
+      "deviceContext": {
+        "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+        "osPlatform": "MacIntel",
+        "refreshRateHz": 60.00960153623239,
+        "batteryState": {
+          "supported": true,
+          "charging": false,
+          "level": 0.8
+        },
+        "powerMode": "unknown",
+        "inAppBrowser": false,
+        "hardwareConcurrency": 10,
+        "deviceMemoryGb": 16,
+        "maxTouchPoints": 0
+      },
+      "nodeCount": 99,
+      "springCount": 99,
+      "dustCount": 0,
+      "finiteCenters": 6,
+      "totalCenters": 6,
+      "centerTrajectorySnapshot": [
+        {
+          "field": "distance",
+          "x": 115.5,
+          "y": 633.36,
+          "normalizedX": 0.308,
+          "normalizedY": 0.78,
+          "observedX": 476.3294544571433,
+          "observedY": 540.6554962874512,
+          "observedNormalizedX": 1.2702118785523822,
+          "observedNormalizedY": 0.6658318919796198,
+          "observedDistancePx": 372.54801061397393,
+          "nodeCount": 14
+        },
+        {
+          "field": "ecstasy",
+          "x": 307.5,
+          "y": 292.32,
+          "normalizedX": 0.82,
+          "normalizedY": 0.36,
+          "observedX": 410.64366272000063,
+          "observedY": 568.0594624862719,
+          "observedNormalizedX": 1.095049767253335,
+          "observedNormalizedY": 0.699580618825458,
+          "observedDistancePx": 294.3991615672765,
+          "nodeCount": 10
+        },
+        {
+          "field": "entropy",
+          "x": 187.5,
+          "y": 451.472,
+          "normalizedX": 0.5,
+          "normalizedY": 0.5559999999999999,
+          "observedX": 458.77419345185257,
+          "observedY": 478.6239542013152,
+          "observedNormalizedX": 1.2233978492049402,
+          "observedNormalizedY": 0.589438367242999,
+          "observedDistancePx": 272.6296327435876,
+          "nodeCount": 27
+        },
+        {
+          "field": "eros",
+          "x": 259.5,
+          "y": 633.36,
+          "normalizedX": 0.692,
+          "normalizedY": 0.78,
+          "observedX": 418.5972030857147,
+          "observedY": 643.1942826874513,
+          "observedNormalizedX": 1.1162592082285725,
+          "observedNormalizedY": 0.7921111855756789,
+          "observedDistancePx": 159.4008567909026,
+          "nodeCount": 14
+        },
+        {
+          "field": "longing",
+          "x": 67.5,
+          "y": 292.32,
+          "normalizedX": 0.18,
+          "normalizedY": 0.36,
+          "observedX": 365.99765656000056,
+          "observedY": 620.2727132369919,
+          "observedNormalizedX": 0.9759937508266682,
+          "observedNormalizedY": 0.7638826517696944,
+          "observedDistancePx": 443.4566868267031,
+          "nodeCount": 10
+        },
+        {
+          "field": "memory",
+          "x": 187.5,
+          "y": 178.64,
+          "normalizedX": 0.5,
+          "normalizedY": 0.21999999999999997,
+          "observedX": 451.58545996666703,
+          "observedY": 491.25124533631987,
+          "observedNormalizedX": 1.2042278932444455,
+          "observedNormalizedY": 0.6049892183944826,
+          "observedDistancePx": 409.22722401684234,
+          "nodeCount": 24
+        }
+      ],
+      "maxVelocity": 0,
+      "avgVelocity": 0,
+      "hasNaNState": false,
+      "centerDrift": 359.7498997131147,
+      "activeRegion": "none",
+      "silenceLevel": 1,
+      "memoryPressure": {
+        "usedJSHeapSize": 5080061,
+        "totalJSHeapSize": 8425333,
+        "jsHeapSizeLimit": 4294967296
+      },
+      "centerVelocityVariance": {
+        "unit": "px/frame variance",
+        "meanPxPerFrame": 0,
+        "variancePxPerFrame": 0,
+        "samples": 6
+      }
+    },
+    {
+      "elapsedMs": 2001,
+      "sampledAtMs": 2591019.5,
+      "href": "http://127.0.0.1:3000/lab?debug=physics",
+      "hidden": false,
+      "viewport": {
+        "width": 375,
+        "height": 812,
+        "devicePixelRatio": 1
+      },
+      "deviceContext": {
+        "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+        "osPlatform": "MacIntel",
+        "refreshRateHz": 60.00960153623239,
+        "batteryState": {
+          "supported": true,
+          "charging": false,
+          "level": 0.8
+        },
+        "powerMode": "unknown",
+        "inAppBrowser": false,
+        "hardwareConcurrency": 10,
+        "deviceMemoryGb": 16,
+        "maxTouchPoints": 0
+      },
+      "nodeCount": 99,
+      "springCount": 99,
+      "dustCount": 0,
+      "finiteCenters": 6,
+      "totalCenters": 6,
+      "centerTrajectorySnapshot": [
+        {
+          "field": "distance",
+          "x": 115.5,
+          "y": 633.36,
+          "normalizedX": 0.308,
+          "normalizedY": 0.78,
+          "observedX": 476.3294544571433,
+          "observedY": 540.6554962874512,
+          "observedNormalizedX": 1.2702118785523822,
+          "observedNormalizedY": 0.6658318919796198,
+          "observedDistancePx": 372.54801061397393,
+          "nodeCount": 14
+        },
+        {
+          "field": "ecstasy",
+          "x": 307.5,
+          "y": 292.32,
+          "normalizedX": 0.82,
+          "normalizedY": 0.36,
+          "observedX": 410.64366272000063,
+          "observedY": 568.0594624862719,
+          "observedNormalizedX": 1.095049767253335,
+          "observedNormalizedY": 0.699580618825458,
+          "observedDistancePx": 294.3991615672765,
+          "nodeCount": 10
+        },
+        {
+          "field": "entropy",
+          "x": 187.5,
+          "y": 451.472,
+          "normalizedX": 0.5,
+          "normalizedY": 0.5559999999999999,
+          "observedX": 458.77419345185257,
+          "observedY": 478.6239542013152,
+          "observedNormalizedX": 1.2233978492049402,
+          "observedNormalizedY": 0.589438367242999,
+          "observedDistancePx": 272.6296327435876,
+          "nodeCount": 27
+        },
+        {
+          "field": "eros",
+          "x": 259.5,
+          "y": 633.36,
+          "normalizedX": 0.692,
+          "normalizedY": 0.78,
+          "observedX": 418.5972030857147,
+          "observedY": 643.1942826874513,
+          "observedNormalizedX": 1.1162592082285725,
+          "observedNormalizedY": 0.7921111855756789,
+          "observedDistancePx": 159.4008567909026,
+          "nodeCount": 14
+        },
+        {
+          "field": "longing",
+          "x": 67.5,
+          "y": 292.32,
+          "normalizedX": 0.18,
+          "normalizedY": 0.36,
+          "observedX": 365.99765656000056,
+          "observedY": 620.2727132369919,
+          "observedNormalizedX": 0.9759937508266682,
+          "observedNormalizedY": 0.7638826517696944,
+          "observedDistancePx": 443.4566868267031,
+          "nodeCount": 10
+        },
+        {
+          "field": "memory",
+          "x": 187.5,
+          "y": 178.64,
+          "normalizedX": 0.5,
+          "normalizedY": 0.21999999999999997,
+          "observedX": 451.58545996666703,
+          "observedY": 491.25124533631987,
+          "observedNormalizedX": 1.2042278932444455,
+          "observedNormalizedY": 0.6049892183944826,
+          "observedDistancePx": 409.22722401684234,
+          "nodeCount": 24
+        }
+      ],
+      "maxVelocity": 0,
+      "avgVelocity": 0,
+      "hasNaNState": false,
+      "centerDrift": 359.7498997131147,
+      "activeRegion": "none",
+      "silenceLevel": 1,
+      "memoryPressure": {
+        "usedJSHeapSize": 4570469,
+        "totalJSHeapSize": 8425333,
+        "jsHeapSizeLimit": 4294967296
+      },
+      "centerVelocityVariance": {
+        "unit": "px/frame variance",
+        "meanPxPerFrame": 0,
+        "variancePxPerFrame": 0,
+        "samples": 6
+      }
+    },
+    {
+      "elapsedMs": 5001,
+      "sampledAtMs": 2594019.7,
+      "href": "http://127.0.0.1:3000/lab?debug=physics",
+      "hidden": false,
+      "viewport": {
+        "width": 375,
+        "height": 812,
+        "devicePixelRatio": 1
+      },
+      "deviceContext": {
+        "browserUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36",
+        "osPlatform": "MacIntel",
+        "refreshRateHz": 59.99520038394247,
+        "batteryState": {
+          "supported": true,
+          "charging": false,
+          "level": 0.8
+        },
+        "powerMode": "unknown",
+        "inAppBrowser": false,
+        "hardwareConcurrency": 10,
+        "deviceMemoryGb": 16,
+        "maxTouchPoints": 0
+      },
+      "nodeCount": 99,
+      "springCount": 99,
+      "dustCount": 0,
+      "finiteCenters": 6,
+      "totalCenters": 6,
+      "centerTrajectorySnapshot": [
+        {
+          "field": "distance",
+          "x": 115.5,
+          "y": 633.36,
+          "normalizedX": 0.308,
+          "normalizedY": 0.78,
+          "observedX": 476.3294544571433,
+          "observedY": 540.6554962874512,
+          "observedNormalizedX": 1.2702118785523822,
+          "observedNormalizedY": 0.6658318919796198,
+          "observedDistancePx": 372.54801061397393,
+          "nodeCount": 14
+        },
+        {
+          "field": "ecstasy",
+          "x": 307.5,
+          "y": 292.32,
+          "normalizedX": 0.82,
+          "normalizedY": 0.36,
+          "observedX": 410.64366272000063,
+          "observedY": 568.0594624862719,
+          "observedNormalizedX": 1.095049767253335,
+          "observedNormalizedY": 0.699580618825458,
+          "observedDistancePx": 294.3991615672765,
+          "nodeCount": 10
+        },
+        {
+          "field": "entropy",
+          "x": 187.5,
+          "y": 451.472,
+          "normalizedX": 0.5,
+          "normalizedY": 0.5559999999999999,
+          "observedX": 458.77419345185257,
+          "observedY": 478.6239542013152,
+          "observedNormalizedX": 1.2233978492049402,
+          "observedNormalizedY": 0.589438367242999,
+          "observedDistancePx": 272.6296327435876,
+          "nodeCount": 27
+        },
+        {
+          "field": "eros",
+          "x": 259.5,
+          "y": 633.36,
+          "normalizedX": 0.692,
+          "normalizedY": 0.78,
+          "observedX": 418.5972030857147,
+          "observedY": 643.1942826874513,
+          "observedNormalizedX": 1.1162592082285725,
+          "observedNormalizedY": 0.7921111855756789,
+          "observedDistancePx": 159.4008567909026,
+          "nodeCount": 14
+        },
+        {
+          "field": "longing",
+          "x": 67.5,
+          "y": 292.32,
+          "normalizedX": 0.18,
+          "normalizedY": 0.36,
+          "observedX": 365.99765656000056,
+          "observedY": 620.2727132369919,
+          "observedNormalizedX": 0.9759937508266682,
+          "observedNormalizedY": 0.7638826517696944,
+          "observedDistancePx": 443.4566868267031,
+          "nodeCount": 10
+        },
+        {
+          "field": "memory",
+          "x": 187.5,
+          "y": 178.64,
+          "normalizedX": 0.5,
+          "normalizedY": 0.21999999999999997,
+          "observedX": 451.58545996666703,
+          "observedY": 491.25124533631987,
+          "observedNormalizedX": 1.2042278932444455,
+          "observedNormalizedY": 0.6049892183944826,
+          "observedDistancePx": 409.22722401684234,
+          "nodeCount": 24
+        }
+      ],
+      "maxVelocity": 0,
+      "avgVelocity": 0,
+      "hasNaNState": false,
+      "centerDrift": 359.7498997131147,
+      "activeRegion": "none",
+      "silenceLevel": 1,
+      "memoryPressure": {
+        "usedJSHeapSize": 4868524,
+        "totalJSHeapSize": 7901044,
+        "jsHeapSizeLimit": 4294967296
+      },
+      "centerVelocityVariance": {
+        "unit": "px/frame variance",
+        "meanPxPerFrame": 0,
+        "variancePxPerFrame": 0,
+        "samples": 6
+      }
+    }
+  ]
+}

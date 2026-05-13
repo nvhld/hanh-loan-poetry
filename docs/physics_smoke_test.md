@@ -74,6 +74,31 @@ PR 3 cannot be locked until this preservation protocol is executed and recorded.
   - Center Velocity Variance:
   - Notes:
 
+### Recorded Run: `PR3-SMOKE-2026-05-13-A`
+
+- Test Date: `2026-05-13`
+- Tester: Codex / CDP probe
+- Browser: `Chrome/148.0.0.0`
+- OS: `MacIntel`
+- Viewport: `1200x792`, DPR `2`
+- Refresh Rate: approximately `60Hz`
+- Battery State: supported, unplugged, `0.82` at final visible-idle sample
+- Power Mode: `unknown`
+- In-app Browser: `no`
+- Route: `http://127.0.0.1:3000/lab?debug=physics`
+- Result: `DESKTOP PARTIAL`
+- Phenomenology Drift: `none observed in debug screenshots`
+- Recovery Time: `n/a`
+- Settled At: `120997ms`
+- Observed Memory Behavior: `stable by particle floor; heap profiler not run`
+- Console Warnings: none captured by probe
+- Center Trajectory Snapshot: recorded in `docs/baselines/physics/PR3-SMOKE-2026-05-13-A/visible-idle-30m.json`
+- Center Velocity Variance: max `0`
+- Notes:
+  - Visible idle ran for `1814995ms` (`30.25min`) with `31` samples.
+  - Cluster integrity stayed `6/6`; `hasNaNState=false`; particle floor stayed `0-0`.
+  - Hidden idle and minimized-window idle remain pending.
+
 ## Scenario 2: Tab Suspend / Resume
 
 - Action: background the tab for 10 minutes, then resume
@@ -103,6 +128,31 @@ PR 3 cannot be locked until this preservation protocol is executed and recorded.
   - Center Velocity Variance:
   - Notes:
 
+### Recorded Run: `PR3-SMOKE-2026-05-13-A`
+
+- Test Date: `2026-05-13`
+- Tester: Codex / CDP probe
+- Browser: `Chrome/148.0.0.0`
+- OS: `MacIntel`
+- Viewport: `1200x792`, DPR `2`
+- Refresh Rate: approximately `60Hz`
+- Battery State: supported, unplugged, `0.75` at post-resume final sample
+- Power Mode: `unknown`
+- In-app Browser: `no`
+- Route: `http://127.0.0.1:3000/lab?debug=physics`
+- Result: `DESKTOP PARTIAL`
+- Phenomenology Drift: `none observed in post-resume screenshot`
+- Recovery Time: approximately `2.0s`
+- Settled At: `2001ms`
+- Observed Memory Behavior: `stable by particle floor; heap profiler not run`
+- Console Warnings: none captured by probe
+- Center Trajectory Snapshot: recorded in `docs/baselines/physics/PR3-SMOKE-2026-05-13-A/post-background-resume-recovery.json`
+- Center Velocity Variance: max `0`
+- Notes:
+  - Foreground was switched to `about:blank` to background the topology tab before reactivation.
+  - One helper restore command failed because target id was not exported; corrected restore/probe evidence is recorded.
+  - This is desktop Chrome evidence only, not Safari/mobile suspension evidence.
+
 ## Scenario 3: Resize Abuse
 
 - Action: repeated resize on desktop and repeated viewport rotation on mobile
@@ -130,6 +180,30 @@ PR 3 cannot be locked until this preservation protocol is executed and recorded.
   - Center Trajectory Snapshot:
   - Center Velocity Variance:
   - Notes:
+
+### Recorded Run: `PR3-SMOKE-2026-05-13-A`
+
+- Test Date: `2026-05-13`
+- Tester: Codex / CDP probe
+- Browser: `Chrome/148.0.0.0`
+- OS: `MacIntel`
+- Viewport: `900x700`, `375x812`, `812x375`, `1440x900`
+- Refresh Rate: approximately `60Hz`
+- Battery State: supported, unplugged, approximately `0.80`
+- Power Mode: `unknown`
+- In-app Browser: `no`
+- Route: `http://127.0.0.1:3000/lab?debug=physics`
+- Result: `DESKTOP PARTIAL`
+- Phenomenology Drift: `none observed in debug screenshots`
+- Recovery Time: approximately `2.0s`
+- Settled At: `2001-2002ms`
+- Observed Memory Behavior: `stable by particle floor; heap profiler not run`
+- Console Warnings: none captured by probe
+- Center Trajectory Snapshot: recorded in resize recovery JSON files under `docs/baselines/physics/PR3-SMOKE-2026-05-13-A/`
+- Center Velocity Variance: max `0`
+- Notes:
+  - Cluster integrity stayed `6/6`; `hasNaNState=false`; particle floor stayed `0-0`.
+  - Mobile viewports were CDP emulation only and must not be counted as real-device mobile pass.
 
 ## Scenario 4: Debug Overlay Validation
 
@@ -199,6 +273,13 @@ PR 3 cannot be locked until this preservation protocol is executed and recorded.
   - Center Trajectory Snapshot:
   - Center Velocity Variance:
   - Notes:
+
+### Recorded Run: `PR3-SMOKE-2026-05-13-A`
+
+- Result: `UNVERIFIED`
+- Notes:
+  - No real iOS Safari or Android Chrome device was tested in this run.
+  - CDP mobile viewport emulation was used only for resize trajectory evidence.
 
 ## Cooling Period Confirmation
 

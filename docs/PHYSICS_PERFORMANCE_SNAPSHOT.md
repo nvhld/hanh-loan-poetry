@@ -73,6 +73,45 @@ This file is the regression baseline for PR 3 smoke validation. It is not a pass
   - Full elapsed-time idle/resume validation is still pending.
   - Preflight predates `pr3-physics-probe-v1`; rerun before lock with center trajectory snapshots and center velocity variance.
 
+## Desktop CDP Smoke Run — `PR3-SMOKE-2026-05-13-A`
+
+- Status: `DESKTOP PARTIAL`
+- Route: `http://127.0.0.1:3000/lab?debug=physics`
+- Evidence directory: `docs/baselines/physics/PR3-SMOKE-2026-05-13-A/`
+- Browser: `Chrome/148.0.0.0`
+- OS: browser-reported `MacIntel`
+- Refresh rate: approximately `60Hz`
+- Battery state: supported, unplugged, observed range `0.75-0.82`
+- Power mode: `unknown`
+- In-app browser: `no`
+- Node count: `99`
+- Visible idle duration: `1814995ms` (`30.25min`)
+- Visible idle result:
+  - cluster integrity: `6/6`
+  - NaN state: `false`
+  - particle floor: `0-0`
+  - max velocity: `0`
+  - center velocity variance max: `0`
+  - settled at: `120997ms`
+- Resize / restore recovery:
+  - `900x700`: settled at `2002ms`
+  - `375x812` emulated mobile: settled at `2001ms`
+  - `812x375` emulated mobile: settled at `2001ms`
+  - `1440x900` restore: settled at `2001ms`
+- Background tab / resume recovery:
+  - settled at: `2001ms`
+  - cluster integrity: `6/6`
+  - NaN state: `false`
+  - particle floor: `0-0`
+- Observed Memory Behavior: `stable by particle floor; heap profiler not run`
+- Phenomenology drift: `none observed in debug screenshots`
+- Mobile thermal sanity: `UNVERIFIED`; no real iOS Safari or Android Chrome device was tested.
+- Remaining lock blockers:
+  - hidden idle with clean harness record
+  - minimized-window idle
+  - real mobile thermal sanity
+  - 24h cooling period and short rerun
+
 ## Overlay Format Freeze
 
 - `Cluster Integrity`
