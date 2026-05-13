@@ -266,7 +266,8 @@ def validate_orphans() -> tuple[bool, list[str]]:
     final_payload = load_json(final_path)
     final_ids = {poem["id"] for poem in final_payload.get("poems", []) if isinstance(poem, dict)}
     referenced_ids: set[str] = set()
-    for entry in lens:
+    entries = lens.get("poem_notes", []) if isinstance(lens, dict) else lens
+    for entry in entries:
         if not isinstance(entry, dict):
             continue
         poem_ids = entry.get("poemId", [])
@@ -277,6 +278,72 @@ def validate_orphans() -> tuple[bool, list[str]]:
     orphans = referenced_ids - final_ids
     if orphans:
         errors.append(f"❌ Orphan critical-lens ids: {sorted(orphans)}")
+    return bool(errors), errors
+
+
+def extract_js_string_array(text: str, label: str) -> list[str]:
+    match = re.search(rf"{label}\s*=\s*(?:new Set\()?[\r\n\s]*\[([^\]]*)\]", text, re.MULTILINE)
+    if not match:
+        return []
+    return re.findall(r"['\"]([^'\"]+)['\"]", match.group(1))
+
+
+def validate_instrument_modal() -> tuple[bool, list[str]]:
+    errors: list[str] = []
+    anchor_path = LITERARY_DIR / "anchor_mri.json"
+    inline_path = LITERARY_DIR / "anchor_mri_inline.js"
+    reader_path = LITERARY_DIR / "reader.html"
+    pending_path = LITERARY_DIR / "pending-modal.js"
+    translator_path = LITERARY_DIR / "instrument_translator.js"
+
+    for path in (anchor_path, inline_path, reader_path, pending_path, translator_path):
+        if not path.exists():
+            errors.append(f"❌ Instrument Modal required file missing: {path}")
+    if errors:
+        return True, errors
+
+    anchor_data = load_json(anchor_path)
+    if not isinstance(anchor_data, dict):
+        errors.append("❌ anchor_mri.json must be an object keyed by poem id")
+        return True, errors
+    anchor_ids = set(anchor_data)
+    if len(anchor_ids) != 12:
+        errors.append(f"❌ Instrument Modal expects exactly 12 anchor MRI entries, got {len(anchor_ids)}")
+
+    inline_text = inline_path.read_text(encoding="utf-8")
+    inline_match = re.search(r"const\s+ANCHOR_MRI_DATA\s*=\s*(\{.*\});?\s*$", inline_text, re.DOTALL)
+    if not inline_match:
+        errors.append("❌ anchor_mri_inline.js must assign const ANCHOR_MRI_DATA")
+    else:
+        inline_data = json.loads(inline_match.group(1))
+        if inline_data != anchor_data:
+            errors.append("❌ anchor_mri_inline.js drift detected against anchor_mri.json")
+
+    pending_ids = set(extract_js_string_array(pending_path.read_text(encoding="utf-8"), "ANCHOR_12_IDS"))
+    reader_ids = set(extract_js_string_array(reader_path.read_text(encoding="utf-8"), "ANCHOR_IDS"))
+    if pending_ids != anchor_ids:
+        errors.append(f"❌ PendingModal anchor set drift: {sorted(pending_ids ^ anchor_ids)}")
+    if reader_ids != anchor_ids:
+        errors.append(f"❌ reader.html ANCHOR_IDS drift: {sorted(reader_ids ^ anchor_ids)}")
+
+    reader_text = reader_path.read_text(encoding="utf-8")
+    for needle in (
+        "InstrumentModal.hasSignal(p.id)",
+        "InstrumentModal.open(p.id)",
+        "window.InstrumentModal = { open, dismiss, hasSignal };",
+    ):
+        if needle not in reader_text:
+            errors.append(f"❌ Instrument Modal reader guard missing: {needle}")
+
+    translator_text = translator_path.read_text(encoding="utf-8")
+    for needle in (
+        "window.InstrumentTranslator = { translateMRI };",
+        "No generative prose.",
+        "No interpretation.",
+    ):
+        if needle not in translator_text:
+            errors.append(f"❌ Instrument translator contract missing: {needle}")
+
     return bool(errors), errors
 
 
@@ -451,7 +518,7 @@ def main() -> None:
 
     sections: list[str] = []
     has_error = False
-    validations = [validate_generated, validate_utf8_and_forbidden_patch, validate_orphans, validate_duplicate_runtime]
+    validations = [validate_generated, validate_utf8_and_forbidden_patch, validate_orphans, validate_instrument_modal, validate_duplicate_runtime]
     if args.preserve_runtime:
         validations.append(validate_runtime_preservation)
     for fn in validations:
