@@ -30,8 +30,16 @@ If an anchor id is missing MRI data, the modal must not open.
 1. User opens an anchor poem.
 2. User enables Lens.
 3. Whisper appears after the existing threshold.
-4. Clicking the whisper opens Instrument Modal.
+4. Clicking the whisper begins a three-state instrument reveal.
 5. Escape or outside click dismisses the modal.
+
+## Three-State Reveal
+
+1. Residue: `FIELD RESIDUE DETECTED` for approximately `1.2s`.
+2. Scan: `structural compression stabilizing...` for approximately `1.8s`.
+3. Reading Instrument: `FIELD MOTION`, `STRUCTURAL WEATHER`, and `ABSENCE` fade in with staggered opacity.
+
+No spinner. No terminal animation. No typewriter effect. No visual CTA.
 
 No React takeover. No iframe. No topology dependency.
 
@@ -44,6 +52,7 @@ No React takeover. No iframe. No topology dependency.
 - anchor id sets stay synchronized.
 - reader uses `InstrumentModal.hasSignal()` before opening.
 - translator keeps its template-only export contract.
+- translator keeps a text humility filter for over-confident interpretive phrasing.
 
 ## Non-Goals
 
@@ -52,3 +61,4 @@ No React takeover. No iframe. No topology dependency.
 - No dust, drift, damping, cluster, or canvas changes.
 - No full critical essay surface yet.
 - No non-anchor modal expansion.
+- No modal stacking.

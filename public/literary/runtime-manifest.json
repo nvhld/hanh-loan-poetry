@@ -1,7 +1,7 @@
 {
   "version": "pr4-runtime-1",
   "runtimeVersion": "2026.05.13-atmospheric-freeze",
-  "generatedAt": "2026-05-13T07:09:46.236862+00:00",
+  "generatedAt": "2026-05-13T07:37:01.472402+00:00",
   "runtimeRoot": "/literary/",
   "entries": {
     "reader": {
@@ -18,7 +18,7 @@
         "anchor_mri.json",
         "motif_clusters.json"
       ],
-      "sha256": "48368ea76c079dc536eb13ab0899aa30625159f42f69a6993a99d143533fe323"
+      "sha256": "c2a66c5460f20b69a9285d20be027d66927b3fecd46bd01e6393f81ff781ec5e"
     },
     "archive": {
       "file": "archive.html",
@@ -79,7 +79,7 @@
     },
     {
       "path": "instrument_translator.js",
-      "sha256": "67421cbcfb7af0d50c576fb75b099d48c73e526d10f14f6bdae7003b47355a9e"
+      "sha256": "cd8018d2d4d1c536d6c413bdbc254669c7f4855f4989f1421ae1014acadb97be"
     },
     {
       "path": "motif_clusters.json",
@@ -95,7 +95,7 @@
     },
     {
       "path": "reader.html",
-      "sha256": "48368ea76c079dc536eb13ab0899aa30625159f42f69a6993a99d143533fe323"
+      "sha256": "c2a66c5460f20b69a9285d20be027d66927b3fecd46bd01e6393f81ff781ec5e"
     },
     {
       "path": "topology.html",

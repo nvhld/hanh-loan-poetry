@@ -665,9 +665,41 @@
       padding: 36px 40px 44px;
       pointer-events: auto;
     }
-    .im-section {
-      margin-bottom: 0;
+    .im-residue,
+    .im-scan,
+    .im-final {
+      opacity: 0;
+      transition: opacity 900ms ease;
     }
+    .im-residue.im-stage-visible,
+    .im-scan.im-stage-visible,
+    .im-final.im-stage-visible {
+      opacity: 1;
+    }
+    .im-residue {
+      font-family: 'Outfit', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(220, 219, 227, 0.42);
+    }
+    .im-scan {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      line-height: 1.9;
+      color: rgba(220, 219, 227, 0.56);
+    }
+    .im-section {
+      opacity: 0;
+      margin-bottom: 0;
+      transition: opacity 1100ms ease;
+    }
+    .im-final.im-stage-visible .im-section {
+      opacity: 1;
+    }
+    .im-final.im-stage-visible .im-section:nth-child(1) { transition-delay: 0ms; }
+    .im-final.im-stage-visible .im-section:nth-child(2) { transition-delay: 280ms; }
+    .im-final.im-stage-visible .im-section:nth-child(3) { transition-delay: 560ms; }
     .im-section + .im-section:nth-child(2) { margin-top: 24px; }
     .im-section + .im-section:nth-child(3) { margin-top: 38px; }
     .im-section + .im-section:nth-child(4) { margin-top: 31px; }
@@ -705,6 +737,7 @@
     @media (max-width: 640px) {
       #im-box { padding: 28px 24px 36px; }
       #im-overlay { padding-top: 10vh; }
+      .im-residue { letter-spacing: 0.22em; }
     }
 
     @media print {
@@ -2125,12 +2158,28 @@
     'use strict';
 
     const isLocalFile = window.location.protocol === 'file:';
+    const RESIDUE_MS = 1200;
+    const SCAN_MS = 1800;
+    const MODAL_CLEAR_MS = 920;
     let _mriCache = null;        // loaded once
     let _overlayEl = null;       // #im-overlay
     let _escHandler = null;
+    let _phaseTimers = [];
+    let _clearContentTimer = null;
+    let _activePoemId = null;
 
     function getOverlay() {
       return _overlayEl || (_overlayEl = document.getElementById('im-overlay'));
+    }
+
+    function clearPhaseTimers() {
+      _phaseTimers.forEach(timer => clearTimeout(timer));
+      _phaseTimers = [];
+    }
+
+    function schedulePhase(fn, delay) {
+      const timer = setTimeout(fn, delay);
+      _phaseTimers.push(timer);
     }
 
     function escapeHTML(value) {
@@ -2143,9 +2192,9 @@
 
     function buildHTML(blocks) {
       const sections = [
-        { label: 'drift',    lines: blocks.drift },
-        { label: 'pressure', lines: blocks.pressure },
-        { label: 'absence',  lines: blocks.absence },
+        { label: 'FIELD MOTION',        lines: blocks.drift },
+        { label: 'STRUCTURAL WEATHER',  lines: blocks.pressure },
+        { label: 'ABSENCE',             lines: blocks.absence },
       ];
       return sections.map(s => {
         const items = s.lines.length
@@ -2158,12 +2207,49 @@
       }).join('');
     }
 
+    function renderResidue() {
+      const box = getOverlay().querySelector('#im-box');
+      if (!box) return false;
+      box.innerHTML = '<div class="im-residue">FIELD RESIDUE DETECTED</div>';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const residue = box.querySelector('.im-residue');
+        if (residue) residue.classList.add('im-stage-visible');
+      }));
+      return true;
+    }
+
+    function renderScan() {
+      const box = getOverlay().querySelector('#im-box');
+      if (!box) return;
+      box.innerHTML = '<div class="im-scan">structural compression stabilizing...</div>';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const scan = box.querySelector('.im-scan');
+        if (scan) scan.classList.add('im-stage-visible');
+      }));
+    }
+
+    function renderInstrument(blocks) {
+      const box = getOverlay().querySelector('#im-box');
+      if (!box) return;
+      box.innerHTML = `<div class="im-final">${buildHTML(blocks)}</div>`;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const final = box.querySelector('.im-final');
+        if (final) final.classList.add('im-stage-visible');
+      }));
+    }
+
     function dismiss() {
       const ov = getOverlay();
       if (!ov) return;
+      clearPhaseTimers();
+      _activePoemId = null;
       ov.classList.remove('im-visible');
       if (_escHandler) { document.removeEventListener('keydown', _escHandler); _escHandler = null; }
-      setTimeout(() => { ov.querySelector('#im-box').innerHTML = ''; }, 920);
+      if (_clearContentTimer) clearTimeout(_clearContentTimer);
+      _clearContentTimer = setTimeout(() => {
+        ov.querySelector('#im-box').innerHTML = '';
+        _clearContentTimer = null;
+      }, MODAL_CLEAR_MS);
     }
 
     function render(mriEntry) {
@@ -2171,13 +2257,21 @@
       const translator = window.InstrumentTranslator;
       if (!translator) return false;
       const blocks = translator.translateMRI(mriEntry);
-      const box = getOverlay().querySelector('#im-box');
-      if (!box) return false;
-      box.innerHTML = buildHTML(blocks);
-
       const ov = getOverlay();
-      ov.classList.remove('im-visible');  // reset if already open
+      clearPhaseTimers();
+      if (_clearContentTimer) {
+        clearTimeout(_clearContentTimer);
+        _clearContentTimer = null;
+      }
+      if (_escHandler) {
+        document.removeEventListener('keydown', _escHandler);
+        _escHandler = null;
+      }
+      renderResidue();
+      ov.classList.remove('im-visible'); // reset if already open
       requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('im-visible')));
+      schedulePhase(renderScan, RESIDUE_MS);
+      schedulePhase(() => renderInstrument(blocks), RESIDUE_MS + SCAN_MS);
 
       // Close: outside click
       ov.onclick = (e) => { if (!e.target.closest('#im-box')) dismiss(); };
@@ -2203,6 +2297,10 @@
       if (typeof PendingModal !== 'undefined' && !PendingModal.isAnchor(poemId)) {
         return false;
       }
+      if (_activePoemId === poemId && getOverlay()?.classList.contains('im-visible')) {
+        return true;
+      }
+      _activePoemId = poemId;
 
       const cached = cache();
       if (cached) {

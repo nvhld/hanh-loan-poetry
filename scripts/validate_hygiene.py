@@ -149,6 +149,14 @@ def extract_required(pattern: str, text: str, label: str, cast=float):
     return cast(match.group(1))
 
 
+def extract_first(patterns: tuple[str, ...], text: str, label: str, cast=float):
+    for pattern in patterns:
+        match = re.search(pattern, text, re.MULTILINE)
+        if match:
+            return cast(match.group(1))
+    raise ValueError(f"Missing pattern for {label}: {patterns[0]}")
+
+
 def build_phenomenology_snapshot() -> dict:
     reader_text = (LITERARY_DIR / "reader.html").read_text(encoding="utf-8")
     archive_text = (LITERARY_DIR / "archive.html").read_text(encoding="utf-8")
@@ -171,7 +179,10 @@ def build_phenomenology_snapshot() -> dict:
             "transitPressureDelayMs": int(extract_required(r"ghost\.classList\.add\('pressure'\); }, ([0-9]+)\)\);", reader_text, "reader transit pressure", int)),
             "transitTitleDelayMs": int(extract_required(r"ghost\.style\.cursor = 'pointer';\s+ghost\.onclick = \(\) => { if \(_transitTarget\) transitTo\(_transitTarget\); };\s+}, ([0-9]+)\)\);", reader_text, "reader transit title", int)),
             "transitWarmthDelayMs": int(extract_required(r"ghost\.classList\.add\('warmth'\); }, ([0-9]+)\)\);", reader_text, "reader transit warmth", int)),
-            "instrumentModalClearMs": int(extract_required(r"ov\.querySelector\('#im-box'\)\.innerHTML = '';\s+}, ([0-9]+)\);", reader_text, "reader instrument modal clear", int)),
+            "instrumentModalClearMs": int(extract_first((
+                r"const MODAL_CLEAR_MS = ([0-9]+);",
+                r"ov\.querySelector\('#im-box'\)\.innerHTML = '';\s+}, ([0-9]+)\);",
+            ), reader_text, "reader instrument modal clear", int)),
         },
         "archive": {
             "navigationFadeMs": int(extract_required(r"window\.location\.href = row\.href; }, ([0-9]+)\);", archive_text, "archive navigation fade", int)),
@@ -340,6 +351,8 @@ def validate_instrument_modal() -> tuple[bool, list[str]]:
         "window.InstrumentTranslator = { translateMRI };",
         "No generative prose.",
         "No interpretation.",
+        "HUMILITY_BLOCKLIST",
+        "filterHumility",
     ):
         if needle not in translator_text:
             errors.append(f"❌ Instrument translator contract missing: {needle}")
