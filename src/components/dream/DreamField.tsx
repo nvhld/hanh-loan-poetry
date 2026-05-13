@@ -11,20 +11,22 @@ import { useEffect, useRef, useCallback, useState } from 'react'
 import type { Poem } from '@/types/poem'
 import type { GravityEdge } from '@/types/poem'
 import type { FieldNode } from '@/engine/field'
-import { createFieldSimulation, computeClusterCenters } from '@/engine/field'
+import { createFieldSimulation } from '@/engine/field'
 import { loadEngravings } from '@/engine/memory'
 import { FIELD_COLORS } from '@/engine/gravity'
+import { DREAM_DEBUG_PHYSICS, DREAM_RENDER_PHYSICS, FIELD_PHYSICS } from '@/config/physics'
+
+declare global {
+  interface Window {
+    __HL_DEBUG_PHYSICS?: boolean
+  }
+}
 
 interface DreamFieldProps {
   poems: Poem[]
   edges: GravityEdge[]
   onPoemSelect: (poem: Poem) => void
   activeFilter: string | null
-}
-
-// Biological easing — hesitant, pulling, slightly behind
-function biologicalLerp(current: number, target: number, alpha: number): number {
-  return current + (target - current) * alpha * 0.08
 }
 
 export default function DreamField({
@@ -34,18 +36,19 @@ export default function DreamField({
   const animRef = useRef<number>(0)
   const nodesRef = useRef<FieldNode[]>([])
   const simRef = useRef<ReturnType<typeof createFieldSimulation> | null>(null)
+  const debugPhysicsRef = useRef(false)
 
   // Hover state — afterimage system
   const hoveredRef = useRef<string | null>(null)
   const afterimageRef = useRef<Map<string, number>>(new Map()) // poemId → opacity
 
-  // Camera/pan state
-  const transformRef = useRef({ x: 0, y: 0, scale: 1 })
-
-  // Mouse position for hover detection
-  const mouseRef = useRef({ x: 0, y: 0 })
-
   const [hoveredPoem, setHoveredPoem] = useState<Poem | null>(null)
+  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 })
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    debugPhysicsRef.current = params.get('debug') === 'physics' || window.__HL_DEBUG_PHYSICS === true
+  }, [])
 
   // Draw a single poem node
   const drawNode = useCallback((
@@ -115,8 +118,87 @@ export default function DreamField({
     ctx.restore()
   }, [])
 
-  // Main render loop
-  const render = useCallback(() => {
+  function drawPhysicsDebug(ctx: CanvasRenderingContext2D) {
+    const snapshot = simRef.current?.getDebugSnapshot()
+    if (!snapshot) return
+
+    ctx.save()
+    ctx.font = '10px monospace'
+    ctx.lineWidth = 1
+    ctx.fillStyle = 'rgba(255,255,255,0.72)'
+    ctx.fillText('debug=physics', DREAM_DEBUG_PHYSICS.panelX, DREAM_DEBUG_PHYSICS.panelY)
+
+    const hovered = hoveredRef.current
+    const activeNode = hovered ? snapshot.nodes.find(node => node.id === hovered) : null
+    const avgVelocity = snapshot.nodes.length
+      ? snapshot.nodes.reduce((sum, node) => sum + Math.hypot(node.vx, node.vy), 0) / snapshot.nodes.length
+      : 0
+    const maxVelocity = snapshot.nodes.length
+      ? Math.max(...snapshot.nodes.map(node => Math.hypot(node.vx, node.vy)))
+      : 0
+    const finiteCenters = Object.values(snapshot.clusterCenters).filter(center => Number.isFinite(center.x) && Number.isFinite(center.y)).length
+    const totalCenters = Object.keys(snapshot.clusterCenters).length
+    const centerDrift = snapshot.nodes.length
+      ? snapshot.nodes.reduce((sum, node) => {
+          const center = snapshot.clusterCenters[node.dominantField]
+          return center ? sum + Math.hypot(center.x - node.x, center.y - node.y) : sum
+        }, 0) / snapshot.nodes.length
+      : 0
+    const hasNaNState = snapshot.nodes.some(
+      (node) => !Number.isFinite(node.x) || !Number.isFinite(node.y) || !Number.isFinite(node.vx) || !Number.isFinite(node.vy),
+    )
+    const overlayLines = [
+      'Debug Overlay API: HL Physics v1',
+      `Cluster Integrity: ${finiteCenters}/${totalCenters}`,
+      `Velocity Ceiling: ${maxVelocity.toFixed(3)} / ${FIELD_PHYSICS.clusterMaxVelocity.toFixed(3)}`,
+      `NaN State: ${hasNaNState ? 'FAIL' : 'OK'}`,
+      `Center Drift: ${centerDrift.toFixed(2)}`,
+      'Particle Pressure: n/a',
+      `Active Region: ${activeNode?.dominantField ?? 'none'}`,
+    ]
+    overlayLines.forEach((line, index) => {
+      ctx.fillText(
+        line,
+        DREAM_DEBUG_PHYSICS.panelX,
+        DREAM_DEBUG_PHYSICS.panelY + index * 14,
+      )
+    })
+    ctx.fillText(
+      `Drift Mean: ${avgVelocity.toFixed(3)}`,
+      DREAM_DEBUG_PHYSICS.panelX,
+      DREAM_DEBUG_PHYSICS.panelY + overlayLines.length * 14,
+    )
+
+    for (const [field, center] of Object.entries(snapshot.clusterCenters)) {
+      const color = FIELD_COLORS[field as keyof typeof FIELD_COLORS]?.glow ?? '#ffffff'
+      ctx.strokeStyle = hexToRgba(color, 0.55)
+      ctx.fillStyle = hexToRgba(color, 0.8)
+      ctx.beginPath()
+      ctx.arc(center.x, center.y, DREAM_DEBUG_PHYSICS.centerMarkerRadius, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.beginPath()
+      ctx.arc(center.x, center.y, DREAM_DEBUG_PHYSICS.attractionRadius, 0, Math.PI * 2)
+      ctx.stroke()
+      ctx.fillText(field, center.x + 8, center.y - 8)
+    }
+
+    for (const node of snapshot.nodes.slice(0, DREAM_DEBUG_PHYSICS.maxVectors)) {
+      const center = snapshot.clusterCenters[node.dominantField]
+      if (!center) continue
+      ctx.strokeStyle = 'rgba(255,255,255,0.22)'
+      ctx.beginPath()
+      ctx.moveTo(node.x, node.y)
+      ctx.lineTo(
+        node.x + (center.x - node.x) * DREAM_DEBUG_PHYSICS.vectorScale,
+        node.y + (center.y - node.y) * DREAM_DEBUG_PHYSICS.vectorScale
+      )
+      ctx.stroke()
+    }
+    ctx.restore()
+  }
+
+  // Main frame render. The RAF loop itself lives in the effect below.
+  const renderFrame = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
@@ -127,7 +209,7 @@ export default function DreamField({
     const nodes = nodesRef.current
 
     // --- Clear with subtle persistence (afterimage layer) ---
-    ctx.fillStyle = 'rgba(4, 4, 12, 0.82)' // not 1.0 — intentional ghosting
+    ctx.fillStyle = `rgba(4, 4, 12, ${DREAM_RENDER_PHYSICS.canvasPersistenceAlpha})` // intentional ghosting
     ctx.fillRect(0, 0, W, H)
 
     // --- Draw links (gravity field — very subtle) ---
@@ -145,8 +227,6 @@ export default function DreamField({
       // Only brighten edges when filter is active
       const visible = !activeFilter || isActive
       if (!visible) continue
-
-      const opacity = activeFilter && isActive ? edge.strength * 0.35 : edge.strength * 0.08
 
       drawLink(
         ctx,
@@ -167,10 +247,14 @@ export default function DreamField({
       const afterAlpha = afterimageRef.current.get(node.id) ?? 0
       if (afterAlpha > 0.01) {
         drawNode(ctx, node, afterAlpha * 0.4)
-        afterimageRef.current.set(node.id, afterAlpha * 0.94)
+        afterimageRef.current.set(node.id, afterAlpha * DREAM_RENDER_PHYSICS.afterimageDecay)
       }
 
       drawNode(ctx, node, alpha)
+    }
+
+    if (debugPhysicsRef.current || window.__HL_DEBUG_PHYSICS === true) {
+      drawPhysicsDebug(ctx)
     }
 
     // --- Hover label ---
@@ -191,7 +275,6 @@ export default function DreamField({
       }
     }
 
-    animRef.current = requestAnimationFrame(render)
   }, [edges, activeFilter, drawNode, drawLink])
 
   // Initialize simulation
@@ -216,12 +299,27 @@ export default function DreamField({
     )
     simRef.current = sim
 
-    animRef.current = requestAnimationFrame(render)
+    const resizeObserver = new ResizeObserver(([entry]) => {
+      const nextW = Math.round(entry.contentRect.width)
+      const nextH = Math.round(entry.contentRect.height)
+      if (nextW <= 0 || nextH <= 0) return
+      canvas.width = nextW
+      canvas.height = nextH
+      sim.resize(nextW, nextH)
+    })
+    resizeObserver.observe(canvas)
+
+    const tick = () => {
+      renderFrame()
+      animRef.current = requestAnimationFrame(tick)
+    }
+    animRef.current = requestAnimationFrame(tick)
     return () => {
+      resizeObserver.disconnect()
       cancelAnimationFrame(animRef.current)
       sim.stop()
     }
-  }, [poems, edges, render])
+  }, [poems, edges, renderFrame])
 
   // Hit detection
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -230,18 +328,18 @@ export default function DreamField({
     const rect = canvas.getBoundingClientRect()
     const mx = e.clientX - rect.left
     const my = e.clientY - rect.top
-    mouseRef.current = { x: mx, y: my }
+    setTooltipPos({ x: mx, y: my })
 
     const hit = nodesRef.current.find(n => {
       const dx = (n.x ?? 0) - mx
       const dy = (n.y ?? 0) - my
-      return Math.sqrt(dx * dx + dy * dy) <= n.radius + 8
+      return Math.sqrt(dx * dx + dy * dy) <= n.radius + DREAM_RENDER_PHYSICS.hoverRevealPadding
     })
 
     if (hit?.id !== hoveredRef.current) {
       // Trigger afterimage on previous hover
       if (hoveredRef.current) {
-        afterimageRef.current.set(hoveredRef.current, 0.7)
+        afterimageRef.current.set(hoveredRef.current, DREAM_RENDER_PHYSICS.hoverAfterimageAlpha)
       }
       hoveredRef.current = hit?.id ?? null
       setHoveredPoem(hit?.poem ?? null)
@@ -259,13 +357,17 @@ export default function DreamField({
     const hit = nodesRef.current.find(n => {
       const dx = (n.x ?? 0) - mx
       const dy = (n.y ?? 0) - my
-      return Math.sqrt(dx * dx + dy * dy) <= n.radius + 8
+      return Math.sqrt(dx * dx + dy * dy) <= n.radius + DREAM_RENDER_PHYSICS.hoverRevealPadding
     })
 
     if (hit) {
       onPoemSelect(hit.poem)
       // Perturb nearby nodes — the observer effect
-      simRef.current?.perturb(hit.id, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8)
+      simRef.current?.perturb(
+        hit.id,
+        (Math.random() - 0.5) * DREAM_RENDER_PHYSICS.perturbImpulse,
+        (Math.random() - 0.5) * DREAM_RENDER_PHYSICS.perturbImpulse
+      )
     }
   }, [onPoemSelect])
 
@@ -284,8 +386,8 @@ export default function DreamField({
         <div
           className="poem-tooltip"
           style={{
-            left: mouseRef.current.x + 16,
-            top: mouseRef.current.y - 10,
+            left: tooltipPos.x + 16,
+            top: tooltipPos.y - 10,
           }}
         >
           <p className="text-xs text-white/50 font-light leading-relaxed whitespace-pre-line">
