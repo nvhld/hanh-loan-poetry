@@ -178,6 +178,10 @@
       transition: opacity 0.5s ease 0s, visibility 0s linear 0s;
     }
 
+    body.minimal-mode.direct-entry #poem-text.visible {
+      transition: opacity 0.7s ease 0s, visibility 0s linear 0s;
+    }
+
     body.minimal-mode #poem-veil.active {
       transition: opacity 0.5s ease 0s, visibility 0s linear 0s;
     }
@@ -187,12 +191,25 @@
       padding-bottom: 12dvh;
     }
 
+    body.minimal-mode.direct-entry #poem-text {
+      padding-top: 7dvh;
+    }
+
+    body.minimal-mode.direct-entry .pt-title {
+      margin-bottom: 24px;
+    }
+
     body.minimal-mode .pt-body {
       max-height: none;
       overflow: visible;
       padding-bottom: 16px;
       -webkit-mask-image: none;
       mask-image: none;
+    }
+
+    body.minimal-mode.direct-entry .pt-body {
+      padding-top: 0;
+      margin-top: 0;
     }
 
     .pt-title {
@@ -1808,6 +1825,10 @@
       const tg = document.getElementById('transit-ghost');
       if (tg) { tg.className = ''; document.getElementById('transit-phrase').textContent = ''; document.getElementById('transit-title').textContent = ''; }
       document.getElementById('poem-veil').classList.add('active');
+      if (window._isMinimalMode && window._isDirectEntry) {
+        document.getElementById('poem-text').classList.add('visible');
+        return;
+      }
       // no setTimeout trick — just let the CSS transitions do the timing
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -2065,8 +2086,12 @@
         || forcedMinimal
         || /FBAN|FBAV|Zalo/i.test(navigator.userAgent)
         || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      window._isDirectEntry = isDirect;
       if (window._isMinimalMode) {
         document.body.classList.add('minimal-mode');
+      }
+      if (isDirect) {
+        document.body.classList.add('direct-entry');
       }
 
       const th = document.getElementById('threshold');
@@ -2080,7 +2105,12 @@
           th.classList.add('dissolve');
           setTimeout(() => { th.style.display = 'none'; }, window._isMinimalMode ? 500 : 4000);
         }
-        document.getElementById('dream').classList.add('visible');
+        const dream = document.getElementById('dream');
+        if (isDirectEnter && window._isMinimalMode) {
+          setTimeout(() => dream.classList.add('visible'), 2400);
+        } else {
+          dream.classList.add('visible');
+        }
         document.getElementById('surface-exit').classList.add('visible');
         touch();
       }

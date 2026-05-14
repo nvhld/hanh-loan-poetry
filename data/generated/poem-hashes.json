@@ -1,0 +1,603 @@
+{
+  "schemaVersion": "2.0.0",
+  "generatedAt": "2026-05-13T02:18:28.762956+00:00",
+  "sourceHash": "c97083e9046cb8ebb386cae0867a7a3d4cefb8de367a39659a6a23f13244987d",
+  "artifact": "poem-hashes",
+  "count": 99,
+  "poems": [
+    {
+      "id": "2016-008-vui",
+      "slug": "vui",
+      "title": "VÙI",
+      "hash": "b8e4791fd674311647a0f677c87dd430e7d65c29ca0f91e5f7de702cf358faae"
+    },
+    {
+      "id": "2018-010-chiem-nghiem",
+      "slug": "chiem-nghiem",
+      "title": "CHIÊM NGHIỆM",
+      "hash": "10c941e6a1bb84e21a6740b2631fb2e0e359d5063f05f99b329a0d3d069be181"
+    },
+    {
+      "id": "2018-009-chung-ket",
+      "slug": "chung-ket",
+      "title": "CHUNG KẾT",
+      "hash": "c53a3df58a8757a3e64f809f824d65e41a5af2fe1fcf6027d4bdee654e67d342"
+    },
+    {
+      "id": "2019-011-viet-tiep-chang-xuan-dieu",
+      "slug": "viet-tiep-chang-xuan-dieu",
+      "title": "VIẾT TIẾP CHÀNG XUÂN DIỆU",
+      "hash": "3adbfe9628ac860574374ec9160aa9fbd07affa42ed7b661f75c534f5ea1d8a4"
+    },
+    {
+      "id": "2019-012-tho-tinh-marina-bay",
+      "slug": "tho-tinh-marina-bay",
+      "title": "THƠ TÌNH  MARINA BAY",
+      "hash": "32eb5caa604ee4d73f88a6574b0d2ce76225afa7abe449e0dc9766bd1a6ec795"
+    },
+    {
+      "id": "2019-013-pho-khong-mua",
+      "slug": "pho-khong-mua",
+      "title": "PHỐ KHÔNG MÙA",
+      "hash": "244d8be7888fb86cbc6afea6af830cea949a31f9b98b6320c13ba6041f3c53c7"
+    },
+    {
+      "id": "2019-014-xin-loi-mua-thu",
+      "slug": "xin-loi-mua-thu",
+      "title": "XIN LỖI MÙA THU",
+      "hash": "de1f50e67ef7b6e760b1473b66afd996a6ea6897d23a57d20eac385a51b3a035"
+    },
+    {
+      "id": "2019-015-that-long",
+      "slug": "that-long",
+      "title": "THẬT LÒNG",
+      "hash": "939da7779fe2df11579ed8dc0c14df1542120c085ed1ced133e4be9426dfb875"
+    },
+    {
+      "id": "2019-016-va-ta-mai-yeu-mot-dieu-rat-cu",
+      "slug": "va-ta-mai-yeu-mot-dieu-rat-cu",
+      "title": "VÀ TA MÃI YÊU MỘT ĐIỀU RẤT CŨ",
+      "hash": "4e06a6e9394512bb89dd6d622e6354ffa4570d6dd7d38d323f3d7ceded148988"
+    },
+    {
+      "id": "2019-017-khong-de",
+      "slug": "khong-de",
+      "title": "KHÔNG ĐỀ",
+      "hash": "e85e936d18fa9c1835d196ebf673396aa26ad8c0fbdc5a6d20d0dec218c6646a"
+    },
+    {
+      "id": "2020-018-hon",
+      "slug": "hon",
+      "title": "HÔN",
+      "hash": "0642312d305085db19c3e26cab1db2ca4d793ba65e9e9d59d15aebabceb27e08"
+    },
+    {
+      "id": "2020-019-hoan-hao",
+      "slug": "hoan-hao",
+      "title": "HOÀN HẢO",
+      "hash": "1652e63f2d278dffe2172a222458a4204e2f87297032d0c9bf6ab2c1694a8bae"
+    },
+    {
+      "id": "2020-020-boi-vi-em-yeu-anh",
+      "slug": "boi-vi-em-yeu-anh",
+      "title": "BỞI VÌ EM YÊU ANH",
+      "hash": "7d20e51df1f8bfb5705d4be8aff4bb02466c32551edb167550ceb9c92c8c6417"
+    },
+    {
+      "id": "2020-021-mau-trang",
+      "slug": "mau-trang",
+      "title": "MÀU TRẮNG",
+      "hash": "ec6770e0975456a3b50e186e8a43740044aba295a0169d149dda112b12c94621"
+    },
+    {
+      "id": "2020-045-vi-sao-anh-yeu-ha-tinh",
+      "slug": "vi-sao-anh-yeu-ha-tinh",
+      "title": "VÌ SAO ANH YÊU HÀ TĨNH",
+      "hash": "fe6942be7a12e9daa36994aa7bd9326d39cec4c638f48b5a6217fa5ff8b81794"
+    },
+    {
+      "id": "2020-022-ngay-do-em-va-co-tich",
+      "slug": "ngay-do-em-va-co-tich",
+      "title": "NGÀY ĐÓ, EM VÀ CỔ TÍCH",
+      "hash": "a8cdc259afb98ee5d20a6763b184e72988e5d155f9f7d8b744b6fe94646808d4"
+    },
+    {
+      "id": "2020-023-anh-khong-la-tat-ca",
+      "slug": "anh-khong-la-tat-ca",
+      "title": "ANH KHÔNG LÀ TẤT CẢ",
+      "hash": "fd64a666974c55ac4ecda7da5f453e5af35680520f314820f9690b963556839a"
+    },
+    {
+      "id": "2020-024-long-tot",
+      "slug": "long-tot",
+      "title": "LÒNG TỐT",
+      "hash": "11223a6ab583f6507b7e8ba663a5180da4841dcfb7eea536fe3e378c7ce84835"
+    },
+    {
+      "id": "2020-025-tho-va-em",
+      "slug": "tho-va-em",
+      "title": "THƠ VÀ EM",
+      "hash": "fcd592b23c1ccb7207ed49c808abe395f0fd8964a650941cb43a97199a6dac92"
+    },
+    {
+      "id": "2021-026-bai-tho-gui-thang-tu",
+      "slug": "bai-tho-gui-thang-tu",
+      "title": "BÀI THƠ GỬI THÁNG TƯ",
+      "hash": "6a9615d4c58de56eb98371e8e643e255ed98383c88f103c6f61f7c1c3d607104"
+    },
+    {
+      "id": "2021-027-xin-loi-anh",
+      "slug": "xin-loi-anh",
+      "title": "XIN LỖI ANH",
+      "hash": "cbac4fa9343d1c7783b2aac4292e7b286beddbc32c65575077c37eeee66231cd"
+    },
+    {
+      "id": "2021-028-niem-tin",
+      "slug": "niem-tin",
+      "title": "NIỀM TIN",
+      "hash": "d3e26443ab45c0425ca4a1ec1ec0c3dd09efedc8657459b427a69ea9a7d4d387"
+    },
+    {
+      "id": "2021-029-dung-tim-em",
+      "slug": "dung-tim-em",
+      "title": "ĐỪNG TÌM EM",
+      "hash": "892b5d14220a187b911371ef0762a5ce746e557240b795303b72fbd018f1f38d"
+    },
+    {
+      "id": "2021-030-nghi-truoc-mua-thu",
+      "slug": "nghi-truoc-mua-thu",
+      "title": "NGHĨ TRƯỚC MÙA THU",
+      "hash": "eafd38d0f8f3d3c57f5a34c97f79a8b8a00775c38bdf76694b94e5ff9822d563"
+    },
+    {
+      "id": "2021-031-tron",
+      "slug": "tron",
+      "title": "TRỐN",
+      "hash": "8b1f37bc8948f3859a5cd7d7265090b5b3421abae98f9ac39e37bd009fcc816d"
+    },
+    {
+      "id": "2022-032-tra-anh-ve-phia-binh-minh",
+      "slug": "tra-anh-ve-phia-binh-minh",
+      "title": "TRẢ ANH VỀ PHÍA BÌNH MINH",
+      "hash": "4d925e5e61887b8c513ee075defa476827db231b9af04c74b4b958e124793902"
+    },
+    {
+      "id": "2022-033-rieng-tu",
+      "slug": "rieng-tu",
+      "title": "RIÊNG TƯ",
+      "hash": "241226e6aef3474c7d2d269b0f8e58d98fae2f725cc64969a976335df38cbaac"
+    },
+    {
+      "id": "2022-034-nhung-giay-phut-that-long",
+      "slug": "nhung-giay-phut-that-long",
+      "title": "NHỮNG GIÂY PHÚT THẬT LÒNG",
+      "hash": "82ff57c8506ae02e272c27cfd7d0ef84c76a9b191f8151e008c11f3a513a57fc"
+    },
+    {
+      "id": "2022-035-the-gioi-8-ty-nguoi",
+      "slug": "the-gioi-8-ty-nguoi",
+      "title": "THẾ GIỚI 8 TỶ NGƯỜI",
+      "hash": "39142b9bca3b7f08dd6f9f82ee9cdf84199d575b227871b6b9e7a56dfb382944"
+    },
+    {
+      "id": "2022-036-bai-tho-viet-o-phi-truong",
+      "slug": "bai-tho-viet-o-phi-truong",
+      "title": "BÀI THƠ VIẾT Ở PHI TRƯỜNG",
+      "hash": "abc706ec99395fd7f17e6a137bc4aef50ca29a0bfed9b9f6b05512b1055790be"
+    },
+    {
+      "id": "2022-037-bat-ngo",
+      "slug": "bat-ngo",
+      "title": "BẤT NGỜ",
+      "hash": "31336b9a444e68992b7a012b8d044ca4f4b8a7ee2b1c0090d80387094f2d1206"
+    },
+    {
+      "id": "2022-038-binh-minh-em-va-hoang-hon-anh",
+      "slug": "binh-minh-em-va-hoang-hon-anh",
+      "title": "BÌNH MINH EM VÀ HOÀNG HÔN ANH",
+      "hash": "9ed374b249ba527bcbe3e64bde5661caced7562176b91d86f089d1b143228835"
+    },
+    {
+      "id": "2022-039-khong-phai-dau-anh",
+      "slug": "khong-phai-dau-anh",
+      "title": "KHÔNG PHẢI ĐÂU ANH",
+      "hash": "1c23fb4423dffa7e0a6db940ae565ca19709d0d854e33e78771ec97503ad0a75"
+    },
+    {
+      "id": "2022-040-hai-mien-thang-5",
+      "slug": "hai-mien-thang-5",
+      "title": "HAI MIỀN THÁNG 5",
+      "hash": "75eb9090a05164a866dcf4bb31fd5218240c8d025285c9d5d82342dd1a1b2f93"
+    },
+    {
+      "id": "2022-041-neu-mai-nay-khong-con-yeu-anh",
+      "slug": "neu-mai-nay-khong-con-yeu-anh",
+      "title": "NẾU MAI NÀY KHÔNG CÒN YÊU ANH",
+      "hash": "79bb673e82bec289c90dfac2e3bd16d2eed4c4ed5e9319132b8c5396115fda77"
+    },
+    {
+      "id": "2022-042-tam-su-voi-anh",
+      "slug": "tam-su-voi-anh",
+      "title": "TÂM SỰ VỚI ANH",
+      "hash": "a9940f8e1a387e122fdfeeef8e693427a5f3b07617721e92cf84774f2d4c3045"
+    },
+    {
+      "id": "2022-043-bai-tho-tinh-thang-6",
+      "slug": "bai-tho-tinh-thang-6",
+      "title": "BÀI THƠ TÌNH THÁNG 6",
+      "hash": "9debab4e74c758a1435b4db01686705b97fd8bc038012cbee60b12af1715d5cd"
+    },
+    {
+      "id": "2022-044-mat-troi-cua-em",
+      "slug": "mat-troi-cua-em",
+      "title": "MẶT TRỜI CỦA EM",
+      "hash": "da0da71f24b149a49d4dd8d0aa5c8fb68c444b2805688731798ca4210bfcc414"
+    },
+    {
+      "id": "2022-046-bai-tho-tinh-thang-7",
+      "slug": "bai-tho-tinh-thang-7",
+      "title": "BÀI THƠ TÌNH THÁNG 7",
+      "hash": "2b0ee9740512f255b5c876bb9acac480d269aaec09ec9256c78bb988962518e3"
+    },
+    {
+      "id": "2022-047-bay-gio-thang-tam-roi-anh",
+      "slug": "bay-gio-thang-tam-roi-anh",
+      "title": "BÂY GIỜ THÁNG TÁM RỒI ANH",
+      "hash": "550f0cfe33d156ba81c496e93a8f1470d9abbff157118e65565828e4519594cb"
+    },
+    {
+      "id": "2022-049-neu-anh-khong-con-yeu-em",
+      "slug": "neu-anh-khong-con-yeu-em",
+      "title": "NẾU ANH KHÔNG CÒN YÊU EM",
+      "hash": "c643240a81fd34067efa935f425fe9583dfceb007571d65db44fd6ca4be7bfd4"
+    },
+    {
+      "id": "2022-050-khi-em-yeu-anh",
+      "slug": "khi-em-yeu-anh",
+      "title": "KHI EM YÊU ANH",
+      "hash": "aa3d13a8c3d0a82d096871785c653d71a824912040cc1ae2f646c42439e55a2d"
+    },
+    {
+      "id": "2022-051-tu-do-va-rang-buoc",
+      "slug": "tu-do-va-rang-buoc",
+      "title": "TỰ DO VÀ RÀNG BUỘC",
+      "hash": "fdd93f752cf133ef8083febdc0940231c9454396a1651bc97f13c5f7c56826ad"
+    },
+    {
+      "id": "2022-052-thanh-pho-cua-nu-hon-dau",
+      "slug": "thanh-pho-cua-nu-hon-dau",
+      "title": "THÀNH PHỐ CỦA NỤ HÔN ĐẦU",
+      "hash": "48ebf08dcacee61ec59394e53e5d7d883f419fe76be3c3c0abcdac63d690ce4e"
+    },
+    {
+      "id": "2022-048-het-yeu",
+      "slug": "het-yeu",
+      "title": "HẾT YÊU",
+      "hash": "578ec83377aa958c7578eb1fc153b6b29f6659b925192d4175303d0dedad39c4"
+    },
+    {
+      "id": "2022-053-em-thang-9-va-noi-nho",
+      "slug": "em-thang-9-va-noi-nho",
+      "title": "EM, THÁNG 9 VÀ NỖI NHỚ",
+      "hash": "16d9346da559d38dd55ebcb9446aadb4ff5d55c8eb04f5fb7a3d197e9b11b8c0"
+    },
+    {
+      "id": "2022-054-tim-nhau-trong-con-bao",
+      "slug": "tim-nhau-trong-con-bao",
+      "title": "TÌM NHAU TRONG CƠN BÃO",
+      "hash": "accf2c3fc4480bb3a397694dc2f7027ef4723812aa4608db57bbb4e7fef1228b"
+    },
+    {
+      "id": "2022-055-co-doi-khi",
+      "slug": "co-doi-khi",
+      "title": "CÓ ĐÔI KHI",
+      "hash": "9d02a17182e872fbf7383a2a3ecea4a34206f0c09be34e97bd35f2c626381639"
+    },
+    {
+      "id": "2022-056-bi-mat-cua-em",
+      "slug": "bi-mat-cua-em",
+      "title": "BÍ MẬT CỦA EM",
+      "hash": "647f4cd913eec6c686c88fa7e0fd7a17a165d874c3330c166a30e7e0757f5722"
+    },
+    {
+      "id": "2022-057-nhung-thang-nam-dep-nhat",
+      "slug": "nhung-thang-nam-dep-nhat",
+      "title": "NHỮNG THÁNG NĂM ĐẸP NHẤT",
+      "hash": "9a6b2a2fafdd1fdae5620cb65f8b483f4218830c546968752463472dfe1ca7d8"
+    },
+    {
+      "id": "2022-058-em-anh-va-thang-muoi",
+      "slug": "em-anh-va-thang-muoi",
+      "title": "EM, ANH VÀ THÁNG MƯỜI",
+      "hash": "0e4df757a895a4b6a937ab2c428730f7a85e9bd3095c72935261ff56982a5562"
+    },
+    {
+      "id": "2022-060-hai-phia-mua-thu",
+      "slug": "hai-phia-mua-thu",
+      "title": "HAI PHÍA MÙA THU",
+      "hash": "8e1615b968257603716bba6eb43e4eff5451d1fff16fde4fee412eeab8553792"
+    },
+    {
+      "id": "2022-059-dieu-em-so",
+      "slug": "dieu-em-so",
+      "title": "ĐIỀU EM SỢ",
+      "hash": "b0e08b818ae1de080aa64927080a209dd141d37b6c4a1475ae424f655c40e997"
+    },
+    {
+      "id": "2022-062-roi-den-luc-se-chang-con-nho-nua",
+      "slug": "roi-den-luc-se-chang-con-nho-nua",
+      "title": "RỒI ĐẾN LÚC SẼ CHẲNG CÒN NHỚ NỮA",
+      "hash": "ca3eb6e9bc53260233137129ac2c04803d873d1181cc405d19ee63c73048aac8"
+    },
+    {
+      "id": "2022-063-cho-anh-mua-dong",
+      "slug": "cho-anh-mua-dong",
+      "title": "CHỜ ANH MÙA ĐÔNG",
+      "hash": "d8ff62176b84ea6531deee7154954cb744675c8f20ec9d0bdcf1a7501c48c303"
+    },
+    {
+      "id": "2022-064-thang-muoi-mot-co-con",
+      "slug": "thang-muoi-mot-co-con",
+      "title": "THÁNG MƯỜI MỘT CÓ CÒN",
+      "hash": "a175fb880a847deb76e632210139336fbd463b957842210fc602c193cf05d4f6"
+    },
+    {
+      "id": "2022-065-khi-yeu",
+      "slug": "khi-yeu",
+      "title": "KHI YÊU",
+      "hash": "5aa78ff4e09c6789ba4b3580078844e78644d4a357b18be2b4462befcba12c52"
+    },
+    {
+      "id": "2022-066-nguyen-tac",
+      "slug": "nguyen-tac",
+      "title": "NGUYÊN TẮC",
+      "hash": "097ee70f38a214bbc8585f213d87a303ae4afd9b23f098142c66c581236b670c"
+    },
+    {
+      "id": "2022-067-ben-nay-ben-kia",
+      "slug": "ben-nay-ben-kia",
+      "title": "BÊN NÀY, BÊN KIA",
+      "hash": "cf9a6c034906a38ca9a16d2e0e9c765ac2445b37d98b8a632141d63fe964023d"
+    },
+    {
+      "id": "2023-072-thang-gieng",
+      "slug": "thang-gieng",
+      "title": "THÁNG GIÊNG",
+      "hash": "f5368db01922aaebefae12f16a404af2a67dfe35f9ddd408f05ad8b3ba94db54"
+    },
+    {
+      "id": "2023-068-tho-tinh-cuoi-mua-dong",
+      "slug": "tho-tinh-cuoi-mua-dong",
+      "title": "THƠ TÌNH CUỐI MÙA ĐÔNG",
+      "hash": "e30cf1d6ac0b60b28cf953adfc2ff51ab2d3a6e07e643cdac68fa51c97baf037"
+    },
+    {
+      "id": "2023-069-nguoi-cuoi-cung",
+      "slug": "nguoi-cuoi-cung",
+      "title": "NGƯỜI CUỐI CÙNG",
+      "hash": "344e8f38d962cf56aea4a3f6c6f36be875d56f3394fdd2bb002b887f65df80cd"
+    },
+    {
+      "id": "2023-070-co-dai",
+      "slug": "co-dai",
+      "title": "CỎ DẠI",
+      "hash": "b2fc38fd3cc6b7a8610cc18b19db5e87cc461bd58781d3bbfd9550b731f8e4cf"
+    },
+    {
+      "id": "2023-071-tinh-thu",
+      "slug": "tinh-thu",
+      "title": "TÌNH THU",
+      "hash": "3cd23f9b5e3af700fa5aa8a53acddde1b903c58de9372169bdf839912932d159"
+    },
+    {
+      "id": "2023-073-thay-the",
+      "slug": "thay-the",
+      "title": "THAY THẾ",
+      "hash": "731e9d68590b6da01ea02b1c150932b1e41633eea7361680e456bbd5f9a8aa72"
+    },
+    {
+      "id": "2023-074-nang-i",
+      "slug": "nang-i",
+      "title": "NÀNG I",
+      "hash": "331affa393d8ca6a920941075f1dc5f5564acc1df6fbaa2d280c58ca1519f1dc"
+    },
+    {
+      "id": "2023-075-dieu-diu-dang-cuoi-cung",
+      "slug": "dieu-diu-dang-cuoi-cung",
+      "title": "ĐIỀU DỊU DÀNG CUỐI CÙNG",
+      "hash": "17fe957c6fb5c5808570b3213bd2fafd757b49841f195a975be36357028dc38e"
+    },
+    {
+      "id": "2023-076-ngau-hung",
+      "slug": "ngau-hung",
+      "title": "NGẪU HỨNG",
+      "hash": "a1e4f366c72e2d9293669f044bd6ce602ad9ceabacc6f16bf408d137dda8249e"
+    },
+    {
+      "id": "2023-077-len-mang",
+      "slug": "len-mang",
+      "title": "LÊN MẠNG",
+      "hash": "e472ad9efd13596f2a242af302f7c6e16035ef09c9726e88bf923c4eed726660"
+    },
+    {
+      "id": "2023-078-thoi-gian-va-tinh-yeu",
+      "slug": "thoi-gian-va-tinh-yeu",
+      "title": "THỜI GIAN VÀ TÌNH YÊU",
+      "hash": "f570d1d6b143c73140c2262d5f863dbfd27c0c31a8004ed0d3941038d863ea8f"
+    },
+    {
+      "id": "2023-079-tat-den",
+      "slug": "tat-den",
+      "title": "TẮT ĐÈN",
+      "hash": "b11cc79ae87a3d9ddfdb41500068aa4fdf434c581de7c2fd70e61134756747b9"
+    },
+    {
+      "id": "2023-083-bon-mua-co-con-nhau",
+      "slug": "bon-mua-co-con-nhau",
+      "title": "BỐN MÙA CÓ CÒN NHAU",
+      "hash": "9a1f811cb8d5e2630041e95fa45c8dfe7fc481c03d6ade2fc4a45cd03b0d3dce"
+    },
+    {
+      "id": "2023-082-tren-may-bay-qua-ho-michigan",
+      "slug": "tren-may-bay-qua-ho-michigan",
+      "title": "TRÊN MÁY BAY QUA HỒ MICHIGAN",
+      "hash": "70d2f2f4ff2d20a3b4c3931fbe2beb080a4f6c3ecced8f2c76b95849ff827098"
+    },
+    {
+      "id": "2023-084-xuoi-va-nguoc",
+      "slug": "xuoi-va-nguoc",
+      "title": "XUÔI VÀ NGƯỢC",
+      "hash": "1828686e996f592246cbb1b68d83853b1fae827fed21e532568c48d9642023a4"
+    },
+    {
+      "id": "2023-082-mua-he-o-boston",
+      "slug": "mua-he-o-boston",
+      "title": "MÙA HÈ Ở BOSTON",
+      "hash": "e4be80d76441900aa204072621bc41ea7b31f87355d6b3017e616f073cf80bc0"
+    },
+    {
+      "id": "2023-085-noi-voi-dong-song-potomac",
+      "slug": "noi-voi-dong-song-potomac",
+      "title": "NÓI VỚI DÒNG SÔNG POTOMAC",
+      "hash": "71bd9eae19c3c673ec8e29de4ff608093ad81826d89efa73bd195f1715a9e166"
+    },
+    {
+      "id": "2023-104-ha-canh-noi-anh",
+      "slug": "ha-canh-noi-anh",
+      "title": "HẠ CÁNH NƠI ANH",
+      "hash": "ebf4f59311190d67b68a719393edd55357812ab84f560669e70cdea21f65fdbb"
+    },
+    {
+      "id": "2023-087-tam-biet-thang-sau",
+      "slug": "tam-biet-thang-sau",
+      "title": "TẠM BIỆT THÁNG SÁU",
+      "hash": "72d2fda9922c4aff814c052d7768e66e5a8e51f16bd53d00e8075b3d08ea84fc"
+    },
+    {
+      "id": "2023-086-ghen",
+      "slug": "ghen",
+      "title": "GHEN",
+      "hash": "53d4a45f009bc245b425b7913bd5c9a2de7dee8f7c40a9ac36443c6001d6da86"
+    },
+    {
+      "id": "2023-088-tho-tinh-o-bien-ca-ri-be",
+      "slug": "tho-tinh-o-bien-ca-ri-be",
+      "title": "THƠ TÌNH Ở BIỂN CA RI BÊ",
+      "hash": "d2222e8c118158c41953a824730c9a56c53bcac25db9d8cd50cd68c9af46d840"
+    },
+    {
+      "id": "2023-089-phep-thu",
+      "slug": "phep-thu",
+      "title": "PHÉP THỬ",
+      "hash": "05c7aec11ad868187c50b69aa9774c5eb1e2715b5a7e4d426921c1797524aae5"
+    },
+    {
+      "id": "2023-090-gia-tu-thang-bay",
+      "slug": "gia-tu-thang-bay",
+      "title": "GIÃ TỪ THÁNG BẢY",
+      "hash": "1c0e10514e423e72611a0ef74988f5ca096e80bc69b00d7ee9e8fa5ca303842e"
+    },
+    {
+      "id": "2023-091-anh",
+      "slug": "anh",
+      "title": "ANH",
+      "hash": "7be5ce6deab39620493e9f611d666811e2cedf19be38f5b7823846760822ca2b"
+    },
+    {
+      "id": "2023-092-dieu-bat-ngo-cua-mua-thu",
+      "slug": "dieu-bat-ngo-cua-mua-thu",
+      "title": "ĐIỀU BẤT NGỜ CỦA MÙA THU",
+      "hash": "3f5d0bb356042d51771570afe73b74f14566c86cb56f470a0796512f03608d4e"
+    },
+    {
+      "id": "2023-093-em-mot-ngay",
+      "slug": "em-mot-ngay",
+      "title": "EM MỘT NGÀY",
+      "hash": "5fa4b20c84fb0dbbd0391596131739015bb2f4a9405efa832ffe23413462b499"
+    },
+    {
+      "id": "2023-094-tho-viet-cho-nguoi-dam-yeu",
+      "slug": "tho-viet-cho-nguoi-dam-yeu",
+      "title": "THƠ VIẾT CHO NGƯỜI DÁM YÊU",
+      "hash": "de4c9f86490bb74101ad81bb3bdbe6de4a4fee38565fc583558af259e690483d"
+    },
+    {
+      "id": "2023-103-khi",
+      "slug": "khi",
+      "title": "KHI",
+      "hash": "a9b9181f39025d2b81781f59049d9e997928f7e5038b1a52eb0d217212fa1f76"
+    },
+    {
+      "id": "2023-095-yeu-nguoi-moi-buoc-em-di",
+      "slug": "yeu-nguoi-moi-buoc-em-di",
+      "title": "YÊU NGƯỜI MỖI BƯỚC EM ĐI",
+      "hash": "6d8d46b40c4aa60b994c7e72ca057e1eef741c302dc43a42a9f3bacf2c685c57"
+    },
+    {
+      "id": "2023-097-em-la-hoa-no-ve-dem",
+      "slug": "em-la-hoa-no-ve-dem",
+      "title": "EM LÀ HOA NỞ VỀ ĐÊM",
+      "hash": "fec81e119b4d09bca0d11030abfd125dd6809ae2d6fe1a06f8eeac2fd0f64699"
+    },
+    {
+      "id": "2023-096-boi-em-chinh-hien-than-cho-hanh-phuc",
+      "slug": "boi-em-chinh-hien-than-cho-hanh-phuc",
+      "title": "BỞI EM CHÍNH HIỆN THÂN CHO HẠNH PHÚC",
+      "hash": "15a79a103772435686e580850793f4a3fe69b6f9ffaf1f38188203cc8c17df9f"
+    },
+    {
+      "id": "2023-099-nhung-vi-sao-di-vang",
+      "slug": "nhung-vi-sao-di-vang",
+      "title": "NHỮNG VÌ SAO ĐI VẮNG",
+      "hash": "9c140dccd7664b6dfcf36b045635209ddefde5f237da3ed1ede876bab6a549f4"
+    },
+    {
+      "id": "2023-100-ai-roi-cung-het-yeu",
+      "slug": "ai-roi-cung-het-yeu",
+      "title": "AI RỒI CŨNG HẾT YÊU",
+      "hash": "9337bf46109aa2bc02bdc92aa0820ba374c70acc0b09191f081ae9cd007e2fa1"
+    },
+    {
+      "id": "2023-101-mua-dong-khong-lanh",
+      "slug": "mua-dong-khong-lanh",
+      "title": "MÙA ĐÔNG KHÔNG LẠNH",
+      "hash": "d513903f2466c61e7e6f3f8050f8a68317450fb988f04a53738332376f6c0e3e"
+    },
+    {
+      "id": "2023-102-thang-12-cho-em",
+      "slug": "thang-12-cho-em",
+      "title": "THÁNG 12 CHO EM",
+      "hash": "fec83c64253de45bcd067741a2ff84d074e89c4d2551ad7beae2495063ca66a1"
+    },
+    {
+      "id": "2023-098-nguoi-ve-tu-nghin-trung",
+      "slug": "nguoi-ve-tu-nghin-trung",
+      "title": "NGƯỜI VỀ TỪ NGHÌN TRÙNG",
+      "hash": "ea6b583d7ab97e3c5ce9a66e213d24dd84e92ac279f7afb3b7b6b11ab5b2cb69"
+    },
+    {
+      "id": "2024-105-mon-qua-quy-nhat",
+      "slug": "mon-qua-quy-nhat",
+      "title": "MÓN QUÀ QUÝ NHẤT",
+      "hash": "e5187a35b0812ef10e69214e32b0d2132903c163289582c8fd363d559da35d33"
+    },
+    {
+      "id": "2024-106-vu-vo-truoc-bien",
+      "slug": "vu-vo-truoc-bien",
+      "title": "VU VƠ TRƯỚC BIỂN",
+      "hash": "4c9536913c75f7b741ddd52044a23c02ad0801866c4343041d2a21eb65ea396d"
+    },
+    {
+      "id": "2024-107-nang-ii",
+      "slug": "nang-ii",
+      "title": "NÀNG II",
+      "hash": "da697e19cf9992ebb4fc78bda044e4a1207192752cb399d649d6c4e2aab435be"
+    },
+    {
+      "id": "2024-108-tho-tinh-thang-tam",
+      "slug": "tho-tinh-thang-tam",
+      "title": "THƠ TÌNH THÁNG TÁM",
+      "hash": "721033f155f335f471e4da57b4084aa25a3ff2092420d1a4b5385cd8db8267b4"
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+const CRITICAL_LENS_DATA = {
+  "poem_notes": [
+    {
+      "id": "pn-01",
+      "poemId": [
+        "2016-008-vui"
+      ],
+      "motif": [
+        "vùi"
+      ],
+      "tone": "whisper",
+      "visibility": "linger",
+      "text": "cái chữ 'vùi' cuối cùng vẫn còn động dưới đáy bài."
+    },
+    {
+      "id": "pn-02",
+      "poemId": [
+        "2023-078-thoi-gian-va-tinh-yeu"
+      ],
+      "motif": [
+        "căn phòng"
+      ],
+      "tone": "whisper",
+      "visibility": "after-reading",
+      "text": "cái đáng sợ không nằm ở chỗ người ta rời đi. nó nằm ở lúc bước vào căn phòng quen mà không còn tiếng người ấy nữa."
+    },
+    {
+      "id": "pn-03",
+      "poemId": [
+        "2022-038-binh-minh-em-va-hoang-hon-anh"
+      ],
+      "motif": [
+        "tia nắng"
+      ],
+      "tone": "whisper",
+      "visibility": "linger",
+      "text": "ở đây ngày đi qua bằng ánh sáng chứ không bằng giờ."
+    },
+    {
+      "id": "pn-04",
+      "poemId": [
+        "2020-020-boi-vi-em-yeu-anh"
+      ],
+      "motif": [
+        "đặc biệt"
+      ],
+      "tone": "whisper",
+      "visibility": "after-reading",
+      "text": "ở đây mọi thứ trần trụi. nỏ có hứa hẹn mô. đặc biệt đến mấy mà gió tắt thì cũng thành người dưng."
+    },
+    {
+      "id": "pn-05",
+      "poemId": [
+        "2023-083-bon-mua-co-con-nhau"
+      ],
+      "motif": [
+        "tin nhắn"
+      ],
+      "tone": "whisper",
+      "visibility": "linger",
+      "text": "mọi thứ chưa hẳn kết thúc ở bài thơ. nó kết thúc lúc điện thoại thôi không còn sáng nữa."
+    },
+    {
+      "id": "pn-06",
+      "poemId": [
+        "2023-074-nang-i"
+      ],
+      "motif": [
+        "đôi mắt"
+      ],
+      "tone": "whisper",
+      "visibility": "after-reading",
+      "text": "phải nén bão xuống đáy thì mặt nước mới phẳng được. một sự bình yên nhọc nhằn."
+    },
+    {
+      "id": "pn-07",
+      "poemId": [
+        "2022-040-hai-mien-thang-5"
+      ],
+      "motif": [
+        "tháng 5"
+      ],
+      "tone": "whisper",
+      "visibility": "linger",
+      "text": "tháng 5 ở đây nghe như mặt đất vừa hụt xuống một chút."
+    },
+    {
+      "id": "pn-08",
+      "poemId": [
+        "2022-067-ben-nay-ben-kia"
+      ],
+      "motif": [
+        "tia ấm"
+      ],
+      "tone": "whisper",
+      "visibility": "after-reading",
+      "text": "cái lạnh nằm ở cái tia ấm mùa đông thắp lên lỡ cỡ, rồi bỏ đó."
+    },
+    {
+      "id": "pn-09",
+      "poemId": [
+        "2022-032-tra-anh-ve-phia-binh-minh"
+      ],
+      "motif": [
+        "im lặng"
+      ],
+      "tone": "whisper",
+      "visibility": "linger",
+      "text": "đến đây, mọi thứ đứng yên hơi quá lâu."
+    },
+    {
+      "id": "pn-10",
+      "poemId": [
+        "2023-102-thang-12-cho-em"
+      ],
+      "motif": [
+        "Tháng",
+        "Mười",
+        "Hai"
+      ],
+      "tone": "whisper",
+      "visibility": "after-reading",
+      "text": "chữ rớt xuống từng dòng một ở cuối bài. nhịp rơi ni nghe như tiếng đếm ngược."
+    },
+    {
+      "id": "pn-11",
+      "poemId": [
+        "2022-047-bay-gio-thang-tam-roi-anh"
+      ],
+      "motif": [
+        "ba mươi ngày"
+      ],
+      "tone": "whisper",
+      "visibility": "linger",
+      "text": "ở đây, tháng tám được đếm bằng những lần trời tối."
+    },
+    {
+      "id": "pn-12",
+      "poemId": [
+        "2023-082-mua-he-o-boston"
+      ],
+      "motif": [
+        "chiếc váy màu cà rốt"
+      ],
+      "tone": "whisper",
+      "visibility": "after-reading",
+      "text": "chiếc váy màu cà rốt sáng hơn mọi thứ. phần còn lại chỉ là nhìn lên cửa sổ nhà người khác, mà thôi."
+    }
+  ],
+  "motif_notes": [],
+  "constellation_essays": []
+};
