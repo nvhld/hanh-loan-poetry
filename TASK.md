@@ -76,4 +76,4 @@
 - [x] `npm run build` pass.
 - *Phenomenology preserved by architecture-only scope; no physics tuning in PR 4.*
 
-**⏭️ NEXT ACTION:** Remote branch exposed one missing tracked file (`src/config/physics.ts`); add and push the build-fix patch, then resume deploy check.
+**⏭️ NEXT ACTION:** Remote branch also needs tracked `src/engine/field/index.ts` debug/resize API used by `DreamField`; add minimal build-fix patch and redeploy.

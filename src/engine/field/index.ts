@@ -1,19 +1,21 @@
 // ============================================================
-// ENGINE: FIELD — D3-Force Simulation Topology
+// ENGINE: FIELD - D3-Force Simulation Topology
 // Phase A complete. This is Phase B: Motion Physics.
 // No visuals here. Only the force simulation runtime.
 // ============================================================
 
 import * as d3 from 'd3'
-import type { Poem, GravityEdge } from '@/types/poem'
-import { computeNodeRadius, computeFieldCoupling } from '@/engine/gravity'
+import type { Poem, GravityEdge, DominantField } from '@/types/poem'
+import { computeNodeRadius } from '@/engine/gravity'
+import { FIELD_PHYSICS, PHYSICS_FIELDS } from '@/config/physics'
+
+const physicsWarnings = new Set<string>()
 
 export interface FieldNode extends d3.SimulationNodeDatum {
   id: string
   poem: Poem
   radius: number
   engravingStrength: number
-  // d3 sets these:
   x?: number
   y?: number
   vx?: number
@@ -29,12 +31,32 @@ export interface FieldLink extends d3.SimulationLinkDatum<FieldNode> {
   glowColor: string
 }
 
+export type ClusterCenters = Record<DominantField, { x: number; y: number }>
+
+export interface FieldPhysicsDebugSnapshot {
+  width: number
+  height: number
+  clusterCenters: ClusterCenters
+  nodes: Array<{
+    id: string
+    dominantField: DominantField
+    x: number
+    y: number
+    vx: number
+    vy: number
+    radius: number
+  }>
+}
+
 export interface FieldState {
   simulation: d3.Simulation<FieldNode, FieldLink>
   nodes: FieldNode[]
   links: FieldLink[]
   stop: () => void
   restart: () => void
+  resize: (width: number, height: number) => void
+  getClusterCenters: () => ClusterCenters
+  getDebugSnapshot: () => FieldPhysicsDebugSnapshot
   setEngravings: (engravings: Record<string, number>) => void
   perturb: (poemId: string, dx: number, dy: number) => void
 }
@@ -44,7 +66,7 @@ export interface FieldState {
  * Call this once. Never rebuild on every render.
  *
  * The simulation runs in the background.
- * Visuals READ from node positions — they do not drive them.
+ * Visuals READ from node positions; they do not drive them.
  */
 export function createFieldSimulation(
   poems: Poem[],
@@ -54,20 +76,24 @@ export function createFieldSimulation(
   height: number,
   onTick: (nodes: FieldNode[]) => void
 ): FieldState {
-  // --- Build nodes ---
+  const viewport = {
+    width: Math.max(FIELD_PHYSICS.minViewportWidth, width),
+    height: Math.max(FIELD_PHYSICS.minViewportHeight, height),
+  }
+  const clusterCenters = computeClusterCenters(viewport.width, viewport.height)
+
   const nodes: FieldNode[] = poems.map(poem => ({
     id: poem.id,
     poem,
     radius: computeNodeRadius(poem),
     engravingStrength: engravings[poem.id] ?? 0,
-    x: width / 2 + (Math.random() - 0.5) * width * 0.6,
-    y: height / 2 + (Math.random() - 0.5) * height * 0.6,
+    x: viewport.width / 2 + seededOffset(poem.id, 'x') * viewport.width * FIELD_PHYSICS.initialSpread,
+    y: viewport.height / 2 + seededOffset(poem.id, 'y') * viewport.height * FIELD_PHYSICS.initialSpread,
   }))
 
-  // --- Build links (implicit gravity — no visible lines by default) ---
   const nodeById = new Map(nodes.map(n => [n.id, n]))
   const links: FieldLink[] = edges
-    .filter(e => e.strength >= 0.25) // prune weak coupling
+    .filter(e => e.strength >= FIELD_PHYSICS.linkMinStrength)
     .map(e => ({
       source: e.source,
       target: e.target,
@@ -75,117 +101,208 @@ export function createFieldSimulation(
       glowColor: e.glowColor,
     }))
 
-  // --- Force simulation ---
   const simulation = d3.forceSimulation<FieldNode, FieldLink>(nodes)
     .force('link', d3.forceLink<FieldNode, FieldLink>(links)
       .id(d => d.id)
-      .strength(d => (d as FieldLink).strength * 0.15) // soft coupling — felt, not seen
+      .strength(d => (d as FieldLink).strength * FIELD_PHYSICS.linkStrengthScale)
       .distance(d => {
-        const l = d as FieldLink
-        // Close coupling = near; weak = far
-        return 60 + (1 - l.strength) * 140
+        const link = d as FieldLink
+        return FIELD_PHYSICS.linkDistanceMin + (1 - link.strength) * FIELD_PHYSICS.linkDistanceRange
       })
     )
-    // Emotional repulsion — each poem needs space to breathe
     .force('charge', d3.forceManyBody<FieldNode>()
-      .strength(d => -(80 + d.engravingStrength * 120))
+      .strength(d => -(FIELD_PHYSICS.chargeBase + d.engravingStrength * FIELD_PHYSICS.chargeEngravingScale))
     )
-    .force('center', d3.forceCenter(width / 2, height / 2).strength(0.04))
+    .force('center', d3.forceCenter(viewport.width / 2, viewport.height / 2).strength(FIELD_PHYSICS.centerStrength))
     .force('collision', d3.forceCollide<FieldNode>()
-      .radius(d => d.radius + 20)
-      .strength(0.7)
+      .radius(d => d.radius + FIELD_PHYSICS.collisionPadding)
+      .strength(FIELD_PHYSICS.collisionStrength)
     )
-    // Cluster by dominant field — pull same-type poems together softly
-    .force('fieldCluster', fieldClusterForce(nodes, 0.06))
-    .alphaDecay(0.015)        // slow cooling — field breathes longer
-    .velocityDecay(0.35)      // moderate drag — liquid memory
-    .on('tick', () => onTick([...nodes]))
+    .force('fieldCluster', fieldClusterForce(nodes, clusterCenters, FIELD_PHYSICS.clusterStrength))
+    .alphaDecay(FIELD_PHYSICS.alphaDecay)
+    .velocityDecay(FIELD_PHYSICS.velocityDecay)
+    .on('tick', () => {
+      if (isDebugPhysicsEnabled()) {
+        validatePhysics(nodes, clusterCenters)
+      }
+      onTick([...nodes])
+    })
 
   return {
     simulation,
     nodes,
     links,
     stop: () => simulation.stop(),
-    restart: () => simulation.alpha(0.3).restart(),
+    restart: () => simulation.alpha(FIELD_PHYSICS.restartAlpha).restart(),
+    resize: (nextWidth: number, nextHeight: number) => {
+      const prevWidth = viewport.width
+      const prevHeight = viewport.height
+      viewport.width = Math.max(FIELD_PHYSICS.minViewportWidth, nextWidth)
+      viewport.height = Math.max(FIELD_PHYSICS.minViewportHeight, nextHeight)
 
-    /**
-     * Update engraving strengths — affects repulsion radius
-     * Call this when user engraves a poem
-     */
+      const scaleX = viewport.width / prevWidth
+      const scaleY = viewport.height / prevHeight
+      for (const node of nodes) {
+        const x = node.x ?? prevWidth / 2
+        const y = node.y ?? prevHeight / 2
+        node.x = blend(x, x * scaleX, FIELD_PHYSICS.clusterMemoryAlpha)
+        node.y = blend(y, y * scaleY, FIELD_PHYSICS.clusterMemoryAlpha)
+        node.vx = (node.vx ?? 0) * FIELD_PHYSICS.clusterMemoryAlpha
+        node.vy = (node.vy ?? 0) * FIELD_PHYSICS.clusterMemoryAlpha
+      }
+
+      assignClusterCenters(clusterCenters, computeClusterCenters(viewport.width, viewport.height))
+      simulation.force('center', d3.forceCenter(viewport.width / 2, viewport.height / 2).strength(FIELD_PHYSICS.centerStrength))
+      simulation.alpha(FIELD_PHYSICS.resizeAlpha).restart()
+    },
+    getClusterCenters: () => cloneClusterCenters(clusterCenters),
+    getDebugSnapshot: () => ({
+      width: viewport.width,
+      height: viewport.height,
+      clusterCenters: cloneClusterCenters(clusterCenters),
+      nodes: nodes.map(node => ({
+        id: node.id,
+        dominantField: node.poem.dominantField,
+        x: node.x ?? 0,
+        y: node.y ?? 0,
+        vx: node.vx ?? 0,
+        vy: node.vy ?? 0,
+        radius: node.radius,
+      })),
+    }),
+
     setEngravings: (newEngravings: Record<string, number>) => {
       for (const node of nodes) {
         node.engravingStrength = newEngravings[node.id] ?? 0
         node.radius = computeNodeRadius({
           ...node.poem,
-          memoryDensity: (newEngravings[node.id] ?? 0) * 1000
+          memoryDensity: (newEngravings[node.id] ?? 0) * 1000,
         })
       }
       simulation.force('collision', d3.forceCollide<FieldNode>()
-        .radius(d => d.radius + 20)
-        .strength(0.7)
+        .radius(d => d.radius + FIELD_PHYSICS.collisionPadding)
+        .strength(FIELD_PHYSICS.collisionStrength)
       )
-      simulation.alpha(0.1).restart()
+      simulation.alpha(FIELD_PHYSICS.engravingAlpha).restart()
     },
 
-    /**
-     * Perturb a poem — kick it out of orbit
-     * Used by the Engraving system to deform nearby trajectories
-     */
     perturb: (poemId: string, dx: number, dy: number) => {
       const node = nodeById.get(poemId)
       if (!node) return
       node.vx = (node.vx ?? 0) + dx
       node.vy = (node.vy ?? 0) + dy
-      simulation.alpha(0.15).restart()
+      simulation.alpha(FIELD_PHYSICS.perturbAlpha).restart()
     },
   }
 }
 
 /**
- * Custom clustering force — pulls poems with the same dominant field
- * toward shared "gravity wells" in the canvas.
- *
- * This is the force that creates the 6 emotional galaxies
- * WITHOUT drawing any visible diagram.
+ * Pull poems gently toward their emotional region. The velocity clamp keeps
+ * resize and tab-resume behavior from turning into hard snaps.
  */
-function fieldClusterForce(nodes: FieldNode[], strength: number) {
-  // Cluster centers — 6 fixed anchors, one per dominant field
-  const clusterCenters: Record<string, { x: number; y: number }> = {}
-
+function fieldClusterForce(nodes: FieldNode[], clusterCenters: ClusterCenters, strength: number) {
   return function(alpha: number) {
-    // Compute cluster centers dynamically on first call
-    // (will be available after simulation has width/height)
     for (const node of nodes) {
-      const df = node.poem.dominantField
-      if (!clusterCenters[df]) return // not initialized yet
+      const target = clusterCenters[node.poem.dominantField]
+      if (!target) continue
 
-      const target = clusterCenters[df]
-      node.vx = (node.vx ?? 0) + (target.x - (node.x ?? 0)) * strength * alpha
-      node.vy = (node.vy ?? 0) + (target.y - (node.y ?? 0)) * strength * alpha
+      const nextVx = (node.vx ?? 0) + (target.x - (node.x ?? 0)) * strength * alpha
+      const nextVy = (node.vy ?? 0) + (target.y - (node.y ?? 0)) * strength * alpha
+      node.vx = clamp(nextVx, -FIELD_PHYSICS.clusterMaxVelocity, FIELD_PHYSICS.clusterMaxVelocity)
+      node.vy = clamp(nextVy, -FIELD_PHYSICS.clusterMaxVelocity, FIELD_PHYSICS.clusterMaxVelocity)
     }
   }
 }
 
-/**
- * Initialize cluster centers after we know canvas dimensions.
- * Call this once before starting the simulation.
- */
-export function computeClusterCenters(
-  width: number,
-  height: number
-): Record<string, { x: number; y: number }> {
+export function computeClusterCenters(width: number, height: number): ClusterCenters {
   const cx = width / 2
   const cy = height / 2
-  const rx = width * 0.32
-  const ry = height * 0.28
+  const rx = width * FIELD_PHYSICS.clusterRadiusX
+  const ry = height * FIELD_PHYSICS.clusterRadiusY
 
-  // 6 emotional galaxies arranged in a loose ellipse
   return {
-    longing:      { x: cx - rx,         y: cy - ry * 0.5 },
-    ecstasy:      { x: cx + rx,         y: cy - ry * 0.5 },
-    memory:       { x: cx,              y: cy - ry },
-    distance:     { x: cx - rx * 0.6,  y: cy + ry },
-    eros:         { x: cx + rx * 0.6,  y: cy + ry },
-    entropy:      { x: cx,              y: cy + ry * 0.2 },
+    longing: { x: cx - rx, y: cy - ry * 0.5 },
+    ecstasy: { x: cx + rx, y: cy - ry * 0.5 },
+    memory: { x: cx, y: cy - ry },
+    distance: { x: cx - rx * 0.6, y: cy + ry },
+    eros: { x: cx + rx * 0.6, y: cy + ry },
+    entropy: { x: cx, y: cy + ry * 0.2 },
   }
+}
+
+function assignClusterCenters(target: ClusterCenters, source: ClusterCenters) {
+  for (const field of PHYSICS_FIELDS) {
+    target[field] = { ...source[field] }
+  }
+}
+
+function cloneClusterCenters(source: ClusterCenters): ClusterCenters {
+  return PHYSICS_FIELDS.reduce((acc, field) => {
+    acc[field] = { ...source[field] }
+    return acc
+  }, {} as ClusterCenters)
+}
+
+function seededOffset(id: string, axis: 'x' | 'y'): number {
+  let hash = axis === 'x' ? 2166136261 : 16777619
+  for (let i = 0; i < id.length; i += 1) {
+    hash ^= id.charCodeAt(i)
+    hash = Math.imul(hash, 16777619)
+  }
+  return ((hash >>> 0) / 4294967295) - 0.5
+}
+
+function blend(current: number, target: number, memory: number): number {
+  return current * memory + target * (1 - memory)
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value))
+}
+
+/**
+ * Debug mode instrumentation.
+ * Detects NaN, excessive velocity, and undefined cluster centers.
+ */
+function validatePhysics(nodes: FieldNode[], clusterCenters: ClusterCenters) {
+  for (const field of PHYSICS_FIELDS) {
+    if (!clusterCenters[field]) {
+      warnPhysics(`cluster-center:${field}`, 'Undefined cluster center for field:', field)
+    }
+  }
+
+  const EXCESSIVE_VELOCITY_THRESHOLD = 50 // px per frame
+
+  for (const node of nodes) {
+    const vx = node.vx ?? 0
+    const vy = node.vy ?? 0
+    const x = node.x ?? 0
+    const y = node.y ?? 0
+
+    const isNaNPos = isNaN(x) || isNaN(y)
+    const isNaNVel = isNaN(vx) || isNaN(vy)
+    const isInfiniteForce = !isFinite(vx) || !isFinite(vy)
+    const isExcessiveVel = Math.abs(vx) > EXCESSIVE_VELOCITY_THRESHOLD || Math.abs(vy) > EXCESSIVE_VELOCITY_THRESHOLD
+
+    if (isNaNPos || isNaNVel || isInfiniteForce || isExcessiveVel) {
+      warnPhysics(`node:${node.id}:${isNaNPos}:${isNaNVel}:${isInfiniteForce}:${isExcessiveVel}`, 'Anomaly detected:', {
+        id: node.id,
+        pos: [x, y],
+        vel: [vx, vy],
+        flags: { isNaNPos, isNaNVel, isInfiniteForce, isExcessiveVel }
+      })
+    }
+  }
+}
+
+function warnPhysics(key: string, message: string, payload: unknown) {
+  if (physicsWarnings.has(key)) return
+  physicsWarnings.add(key)
+  console.warn('[HL Physics]', message, payload)
+}
+
+function isDebugPhysicsEnabled(): boolean {
+  if (typeof window === 'undefined') return false
+  return new URLSearchParams(window.location.search).get('debug') === 'physics'
+    || (window as any).__HL_DEBUG_PHYSICS === true
 }
