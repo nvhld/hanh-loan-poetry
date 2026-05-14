@@ -65,14 +65,16 @@ export default async function PoemPage({ params }: PageProps) {
         canonicalPath: resolved.canonicalPath,
       }}
     >
-      <article style={{ maxWidth: 720, padding: '12dvh 24px 8dvh', margin: '0 auto', fontFamily: 'Cormorant Garamond, serif' }}>
-        <p style={{ opacity: 0.5, marginBottom: 12 }}>{resolved.poem.date || resolved.poem.year || ''}</p>
-        <h1 style={{ fontSize: 'clamp(36px, 8vw, 72px)', fontWeight: 400, lineHeight: 1.04, marginBottom: 24 }}>
-          {resolved.poem.title}
-        </h1>
-        <div style={{ whiteSpace: 'pre-wrap', fontSize: 'clamp(20px, 3vw, 28px)', lineHeight: 1.7 }}>
-          {resolved.poem.body}
+      <article className="minimal-poem-shell">
+        <div className="minimal-poem-titlebar" aria-hidden="true">
+          <span>Hạnh Loan</span>
+          <strong>{resolved.poem.title}</strong>
         </div>
+        <section className="minimal-poem-page">
+          <p className="minimal-poem-date">{resolved.poem.date || resolved.poem.year || ''}</p>
+          <h1 className="minimal-poem-title">{resolved.poem.title}</h1>
+          <div className="minimal-poem-body">{resolved.poem.body}</div>
+        </section>
       </article>
     </LiteraryRuntimeHost>
   )

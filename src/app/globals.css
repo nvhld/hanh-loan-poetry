@@ -39,6 +39,132 @@ html, body {
 }
 
 /* ============================================================
+   MINIMAL POEM SHELL — text-first direct links
+   ============================================================ */
+
+.minimal-poem-shell {
+  min-height: 100dvh;
+  background:
+    radial-gradient(ellipse 90% 56% at 50% 4%, rgba(88, 61, 24, 0.2), transparent 62%),
+    linear-gradient(180deg, #16100b 0%, #0d0a08 42%, #100c08 100%);
+  color: #f1dfaa;
+  font-family: var(--font-serif);
+}
+
+.minimal-poem-shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(232, 188, 98, 0.08), transparent 14%, transparent 86%, rgba(232, 188, 98, 0.05)),
+    radial-gradient(circle at 78% 18%, rgba(244, 203, 116, 0.08), transparent 20%);
+}
+
+.minimal-poem-titlebar {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 50px;
+  padding: 14px clamp(20px, 6vw, 72px);
+  border-bottom: 1px solid rgba(221, 178, 91, 0.12);
+  background: linear-gradient(180deg, rgba(18, 13, 8, 0.94), rgba(18, 13, 8, 0.72));
+  color: rgba(238, 205, 138, 0.62);
+  font-family: var(--font-sans);
+  backdrop-filter: blur(12px);
+}
+
+.minimal-poem-titlebar span {
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.minimal-poem-titlebar strong {
+  max-width: min(62vw, 620px);
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  text-align: right;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.minimal-poem-page {
+  width: min(900px, calc(100vw - 48px));
+  margin: 0 auto;
+  padding: clamp(48px, 8dvh, 84px) 0 clamp(88px, 14dvh, 140px);
+}
+
+.minimal-poem-date {
+  margin-bottom: 16px;
+  color: rgba(214, 166, 78, 0.52);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 300;
+  letter-spacing: 0.18em;
+}
+
+.minimal-poem-title {
+  max-width: 840px;
+  margin-bottom: clamp(30px, 5dvh, 52px);
+  color: rgba(243, 224, 174, 0.9);
+  font-size: clamp(42px, 6.2vw, 76px);
+  font-weight: 300;
+  letter-spacing: 0;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.minimal-poem-body {
+  max-width: 900px;
+  color: #f4e1a8;
+  font-size: clamp(21px, 2.1vw, 25px);
+  font-weight: 300;
+  letter-spacing: 0;
+  line-height: 1.95;
+  overflow-wrap: normal;
+  text-wrap: pretty;
+  white-space: pre-wrap;
+  word-break: normal;
+}
+
+@media (max-width: 640px) {
+  .minimal-poem-titlebar {
+    gap: 14px;
+    min-height: 46px;
+    padding: 12px 20px;
+  }
+
+  .minimal-poem-titlebar strong {
+    max-width: 58vw;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+  }
+
+  .minimal-poem-page {
+    width: min(100% - 36px, 620px);
+    padding-top: 42px;
+  }
+
+  .minimal-poem-title {
+    font-size: clamp(36px, 11vw, 52px);
+    line-height: 1.12;
+  }
+
+  .minimal-poem-body {
+    font-size: clamp(20px, 5.4vw, 23px);
+    line-height: 1.92;
+  }
+}
+
+/* ============================================================
    BREATHING TYPOGRAPHY
    Subtle. Users feel it, not see it.
    ============================================================ */
