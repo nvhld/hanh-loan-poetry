@@ -76,4 +76,4 @@
 - [x] `npm run build` pass.
 - *Phenomenology preserved by architecture-only scope; no physics tuning in PR 4.*
 
-**⏭️ NEXT ACTION:** Stable headless first-paint check confirms Batch 1 direction for `/archive` and key anchors; next step is commit/push/deploy or targeted visual refinement if requested.
+**⏭️ NEXT ACTION:** Remote branch exposed one missing tracked file (`src/config/physics.ts`); add and push the build-fix patch, then resume deploy check.
