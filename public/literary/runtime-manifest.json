@@ -1,0 +1,110 @@
+{
+  "version": "pr4-runtime-1",
+  "runtimeVersion": "2026.05.13-atmospheric-freeze",
+  "generatedAt": "2026-05-13T15:39:01.963185+00:00",
+  "runtimeRoot": "/literary/",
+  "entries": {
+    "reader": {
+      "file": "reader.html",
+      "route": "/poem/[slug]",
+      "dependencies": [
+        "pending-modal.js",
+        "curator_data_inline.js",
+        "critical_lens_inline.js",
+        "anchor_mri_inline.js",
+        "instrument_translator.js",
+        "motif_clusters_inline.js",
+        "critical-lens.json",
+        "anchor_mri.json",
+        "motif_clusters.json"
+      ],
+      "sha256": "1fb8b3b9e7a080df6ff74b8b558d747dd5d4623f2628f536217e73a5d1adc8c1"
+    },
+    "archive": {
+      "file": "archive.html",
+      "route": "/archive",
+      "dependencies": [
+        "pending-modal.js",
+        "curator_data_inline.js",
+        "motif_clusters.json"
+      ],
+      "sha256": "84598edbc87465a94ac2f4e984dea2b0952c172333f25c654158a57cebb7459a"
+    },
+    "lab": {
+      "file": "topology.html",
+      "route": "/lab",
+      "dependencies": [
+        "pending-modal.js",
+        "curator_data_inline.js"
+      ],
+      "sha256": "c53db9ab9f53d26eb1ec15657b439c28c035dc1c162c8fb64cd6e46c06a9fbff"
+    },
+    "curator": {
+      "file": "curator.html",
+      "route": "/literary/curator.html",
+      "dependencies": [
+        "curator_data_inline.js"
+      ],
+      "sha256": "88702af4f122d64a79e796a7291c352a6574e0af622217c4c234a5b79727413e"
+    }
+  },
+  "files": [
+    {
+      "path": "anchor_mri.json",
+      "sha256": "901d87b98fa247d1b507d461af9b4e4ea9e6a9a70f1f33c26d9df88358b0e35a"
+    },
+    {
+      "path": "anchor_mri_inline.js",
+      "sha256": "0c6d77249b386e85fae4718fd5bdc6510d849231e3d6745cfda44d54f97284ae"
+    },
+    {
+      "path": "archive.html",
+      "sha256": "84598edbc87465a94ac2f4e984dea2b0952c172333f25c654158a57cebb7459a"
+    },
+    {
+      "path": "critical-lens.json",
+      "sha256": "cd57518080ec5e2432cc24ee3e98b54d903b8ec32afad79d15430b234e3e8006"
+    },
+    {
+      "path": "critical_lens_inline.js",
+      "sha256": "ecca0cdb6051f6f1b37f62d2e73948027d8aa8dc57258f12744e8552b3210395"
+    },
+    {
+      "path": "curator.html",
+      "sha256": "88702af4f122d64a79e796a7291c352a6574e0af622217c4c234a5b79727413e"
+    },
+    {
+      "path": "curator_data_inline.js",
+      "sha256": "32ef146448127396fad0f4a1e4527c6012d014291e5b35554ccd9aebdee05861"
+    },
+    {
+      "path": "instrument_translator.js",
+      "sha256": "a57d36abd04c10d45f66af6a99515c453c4848f5506e880654376c174e407224"
+    },
+    {
+      "path": "motif_clusters.json",
+      "sha256": "18b983a9bca38c4d7dd91c131267118ad78176dae434496c16ef2aa0ca721cfe"
+    },
+    {
+      "path": "motif_clusters_inline.js",
+      "sha256": "18ab4d116783233838db42d307f25614a51245ef3672eab4a91121e60c51b203"
+    },
+    {
+      "path": "pending-modal.js",
+      "sha256": "60c44fdf6d7b5402b6a2440057c9efceebe3f4c87ae0111cda870564e51586c8"
+    },
+    {
+      "path": "reader.html",
+      "sha256": "1fb8b3b9e7a080df6ff74b8b558d747dd5d4623f2628f536217e73a5d1adc8c1"
+    },
+    {
+      "path": "topology.html",
+      "sha256": "c53db9ab9f53d26eb1ec15657b439c28c035dc1c162c8fb64cd6e46c06a9fbff"
+    }
+  ],
+  "atmosphericAssets": [
+    "audio/",
+    "textures/",
+    "poems/"
+  ]
+}

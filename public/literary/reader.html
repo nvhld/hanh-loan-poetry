@@ -1,0 +1,2556 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <script>
+    if (window.location.protocol !== 'file:') {
+      document.write('<base href="/literary/">');
+    }
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='55' cy='45' r='6' fill='%23e4e4eb' opacity='0.3'/></svg>">
+  <link rel="apple-touch-icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'><rect width='256' height='256' fill='%23000'/><circle cx='135' cy='115' r='8' fill='%23111'/></svg>">
+  <meta property="og:title" content="Hạnh Loan">
+  <meta property="og:description" content="bởi vì em yêu anh...">
+  <meta property="og:image" content="https://hanhloan.com/og-image.jpg">
+  <title>Hạnh Loan — Thơ</title>
+  <meta name="description" content="Một vũ trụ thơ ca. Bước vào nhẹ thôi.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      overscroll-behavior: none;
+      background: #050508;
+      color: #dcdbe3;
+      font-family: 'Playfair Display', serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── THRESHOLD ── */
+    #threshold {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #050508;
+      /* dissolve: slow, like losing focus not like a fade-out */
+      transition: opacity 3.6s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: default;
+    }
+
+    #threshold.dissolve {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .t-line {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(16px, 2.8vw, 24px);
+      color: rgba(220, 219, 227, 0);
+      text-align: center;
+      line-height: 1.95;
+      max-width: 500px;
+      padding: 0 40px;
+      /* slow: eyes adjusting to dark, not a reveal animation */
+      transition: color 5.0s cubic-bezier(0.16, 1, 0.3, 1);
+      letter-spacing: 0.025em;
+    }
+
+    /* slightly lower max brightness — outdoor readable but not glaring */
+    #threshold.ready .t-line {
+      color: rgba(220, 219, 227, 0.78);
+    }
+
+    .t-prompt {
+      font-family: 'Outfit', sans-serif;
+      margin-top: 80px;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 5px;
+      color: rgba(220, 219, 227, 0);
+      text-transform: lowercase;
+      /* delayed much longer — prompt only appears after poem has settled */
+      transition: color 2.8s ease 4.2s;
+      user-select: none;
+    }
+
+    #threshold.ready .t-prompt {
+      color: rgba(220, 219, 227, 0.6); /* increased brightness */
+    }
+
+    /* ── DREAM LAYER ── */
+    #dream {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 2.4s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      touch-action: none;
+    }
+
+    #dream.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    /* ── POEM VEIL ── */
+    #poem-veil {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(5, 5, 8, 0);
+      pointer-events: none;
+      transition: background 2.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #poem-veil.active {
+      background: rgba(5, 5, 8, 0.32);
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    #poem-text {
+      position: fixed;
+      inset: 0;
+      z-index: 51;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      /* top-aligned with scroll: ensures whisper/cue always reachable */
+      justify-content: flex-start;
+      padding: 12dvh 40px 8dvh 40px;
+      overflow-y: auto;
+      scrollbar-width: none;
+      pointer-events: none;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.6s, visibility 0s linear 2.1s;
+    }
+    #poem-text::-webkit-scrollbar { display: none; }
+
+    #poem-text.visible {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.6s, visibility 0s linear 0s;
+    }
+
+    /* Radial backdrop: keeps text legible against cosmic background */
+    #poem-text::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 72% 65% at 50% 50%,
+          rgba(5, 5, 8, 0.68) 0%,
+          rgba(5, 5, 8, 0.38) 55%,
+          transparent 100%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    body.minimal-mode #poem-text.visible {
+      transition: opacity 0.5s ease 0s, visibility 0s linear 0s;
+    }
+
+    body.minimal-mode.direct-entry #poem-text.visible {
+      transition: opacity 0.7s ease 0s, visibility 0s linear 0s;
+    }
+
+    body.minimal-mode #poem-veil.active {
+      transition: opacity 0.5s ease 0s, visibility 0s linear 0s;
+    }
+
+    /* Direct-entry / low-end readers need one calm scroll surface, not nested scroll stacks. */
+    body.minimal-mode #poem-text {
+      padding-bottom: 12dvh;
+    }
+
+    body.minimal-mode.direct-entry #poem-text {
+      padding-top: 7dvh;
+    }
+
+    body.minimal-mode.direct-entry .pt-title {
+      margin-bottom: 24px;
+    }
+
+    body.minimal-mode .pt-body {
+      max-height: none;
+      overflow: visible;
+      padding-bottom: 16px;
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+
+    body.minimal-mode.direct-entry .pt-body {
+      padding-top: 0;
+      margin-top: 0;
+    }
+
+    .pt-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(10px, 1.4vw, 12px);
+      font-weight: 600;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: rgba(164, 132, 233, 0.82); /* brighter — was 0.55 */
+      margin-bottom: 40px;
+      text-align: left;
+      width: 100%;
+      max-width: 580px;
+      margin-left: -4%;
+      flex-shrink: 0;
+    }
+
+    .pt-body {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(16px, 2vw, 20px);
+      line-height: 2.2;
+      color: rgba(255, 248, 204, 0.88);
+      text-align: left;
+      white-space: pre-wrap;
+      width: 100%;
+      max-width: 580px;
+      margin-left: -4%;
+      /* Reduce max-height to leave breathing room for whisper/cue below */
+      max-height: 52dvh;
+      overflow-y: auto;
+      scrollbar-width: none;
+      pointer-events: auto;
+      user-select: text;
+      flex-shrink: 1;
+      /* Fade text smoothly when scrolling */
+      padding-top: 32px;
+      padding-bottom: 32px;
+      margin-top: -32px;
+      margin-bottom: 0; /* removed -32px so whisper has space */
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 32px, black calc(100% - 32px), transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 32px, black calc(100% - 32px), transparent 100%);
+    }
+
+    .pt-body::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* ── COSMIC RAY — scroll indicator ── */
+    #scroll-ray {
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 1px;
+      z-index: 52;
+      pointer-events: none;
+      background: linear-gradient(to bottom, transparent, rgba(255, 248, 204, 0.45), transparent);
+      opacity: 0;
+      transform-origin: top center;
+      transition: opacity 0.12s ease;
+    }
+
+    .pt-controls {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-top: 40px;
+      margin-bottom: 24px;
+      flex-shrink: 0;
+      width: 100%;
+      max-width: 580px;
+      margin-left: -4%;
+    }
+
+    .pt-exit {
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 5px;
+      color: rgba(220, 219, 227, 0.16);
+      text-transform: lowercase;
+      transition: color 0.5s;
+      pointer-events: auto;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .pt-exit:hover {
+      color: rgba(220, 219, 227, 0.42);
+    }
+
+    /* ── TOOLTIP whisper ── */
+    #tip {
+      position: fixed;
+      pointer-events: none;
+      display: block;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-style: normal;
+      color: rgba(220, 219, 227, 0.38);
+      z-index: 200;
+      transition: opacity 0.6s ease;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-transform: lowercase;
+      letter-spacing: 3px;
+      white-space: nowrap;
+      opacity: 0;
+    }
+
+    #tip.visible {
+      opacity: 1;
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 640px) {
+
+      /* larger for outdoor readability */
+      .t-line {
+        font-size: 20px;
+        line-height: 2.0;
+      }
+
+      .t-prompt {
+        font-size: 11px;
+        letter-spacing: 4px;
+      }
+
+      #poem-text {
+        padding: 12dvh 24px 4dvh 24px; /* tighter sides on mobile */
+        justify-content: flex-start; /* top-aligned on mobile = more room */
+        padding-top: 14dvh;
+      }
+
+      .pt-title,
+      .pt-body,
+      .pt-controls {
+        margin-left: 0;
+      }
+
+      .pt-body {
+        font-size: 18px;
+        line-height: 2.05;
+        max-height: 48dvh; /* shorter to leave room for whisper */
+      }
+
+      #resonance-cue,
+      #whisper-note {
+        margin-left: 0;
+        font-size: 11px;
+        letter-spacing: 1.5px;
+      }
+
+      .pt-title {
+        font-size: 10px;
+        margin-bottom: 28px;
+      }
+
+      .pt-exit {
+        margin-top: 32px;
+        font-size: 10px;
+        letter-spacing: 4px;
+      }
+
+      #surface-exit {
+        bottom: 20px;
+        right: 20px;
+        font-size: 10px;
+      }
+
+      /* minimum tap target 44px */
+      .pt-exit {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    #btn-archive {
+      position: fixed;
+      top: 36px;
+      right: 40px;
+      z-index: 100;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: rgba(220, 219, 227, 0.38);
+      text-decoration: none;
+      text-transform: lowercase;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 2.4s ease, color 0.3s;
+    }
+
+    #dream.visible~#btn-archive {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #poem-veil.active~#btn-archive {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #btn-archive:hover {
+      color: rgba(220, 219, 227, 0.7);
+    }
+
+    @media (max-width: 640px) {
+      #btn-archive {
+        top: 24px;
+        right: 24px;
+        font-size: 10px;
+      }
+    }
+
+    /* hide surface-exit — readers không truy cập curator */
+    #surface-exit {
+      display: none !important;
+    }
+
+    /* ── SOUND TOGGLE ── */
+    #btn-sound {
+      position: fixed;
+      bottom: 36px;
+      right: 40px;
+      z-index: 100;
+      font-family: 'Outfit', sans-serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: rgba(220, 219, 227, 0.22);
+      text-transform: lowercase;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 2.4s ease, color 0.3s;
+      user-select: none;
+    }
+
+    #dream.visible~#btn-sound {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    #poem-veil.active~#btn-sound {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #btn-sound:hover {
+      color: rgba(220, 219, 227, 0.5);
+    }
+
+    #btn-sound.sound-on {
+      color: rgba(164, 132, 233, 0.45);
+    }
+
+    @media (max-width: 640px) {
+      #btn-sound {
+        bottom: 20px;
+        right: 20px;
+        font-size: 9px;
+      }
+    }
+
+    /* ── LENS LAYER (CRITICAL CONSTELLATION) ── */
+    @keyframes lens-breathe {
+
+      0%,
+      100% {
+        opacity: 0.62;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.88;
+        transform: scale(1.08);
+      }
+    }
+
+    #btn-lens {
+      display: none;
+      position: fixed;
+      /*
+       * Left-align with poem text column:
+       * Content is centred in viewport with max-width 580px.
+       * Left edge = max(40px,  50vw - 290px)
+       * We use 40px on mobile (padding) and calc() on wider screens.
+       */
+      top: clamp(28px, 4dvh, 52px);
+      left: max(40px, calc(50vw - 290px));
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      margin: -8px;
+      color: rgba(164, 132, 233, 0.62);
+      animation: lens-breathe 4s ease-in-out infinite;
+      transition: color 0.5s ease;
+      user-select: none;
+    }
+
+    #btn-lens svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    body.has-lens #btn-lens {
+      display: flex;
+      pointer-events: auto;
+    }
+
+    /* Lens ON: stop breathing, go solid */
+    body.lens-on #btn-lens {
+      color: rgba(164, 132, 233, 0.92);
+      animation: none;
+      opacity: 1;
+    }
+
+    #btn-lens:hover {
+      color: rgba(164, 132, 233, 0.9);
+      animation: none;
+    }
+
+    #resonance-cue {
+      font-family: 'Outfit', sans-serif;
+      font-size: 10px;
+      font-style: normal;
+      letter-spacing: 2px;
+      color: rgba(164, 132, 233, 0.78); /* brighter — was 0.5 */
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity 1.5s ease, max-height 1.5s ease;
+      width: 100%;
+      max-width: 580px;
+      text-align: left;
+      margin-top: 28px; /* breathing room above cue */
+      margin-bottom: 6px;
+      margin-left: -4%;
+      flex-shrink: 0;
+    }
+
+    body.lens-on #resonance-cue {
+      opacity: 1;
+      max-height: 80px;
+    }
+
+    #whisper-note {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px; /* slightly larger — was 10px */
+      letter-spacing: 1.8px;
+      font-weight: 400;
+      font-style: normal;
+      color: rgba(164, 132, 233, 0.85); /* brighter — was 0.65 */
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity 1.5s ease, max-height 1.5s ease;
+      width: 100%;
+      max-width: 580px;
+      text-align: left;
+      margin-left: -4%;
+      margin-top: 14px;
+      line-height: 1.9;
+      flex-shrink: 0;
+    }
+
+    /* Whisper requires BOTH lens-on AND earned state */
+    body.lens-on.whisper-earned #whisper-note {
+      opacity: 1;
+      max-height: 240px; /* enough for longest note */
+      margin-bottom: 20px;
+      transition: opacity 2.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s,
+        max-height 2.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ── TRANSIT GHOST ── */
+    #transit-ghost {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 49;
+      /* below poem-text(51) so pt-controls stay clickable */
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: clamp(32px, 6dvh, 72px);
+      opacity: 0;
+      transition: opacity 3.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #transit-ghost.haunting {
+      pointer-events: auto;
+      opacity: 1;
+    }
+
+    #transit-phrase {
+      font-family: 'Outfit', sans-serif;
+      font-size: 9px;
+      letter-spacing: 4px;
+      color: rgba(220, 219, 227, 0.15);
+      text-transform: lowercase;
+      margin-bottom: 12px;
+      transition: color 2.5s ease;
+    }
+
+    #transit-ghost.pressure #transit-phrase {
+      color: rgba(220, 219, 227, 0.26);
+    }
+
+    #transit-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(14px, 2vw, 18px);
+      color: rgba(220, 219, 227, 0);
+      cursor: default;
+      user-select: none;
+      transition: color 2.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #transit-ghost.title-visible #transit-title {
+      color: rgba(220, 219, 227, 0.48);
+    }
+
+    #transit-ghost.warmth #transit-title {
+      color: rgba(220, 219, 227, 0.62);
+      text-shadow: 0 0 18px rgba(220, 219, 227, 0.08);
+    }
+
+    /* Whisper memory: returning readers see lower opacity cap */
+    body.whisper-heard-before.lens-on.whisper-earned #whisper-note {
+      opacity: 0.55;
+      /* subtler than first-time 1.0 */
+    }
+    body.instrument-familiar.whisper-heard-before.lens-on.whisper-earned #whisper-note {
+      opacity: 0.6;
+    }
+
+    .lens-motif {
+      transition: opacity 1.5s ease, color 1.5s ease, border-bottom 1.5s ease;
+    }
+
+    body.lens-on .lens-motif {
+      color: rgba(255, 255, 255, 0.95);
+      border-bottom: 1px solid rgba(220, 219, 227, 0.15);
+    }
+
+    /* ── INSTRUMENT MODAL ── */
+    #im-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9500;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 14vh;
+      padding-left: 20px;
+      padding-right: 20px;
+      background: rgba(0, 0, 0, 0.22);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 900ms ease;
+    }
+    #im-overlay.im-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #im-box {
+      width: 100%;
+      max-width: 480px;
+      background: rgba(7, 7, 10, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 36px 40px 44px;
+      pointer-events: auto;
+    }
+    .im-residue,
+    .im-scan,
+    .im-final {
+      opacity: 0;
+      transition: opacity 900ms ease;
+    }
+    .im-residue.im-stage-visible,
+    .im-scan.im-stage-visible,
+    .im-final.im-stage-visible {
+      opacity: 1;
+    }
+    .im-residue {
+      font-family: 'Outfit', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(220, 219, 227, 0.42);
+    }
+    .im-scan {
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      line-height: 1.9;
+      color: rgba(220, 219, 227, 0.56);
+    }
+    .im-section {
+      opacity: 0;
+      margin-bottom: 0;
+      transition: opacity var(--im-section-fade-ms, 1100ms) ease;
+    }
+    .im-final.im-stage-visible .im-section {
+      opacity: 1;
+    }
+    .im-final.im-stage-visible .im-section:nth-child(1) { transition-delay: 0ms; }
+    .im-final.im-stage-visible .im-section:nth-child(2) { transition-delay: 280ms; }
+    .im-final.im-stage-visible .im-section:nth-child(3) { transition-delay: 560ms; }
+    .im-section + .im-section:nth-child(2) { margin-top: 24px; }
+    .im-section + .im-section:nth-child(3) { margin-top: 38px; }
+    .im-section + .im-section:nth-child(4) { margin-top: 31px; }
+    .im-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(220, 219, 227, 1);
+      opacity: 0.34;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .im-body {
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      line-height: 1.9;
+      color: rgba(220, 219, 227, 1);
+      opacity: 0.78;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .im-body li {
+      padding-left: 12px;
+      position: relative;
+    }
+    .im-body li::before {
+      content: '·';
+      position: absolute;
+      left: 0;
+      opacity: 0.38;
+    }
+    .im-empty { opacity: 0.28; font-style: italic; }
+    @media (max-width: 640px) {
+      #im-box { padding: 28px 24px 36px; }
+      #im-overlay { padding-top: 10vh; }
+      .im-residue { letter-spacing: 0.22em; }
+    }
+
+    @media print {
+      body {
+        background: #fff !important;
+        color: #000 !important;
+      }
+
+      #dream,
+      #threshold,
+      #poem-veil,
+      #btn-archive,
+      #scroll-ray,
+      .pt-exit {
+        display: none !important;
+      }
+
+      #poem-text {
+        position: static !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        padding: 0 !important;
+        transform: none !important;
+      }
+
+      .pt-title {
+        color: #000 !important;
+        margin-bottom: 24px !important;
+      }
+
+      .pt-body {
+        color: #000 !important;
+        overflow: visible !important;
+        max-height: none !important;
+      }
+
+      body::after {
+        content: "hanhloan.com";
+        display: block;
+        margin-top: 40px;
+        font-size: 10px;
+        font-family: 'Outfit', sans-serif;
+        color: #999;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="threshold">
+    <div class="t-line" id="t-line"></div>
+    <div class="t-prompt">chạm vào hạnh loan</div>
+  </div>
+
+  <div id="dream">
+    <canvas id="c"></canvas>
+  </div>
+
+  <div id="poem-veil" onclick="closePoem()"></div>
+  <div id="poem-text">
+    <button id="btn-lens" aria-label="quỹ đạo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path
+          d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+      </svg>
+    </button>
+    <div id="resonance-cue"></div>
+    <div class="pt-title" id="pt-title"></div>
+    <div class="pt-body" id="pt-body"></div>
+    <div id="whisper-note"></div>
+    <div class="pt-controls">
+      <div class="pt-exit" onclick="closePoem()">trở về</div>
+    </div>
+  </div>
+
+  <div id="transit-ghost">
+    <div id="transit-phrase"></div>
+    <div id="transit-title"></div>
+  </div>
+
+  <div id="tip"></div>
+  <div id="scroll-ray"></div>
+  <a href="/archive" id="btn-archive" onclick="goToArchive(event)">sắc màu hạnh loan</a>
+
+  <button id="btn-sound" aria-label="âm thanh">○ im lặng</button>
+
+  <script src="pending-modal.js"></script>
+  <script src="curator_data_inline.js"></script>
+  <script src="critical_lens_inline.js"></script>
+  <script src="anchor_mri_inline.js"></script>
+  <script src="instrument_translator.js"></script>
+  <script src="motif_clusters_inline.js"></script>
+  <script>
+    const isLocalFile = window.location.protocol === 'file:';
+
+    // ── LENS LAYER (CRITICAL CONSTELLATION) ──
+    let _criticalData = (typeof CRITICAL_LENS_DATA !== 'undefined') ? CRITICAL_LENS_DATA : { poem_notes: [], motif_notes: [], constellation_essays: [] };
+    // Bug 5 fix: fetch fails with file:// protocol due to CORS. Guard with isLocalFile.
+    if (!isLocalFile && typeof CRITICAL_LENS_DATA === 'undefined') {
+      fetch('critical-lens.json').then(r => r.json()).then(d => _criticalData = d).catch(e => { });
+    }
+
+    // resonance phrases: tonal cues, not diagnoses
+    const RESONANCE_PHRASES = {
+      longing: 'có thứ chi đó đang được giữ lại...',
+      eros: 'hơi ấm còn phương phưởng nơi đây...',
+      entropy: 'có chi đó đang tan ra khỏi hình hài của nó...',
+      memory: 'có vết dấu nhưng nỏ phải là kỷ niệm...',
+      distance: 'có hai đầu dây nhưng nỏ biết ai cầm phía mô...',
+      ecstasy: 'ngượng cửa ni chỉ đứng được một lằn...',
+    };
+
+    let _lensOn = false;
+    const btnLens = document.getElementById('btn-lens');
+    btnLens.addEventListener('click', () => {
+      _lensOn = !_lensOn;
+      document.body.classList.toggle('lens-on', _lensOn);
+    });
+
+    function resetLens() {
+      _lensOn = false;
+      document.body.classList.remove('lens-on', 'has-lens', 'instrument-familiar');
+    }
+
+    // ── SOUND ENGINE — default OFF ─────────────────────────────────────────────
+    // Only micro-sonic feedback: faint resonance + pressure shifts.
+    // NO music, NO ambient bed, NO cinematic audio.
+    let _soundOn = true;
+    let _audioCtx = null;
+    function getAudioCtx() {
+      if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      return _audioCtx;
+    }
+    // Faint resonance: played when a poem is opened.
+    // A single sine partial, very short, slight reverb via convolution-free approach.
+    function playResonance(field) {
+      if (!_soundOn) return;
+      try {
+        const ctx = getAudioCtx();
+        // Frequency mapped to emotional field — physics, not melody
+        const freqMap = { longing: 174, eros: 210, entropy: 136, memory: 198, distance: 152, ecstasy: 220 };
+        const freq = freqMap[field] || 174;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 0.08); // slow attack
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.4); // long decay
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 2.5);
+      } catch (e) { }
+    }
+    // Pressure shift: very faint white noise burst when scrolling fast
+    function playPressureShift() {
+      if (!_soundOn) return;
+      try {
+        const ctx = getAudioCtx();
+        const bufLen = ctx.sampleRate * 0.12;
+        const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < bufLen; i++) data[i] = (Math.random() * 2 - 1);
+        const src = ctx.createBufferSource();
+        const gain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass'; filter.frequency.value = 800; filter.Q.value = 0.8;
+        src.buffer = buf;
+        gain.gain.setValueAtTime(0.025, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
+        src.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+        src.start(ctx.currentTime);
+      } catch (e) { }
+    }
+    const btnSound = document.getElementById('btn-sound');
+    btnSound.textContent = '● tiếng vọng';
+    btnSound.classList.add('sound-on');
+    btnSound.addEventListener('click', () => {
+      _soundOn = !_soundOn;
+      btnSound.textContent = _soundOn ? '● tiếng vọng' : '○ im lặng';
+      btnSound.classList.toggle('sound-on', _soundOn);
+      if (_soundOn) { try { getAudioCtx().resume(); } catch (e) { } }
+    });
+
+
+    // Fix href immediately for local file testing
+    if (isLocalFile) {
+      document.getElementById('btn-archive').href = 'archive.html';
+    }
+
+    window.goToArchive = function (e) {
+      if (e) e.preventDefault();
+      if (poemOpen && selPoem && _poemLinger > 0) {
+        recordLinger(selPoem.id, _poemLinger);
+        _poemLinger = 0;
+      }
+      document.body.style.transition = 'opacity 1.5s ease';
+      document.body.style.opacity = '0';
+      setTimeout(() => { window.location.href = isLocalFile ? 'archive.html' : '/archive'; }, 1500);
+    };
+
+    window.addEventListener('pageshow', function (e) {
+      if (e.persisted) {
+        document.body.style.opacity = '1';
+      }
+    });
+
+    // ── DATA ─────────────────────────────────────────────────────────────────
+    const poems = JSON.parse(JSON.stringify(POEMS_DATA));
+    const isMobile = window.innerWidth <= 640 || 'ontouchstart' in window;
+
+    // Sync curator state
+    try {
+      const saved = localStorage.getItem('hanh-loan-curation-v1');
+      if (saved) {
+        const m = JSON.parse(saved);
+        poems.forEach(p => { if (m[p.id]) Object.assign(p, m[p.id]); });
+      }
+    } catch (e) { }
+
+    // Memory: poemId → { count, linger }
+    let MEM = {};
+    try {
+      const saved = JSON.parse(localStorage.getItem('hanh-loan-reader-v1') || '{}');
+      for (let k in saved) {
+        if (typeof saved[k] === 'number') MEM[k] = { count: saved[k], linger: 0 };
+        else MEM[k] = saved[k];
+      }
+    } catch (e) { }
+    function saveMemory() { try { localStorage.setItem('hanh-loan-reader-v1', JSON.stringify(MEM)); } catch (e) { } }
+    function recordRead(id) {
+      if (!MEM[id]) MEM[id] = { count: 0, linger: 0 };
+      if (MEM[id].count === undefined) MEM[id].count = 0;
+      MEM[id].count++; saveMemory();
+    }
+    function readCount(id) { return MEM[id] ? (MEM[id].count || 0) : 0; }
+    function recordLinger(id, dt) {
+      if (!MEM[id]) MEM[id] = { count: 0, linger: 0 };
+      if (MEM[id].linger === undefined) MEM[id].linger = 0;
+      MEM[id].linger += dt; saveMemory();
+    }
+
+    // ── COLORS — emotional color temperature, NOT rainbow art ───────────────
+    // Each field: hue chosen for emotional temperature, never for decoration.
+    // longing=blue-grey sparse, eros=deep warm, entropy=dim fractured,
+    // memory=amber residue, distance=cold indigo, ecstasy=muted gold
+    const DOM_COLORS = {
+      longing: '#6a8fa8',  // blue-grey — sparse, cold
+      eros: '#c45a3a',  // deep warm terracotta
+      entropy: '#6b5f7a',  // dim muted violet — fractured
+      memory: '#b8862a',  // amber residue
+      distance: '#3d5a7a',  // cold indigo
+      ecstasy: '#8a7a3a'   // muted gold, not bright
+    };
+    function getEff(p) { return p.curatorOverride || p.aiSuggestion || {}; }
+    function nodeColor(p) { return DOM_COLORS[getEff(p).dominantField] || '#6a6879'; }
+
+    // ── ANCHOR CLASSIFICATION ────────────────────────────────────────────────
+    // anchor: high gravityMass OR high read count → stable, bright
+    // dying:  high entropy OR zero interaction → near-invisible
+    // normal: everything else
+    function starClass(p) {
+      const eff = getEff(p);
+      const gm = eff.gravityMass || 1;
+      const rc = readCount(p.id);
+      const ent = (eff.emotionalField || {}).entropy || 0;
+      if (gm >= 2.5 || rc >= 3) return 'anchor';
+      if (ent >= 0.75 && rc === 0) return 'dying';
+      return 'normal';
+    }
+
+    // ── INITIAL NODES — anchor poems first, then 1/field fallback ───────────
+    // 12 anchor poems (docs/12-anchor-poems.md) are prioritised so testers
+    // see the representative corpus immediately. No other logic is changed.
+    const ANCHOR_IDS = [
+      '2016-008-vui',
+      '2023-078-thoi-gian-va-tinh-yeu',
+      '2022-038-binh-minh-em-va-hoang-hon-anh',
+      '2020-020-boi-vi-em-yeu-anh',
+      '2023-083-bon-mua-co-con-nhau',
+      '2023-074-nang-i',
+      '2022-040-hai-mien-thang-5',
+      '2022-067-ben-nay-ben-kia',
+      '2022-032-tra-anh-ve-phia-binh-minh',
+      '2023-102-thang-12-cho-em',
+      '2022-047-bay-gio-thang-tam-roi-anh',
+      '2023-082-mua-he-o-boston'
+    ];
+    function pickInitial() {
+      const maxInit = isMobile ? 4 : 6;
+      const s = new Set();
+      // Step 1: prefer anchor poems (in declared order)
+      for (const anchorId of ANCHOR_IDS) {
+        if (s.size >= maxInit) break;
+        const idx = poems.findIndex(p => p.id === anchorId);
+        if (idx >= 0) s.add(idx);
+      }
+      // Step 2: fallback — 1 node per dominant field (original logic)
+      if (s.size < maxInit) {
+        const byField = {};
+        poems.forEach((p, i) => {
+          const d = getEff(p).dominantField || 'entropy';
+          if (!byField[d]) byField[d] = [];
+          byField[d].push(i);
+        });
+        Object.values(byField).forEach(arr => {
+          if (s.size < maxInit && arr.length) s.add(arr[Math.floor(arr.length / 2)]);
+        });
+      }
+      // Step 3: fill any remaining slots sequentially
+      let i = 0;
+      while (s.size < maxInit && i < poems.length) { s.add(i); i++; }
+      return s;
+    }
+    const revealed = pickInitial();
+
+    // ── SPRINGS ───────────────────────────────────────────────────────────────
+    const SP = poems.map(() => ({
+      sc: 0, tSc: 0, vSc: 0,
+      dx: 0, tDx: 0, vDx: 0,
+      dy: 0, tDy: 0, vDy: 0,
+      op: 0
+    }));
+    poems.forEach((p, i) => { if (revealed.has(i)) { SP[i].tSc = 1; } });
+
+    function updateSprings(dt) {
+      if (window._isMinimalMode) {
+        SP.forEach((s, i) => {
+          s.sc = s.tSc; s.dx = s.tDx; s.dy = s.tDy; s.op = revealed.has(i) ? 1 : 0;
+        });
+        return;
+      }
+      // Softer spring: less cinematic bounce, more weight
+      const K = 72, D = 13;
+      SP.forEach((s, i) => {
+        const fSc = -K * (s.sc - s.tSc) - D * s.vSc;
+        s.vSc += fSc * dt; s.sc += s.vSc * dt;
+        const fDx = -K * (s.dx - s.tDx) - D * s.vDx;
+        s.vDx += fDx * dt; s.dx += s.vDx * dt;
+        const fDy = -K * (s.dy - s.tDy) - D * s.vDy;
+        s.vDy += fDy * dt; s.dy += s.vDy * dt;
+        // opacity: slower reveal — node surfaces like memory, not notification
+        const targetOp = revealed.has(i) ? 1 : 0;
+        s.op += (targetOp - s.op) * Math.min(1, dt * 0.35);
+      });
+    }
+
+    // ── ATTENTION / WARMTH ────────────────────────────────────────────────────
+    const attn = {};
+    let _hTimer = null, _hId = null;
+    function startAttn(id) {
+      if (_hId === id) return;
+      stopAttn(); _hId = id;
+      const rate = isMobile ? 0.15 : 0.1;
+      _hTimer = setInterval(() => { attn[id] = (attn[id] || 0) + rate; }, 100);
+    }
+    function stopAttn() { if (_hTimer) { clearInterval(_hTimer); _hTimer = null; } _hId = null; }
+    function warmth(p) {
+      const s = (attn[p.id] || 0) + readCount(p.id) * 4;
+      return Math.min(1, Math.log(1 + s * 0.35) / Math.log(1 + 35 * 0.35));
+    }
+
+    // ── SILENCE & WEATHER ─────────────────────────────────────────────────────
+    let _lastAct = Date.now(), _sil = 0, _bph = 0;
+    let _sessionWeather = { longing: 0, eros: 0, entropy: 0, memory: 0, distance: 0, ecstasy: 0 };
+    function getSessionWeather() {
+      let dom = 'entropy', maxV = 0;
+      for (let k in _sessionWeather) { if (_sessionWeather[k] > maxV) { maxV = _sessionWeather[k]; dom = k; } }
+      return { dominant: dom, value: maxV };
+    }
+    function touch() { _lastAct = Date.now(); }
+    function updateSilence(dt) {
+      const sw = getSessionWeather();
+      let silThresh = 7500;
+      if (sw.dominant === 'entropy' && sw.value > 30) silThresh -= 1000;
+      const idle = Date.now() - _lastAct;
+      _sil = idle > silThresh ? Math.min(1, _sil + dt / 4) : Math.max(0, _sil - dt * 2);
+      // Lens ON: breathing slows — reading state shifts
+      _bph += dt * (_lensOn ? 0.09 : 0.28);
+    }
+
+    // ── LAYOUT ────────────────────────────────────────────────────────────────
+    let NP = [];
+    function computePositions(W, H) {
+      const pad = Math.min(W, H) * 0.10;
+      NP = poems.map((p, i) => {
+        const ef = (getEff(p).emotionalField) || {};
+        const xv = (ef.longing || 0) * 0.65 + (ef.warmth || 0) * 0.35;
+        const yv = (ef.entropy || 0) * 0.6 + (ef.isolation || 0) * 0.4;
+        const ang = i * 2.39996 * Math.PI;
+        const jit = 18 + (i % 5) * 5;
+        return {
+          x: pad + xv * (W - pad * 2) + Math.cos(ang) * jit,
+          y: pad + (1 - yv) * (H - pad * 2) + Math.sin(ang) * jit,
+          poem: p, idx: i
+        };
+      });
+    }
+
+    // ── HAZE — each field breathes at its own cadence ─────────────────────────
+    function hexA(a) { return Math.min(255, Math.max(0, Math.round(a * 255))).toString(16).padStart(2, '0'); }
+    // Per-field haze config: encodes emotional physics, NOT decoration
+    // Haze: sparser than before — more void, more darkness between nodes
+    const FIELD_HAZE = {
+      longing: { spread: 2.1, alpha: 0.024, op: 'source-over' }, // thin, expansive
+      eros: { spread: 1.2, alpha: 0.032, op: 'source-over' }, // contained but not dense
+      entropy: { spread: 1.6, alpha: 0.014, op: 'source-over' }, // barely visible
+      memory: { spread: 1.8, alpha: 0.026, op: 'source-over' }, // faint amber trace
+      distance: { spread: 2.4, alpha: 0.018, op: 'source-over' }, // almost not there
+      ecstasy: { spread: 1.4, alpha: 0.022, op: 'source-over' }
+    };
+    let _hazePhase = 0; // breathing phase, advanced in drawFrame
+    function drawHaze(ctx, dt) {
+      if (window._isMinimalMode) return;
+      _hazePhase += dt * 0.08; // extremely slow breath
+      const breathe = Math.sin(_hazePhase) * 0.18 + 1.0; // ±18% intensity sway
+      ctx.save();
+      const grp = {};
+      NP.forEach((n, i) => {
+        if (!revealed.has(i)) return;
+        const d = getEff(n.poem).dominantField || 'entropy';
+        if (!grp[d]) grp[d] = [];
+        grp[d].push(n);
+      });
+      Object.entries(grp).forEach(([d, ns]) => {
+        if (!ns.length) return;
+        const cfg = FIELD_HAZE[d] || { spread: 2.0, alpha: 0.04, op: 'source-over' };
+        const cx = ns.reduce((s, n) => s + n.x, 0) / ns.length;
+        const cy = ns.reduce((s, n) => s + n.y, 0) / ns.length;
+        const sp = ns.reduce((s, n) => s + Math.hypot(n.x - cx, n.y - cy), 0) / ns.length;
+        const hr = Math.max(60, sp * cfg.spread);
+        const c = DOM_COLORS[d] || '#555';
+        const silFade = 1 - _sil * 0.4;
+        const a = cfg.alpha * breathe * silFade;
+        ctx.globalCompositeOperation = cfg.op;
+        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, hr);
+        g.addColorStop(0, c + hexA(a * 1.8));
+        g.addColorStop(0.55, c + hexA(a * 0.4));
+        g.addColorStop(1, c + '00');
+        ctx.beginPath(); ctx.arc(cx, cy, hr, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
+      });
+      ctx.restore();
+    }
+
+    // ── DUST — behavior encodes field physics, NOT random decoration ──────────
+    const FIELD_DUST = {
+      longing: { spawnRate: 0.14, speed: 0.07, gravity: -0.0006, maxR: 1.1, decay: 0.003 },
+      eros: { spawnRate: 0.34, speed: 0.18, gravity: 0.0008, maxR: 1.6, decay: 0.008 },
+      entropy: { spawnRate: 0.18, speed: 0.24, gravity: 0.0015, maxR: 0.9, decay: 0.012 },
+      memory: { spawnRate: 0.22, speed: 0.05, gravity: -0.0003, maxR: 1.4, decay: 0.0025 },
+      distance: { spawnRate: 0.10, speed: 0.09, gravity: 0.0000, maxR: 1.0, decay: 0.005 },
+      ecstasy: { spawnRate: 0.26, speed: 0.13, gravity: -0.0004, maxR: 1.5, decay: 0.006 }
+    };
+    // All palette colors — dust randomly draws from full emotional spectrum
+    const _allColors = Object.values(DOM_COLORS);
+    function _pickDustColor(primaryColor) {
+      // 60% source field color, 40% random emotional color → feels like living atmosphere
+      if (Math.random() < 0.60) return primaryColor;
+      return _allColors[Math.floor(Math.random() * _allColors.length)];
+    }
+    const dust = [];
+    // Celestial event state
+    let _cevTimer = 0, _cevActive = false, _cevDust = [];
+    function spawnDust() {
+      if (window._isMinimalMode) return;
+      // Ambient background dust — position + directional motion
+      const W = canvas.width, H = canvas.height;
+      const ambientChance = poemOpen ? 0.92 : 0.45;
+      const ambientBatch = poemOpen ? (isMobile ? 6 : 14) : 1;
+      if (Math.random() < ambientChance) {
+        for (let _ab = 0; _ab < ambientBatch; _ab++) {
+          const col = _allColors[Math.floor(Math.random() * _allColors.length)];
+          let px, py, vx, vy;
+          if (poemOpen && Math.random() < 0.65) {
+            // Edge-spawn: particles flow across screen creating "drifting through space"
+            const edge = Math.floor(Math.random() * 4);
+            if (edge === 0) { px = Math.random() * W; py = -4; }
+            else if (edge === 1) { px = Math.random() * W; py = H + 4; }
+            else if (edge === 2) { px = -4; py = Math.random() * H; }
+            else { px = W + 4; py = Math.random() * H; }
+            // Direction: toward center ±50°, plus cosmic current bias
+            const toCenter = Math.atan2(H * 0.5 - py, W * 0.5 - px);
+            const spread = (Math.random() - 0.5) * 1.0;
+            const sp = 0.55 + Math.random() * 1.6;
+            vx = Math.cos(toCenter + spread) * sp + _cosmosDX * 0.6;
+            vy = Math.sin(toCenter + spread) * sp + _cosmosDY * 0.6;
+          } else {
+            // Random position — but WITH directional velocity + cosmic current
+            px = Math.random() * W; py = Math.random() * H;
+            const ang = Math.random() * Math.PI * 2;
+            const sp = poemOpen ? (0.40 + Math.random() * 1.2) : (0.18 + Math.random() * 0.55);
+            vx = Math.cos(ang) * sp + _cosmosDX;
+            vy = Math.sin(ang) * sp + _cosmosDY;
+          }
+          dust.push({
+            x: px, y: py, vx, vy,
+            gravity: (Math.random() - 0.5) * 0.0004,
+            life: 0.5 + Math.random() * 0.5,
+            decay: 0.0010 + Math.random() * (poemOpen ? 0.0018 : 0.003),
+            color: col, r: 0.35 + Math.random() * (poemOpen ? 1.6 : 1.2)
+          });
+        }
+      }
+      // Node-anchored dust — directional, not random
+      if (!poemOpen) {
+        NP.forEach((n, i) => {
+          if (!revealed.has(i)) return;
+          const w = warmth(n.poem);
+          const field = getEff(n.poem).dominantField || 'entropy';
+          const cfg = FIELD_DUST[field] || FIELD_DUST.entropy;
+          const sc = starClass(n.poem);
+          const emitMult = sc === 'dying' ? 0.15 : sc === 'anchor' ? 2.2 : 1.0;
+          if (Math.random() > cfg.spawnRate * emitMult * (0.4 + w * 0.6)) return;
+          const ang = Math.random() * Math.PI * 2;
+          // Speed: 4x faster than before so star-field drift is visible
+          const sp = cfg.speed * 4.5 * (0.5 + Math.random() * 0.7);
+          dust.push({
+            x: n.x + (Math.random() - 0.5) * 10,
+            y: n.y + (Math.random() - 0.5) * 10,
+            vx: Math.cos(ang) * sp + _cosmosDX * 0.5,
+            vy: Math.sin(ang) * sp + _cosmosDY * 0.5,
+            gravity: cfg.gravity * 2,
+            life: 1, decay: cfg.decay * (0.6 + Math.random() * 0.8),
+            color: _pickDustColor(nodeColor(n.poem)),
+            r: 0.4 + Math.random() * cfg.maxR
+          });
+        });
+      }
+      const maxDust = poemOpen ? (isMobile ? 520 : 980) : (isMobile ? 220 : 420);
+      while (dust.length > maxDust) dust.shift();
+    }
+    function stepDust() {
+      dust.forEach(d => { d.x += d.vx; d.y += d.vy; d.vy += d.gravity; d.life -= d.decay; });
+      // Celestial event: frequency doubles when poem is open
+      _cevTimer += 1;
+      const _cevBase = poemOpen ? (isMobile ? 200 : 130) : (isMobile ? 480 : 320);
+      const _cevJitter = poemOpen ? 260 : 600;
+      if (!_cevActive && _cevTimer > _cevBase + Math.random() * _cevJitter) {
+        _cevActive = true; _cevTimer = 0; _cevDust = [];
+        const sy = 0.08 + Math.random() * 0.84;
+        const sx = Math.random() < 0.5 ? -12 : canvas.width + 12;
+        const dir = sx < 0 ? 1 : -1;
+        const count = 8 + Math.floor(Math.random() * 10);
+        const evtColor = _allColors[Math.floor(Math.random() * _allColors.length)];
+        const evtColor2 = _allColors[Math.floor(Math.random() * _allColors.length)];
+        for (let k = 0; k < count; k++) {
+          _cevDust.push({
+            x: sx + dir * k * 16, y: canvas.height * sy + (Math.random() - 0.5) * 24,
+            vx: dir * (0.18 + Math.random() * 0.16), vy: (Math.random() - 0.5) * 0.05,
+            life: 1, decay: 0.0014 + Math.random() * 0.0008,
+            r: 0.6 + Math.random() * 1.0,
+            color: k % 2 === 0 ? evtColor : evtColor2
+          });
+        }
+      }
+      if (_cevActive) {
+        _cevDust.forEach(d => { d.x += d.vx; d.y += d.vy; d.life -= d.decay; });
+        if (_cevDust.every(d => d.life <= 0)) _cevActive = false;
+      }
+    }
+    function drawDust(ctx) {
+      // When poem is open, dust is more opaque — space feels denser
+      const iw = _inheritedWeather;
+      const inheritedAlphaMod = iw ? (1 + (iw.dustAlphaMult - 1) * 0.22) : 1;
+      const baseAlpha = poemOpen ? 0.38 * inheritedAlphaMod : 0.26;
+      const silF = 1 - _sil * 0.5;
+      dust.forEach(d => {
+        if (d.life <= 0) return;
+        ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        ctx.fillStyle = d.color + hexA(d.life * baseAlpha * silF);
+        ctx.fill();
+      });
+      if (_cevActive) {
+        const cevAlpha = poemOpen ? 0.82 : 0.62;
+        _cevDust.forEach(d => {
+          if (d.life <= 0) return;
+          ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+          ctx.fillStyle = d.color + hexA(d.life * cevAlpha);
+          ctx.fill();
+        });
+      }
+    }
+
+    // ── STATE ─────────────────────────────────────────────────────────────────
+    let selPoem = null, hovIdx = null, poemOpen = false;
+    let _poemLinger = 0;
+    let pNotes = []; // module-level so drawFrame whisper gate can read it
+    // Phase 6 state
+    let _whisperEarned = false;
+    let _skimCount = 0;
+    let _transitActive = false, _transitTarget = null;
+    let _transitTimers = [];
+    // Universe total time (seconds) — not just which poems opened
+    let _universeTime = 0;
+    try { _universeTime = parseFloat(localStorage.getItem('hl-universe-time-v1') || '0'); } catch (e) { }
+    setInterval(() => {
+      _universeTime += 1;
+      try { localStorage.setItem('hl-universe-time-v1', _universeTime.toFixed(0)); } catch (e) { }
+    }, 1000);
+    // Inherited cluster weather from Archive
+    let _inheritedWeather = null;
+    const CLUSTER_WEATHER = {
+      'mc-01': { speedMult: 0.80, dustAlphaMult: 0.88, silThreshDelta: +500 },
+      'mc-02': { speedMult: 0.55, dustAlphaMult: 0.92, silThreshDelta: -800 },
+      'mc-03': { speedMult: 0.70, dustAlphaMult: 1.15, silThreshDelta: -400 },
+      'mc-04': { speedMult: 0.60, dustAlphaMult: 0.72, silThreshDelta: +1000 }
+    };
+    try {
+      const ic = sessionStorage.getItem('hl-inherited-cluster');
+      if (ic && CLUSTER_WEATHER[ic]) _inheritedWeather = CLUSTER_WEATHER[ic];
+    } catch (e) { }
+    // Motif clusters data
+    const _motifClusters = (typeof MOTIF_CLUSTERS_DATA !== 'undefined')
+      ? (MOTIF_CLUSTERS_DATA.motif_clusters || [])
+      : [];
+    // Drift field state
+    let _driftIntent = 0;
+    let _driftVelocity = 0;
+    let _lastPoemAct = Date.now();
+    let _hasDrifted = false;
+    // ── COSMIC CURRENT — galactic wind direction rotates very slowly
+    // All particles are subject to this background current.
+    // Full rotation: ~10 minutes. User perceives it as the universe breathing.
+    let _cosmosAngle = Math.random() * Math.PI * 2;
+    let _cosmosDX = 0, _cosmosDY = 0;
+
+    // ── DRAW FRAME ────────────────────────────────────────────────────────────
+    let _lft = performance.now();
+    function drawFrame(ctx, W, H) {
+      const now = performance.now();
+      const dt = Math.min(0.1, (now - _lft) / 1000); _lft = now;
+      updateSilence(dt); updateSprings(dt);
+      // Advance cosmic current — lens-on halves rotation speed
+      const motionRate = _lensOn ? 0.0038 : 0.011;
+      _cosmosAngle += dt * motionRate;
+      // Apply inherited cluster weather at 22% weight
+      const iw = _inheritedWeather;
+      const baseWindScale = _lensOn ? 0.10 : 0.28;
+      const windScale = iw ? baseWindScale * (1 + (iw.speedMult - 1) * 0.22) : baseWindScale;
+      _cosmosDX = Math.cos(_cosmosAngle) * windScale;
+      _cosmosDY = Math.sin(_cosmosAngle) * (windScale * 0.46);
+      stepDust(); spawnDust();
+
+      // ── DRIFT FIELD & LINGER ──
+      if (poemOpen) {
+        const el = document.getElementById('pt-body');
+        const now2 = Date.now();
+        const idleMs = now2 - _lastPoemAct;
+        const t = now2 / 1000;
+
+        // Reader Presence accumulation (max 2.5 mins idle to avoid AFK farming)
+        if (idleMs < 150000) {
+          if (selPoem) {
+            const eff = getEff(selPoem).emotionalField || {};
+            _sessionWeather.entropy += (eff.entropy || 0) * dt;
+            _sessionWeather.longing += (eff.longing || 0) * dt;
+            _sessionWeather.eros += (eff.eros || 0) * dt;
+            _sessionWeather.memory += (eff.memory || 0) * dt;
+            _sessionWeather.distance += (eff.distance || 0) * dt;
+            _sessionWeather.ecstasy += (eff.ecstasy || 0) * dt;
+          }
+          _poemLinger += dt;
+        }
+
+        // \u2500\u2500 WHISPER GATE (Phase 6) \u2500\u2500
+        if (!_whisperEarned && pNotes && pNotes.length > 0) {
+          // Stanza presence: near a pause zone accelerates emergence by up to 4s
+          const nearPause = el._pauseOffsets &&
+            el._pauseOffsets.some(o => Math.abs(el.scrollTop - o) < (el._lineH || 38) * 1.8);
+          const stanzaBonus = nearPause ? 4 : 0;
+          // Whisper memory: returning readers earn it 6s faster and see dimmer, quicker version
+          const prevHeard = MEM[selPoem.id] && MEM[selPoem.id].whisperHeard;
+          const memoryBonus = prevHeard ? 6 : 0;
+          // Skim penalty: raise gate for skimmers
+          const skimPenalty = _skimCount >= 3 ? 12 : (_skimCount >= 2 ? 6 : 0);
+          const effectiveGate = Math.max(8, 18 - stanzaBonus - memoryBonus + skimPenalty);
+
+          if (_poemLinger >= effectiveGate) {
+            _whisperEarned = true;
+            document.body.classList.add('whisper-earned');
+            // Record that user has heard this whisper
+            if (selPoem && !prevHeard) {
+              if (!MEM[selPoem.id]) MEM[selPoem.id] = { count: 0, linger: 0 };
+              MEM[selPoem.id].whisperHeard = true;
+              saveMemory();
+            }
+          }
+        }
+
+        // \u2500\u2500 TRANSIT ACTIVATION (Phase 6) \u2500\u2500
+        if (!_transitActive && _poemLinger >= 24 && _skimCount < 2) {
+          const bodyEl2 = document.getElementById('pt-body');
+          const nearBottom = bodyEl2 &&
+            (bodyEl2.scrollTop + bodyEl2.clientHeight >= bodyEl2.scrollHeight - 100);
+          if (nearBottom) maybeActivateTransit();
+        }
+
+        // Warm-up: 9s lần đầu, 4.5s các lần sau (tốc độ đọc thơ bình thường)
+        if (_driftIntent > 0.5) _hasDrifted = true;
+        const warmupMs = _hasDrifted ? 4500 : 9000;
+        const lineH = el._lineH || 38;
+
+        if (idleMs > warmupMs) {
+          // Tăng intent mềm khi idle đủ lâu
+          _driftIntent = Math.min(1, _driftIntent + dt * 0.12);
+        } else {
+          // Mọi interaction: giảm intent dần dần, KHÔNG reset cứng
+          _driftIntent = Math.max(0, _driftIntent - dt * 0.3);
+        }
+
+        // Sin rhythm: thở, không tick
+        const breathe = Math.sin(t * 0.28) * 0.03;   // ±0.03 amplitude cực nhẹ
+        const basePx = isMobile ? 0.14 : 0.22;        // mobile chậm hơn 35%
+        const targetV = (basePx + breathe) * _driftIntent;
+
+        // Soft interpolation: velocity không nhảy cứng
+        _driftVelocity += (targetV - _driftVelocity) * Math.min(1, dt * 0.4);
+
+        if (_driftVelocity > 0.003) {
+          // Detect pause zone richness
+          const inBlankZone = el._pauseOffsets &&
+            el._pauseOffsets.some(o => Math.abs(el.scrollTop - o) < lineH * 0.8);
+          const inShortLine = el._shortLineOffsets &&
+            el._shortLineOffsets.some(o => Math.abs(el.scrollTop - o) < lineH * 1.2);
+
+          let zoneMult = 1.0;
+          if (inBlankZone) zoneMult = isMobile ? 0.08 : 0.12; // stanza break: gần đứng hẳn
+          if (inShortLine) zoneMult = Math.min(zoneMult, 0.3);  // isolated line: linger
+
+          // Accumulate sub-pixels to defeat browser integer truncation of scrollTop
+          el._scrollAccum = (el._scrollAccum || 0) + _driftVelocity * zoneMult;
+          if (el._scrollAccum >= 1) {
+            const step = Math.floor(el._scrollAccum);
+            el.scrollTop += step;
+            el._scrollAccum -= step;
+          }
+
+          // Cosmic ray: flash if moving fast enough
+          if (_driftVelocity * zoneMult > 0.05) {
+            flashCosmicRay(el);
+          }
+        }
+      }
+
+      ctx.clearRect(0, 0, W, H);
+
+      const sw = getSessionWeather();
+      let bgAlpha = 0.12;
+      if (sw.dominant === 'entropy' && sw.value > 30) {
+        bgAlpha = Math.max(0.08, 0.12 - (sw.value - 30) * 0.0005);
+      } else if (sw.dominant === 'longing' && sw.value > 30) {
+        bgAlpha = Math.min(0.16, 0.12 + (sw.value - 30) * 0.0005);
+      }
+      const bg = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, W * 0.65);
+      bg.addColorStop(0, `rgba(18,16,26,${bgAlpha.toFixed(3)})`); bg.addColorStop(1, 'rgba(5,5,8,0)');
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+      drawHaze(ctx, dt); drawDust(ctx);
+
+      NP.forEach((n, i) => {
+        if (!revealed.has(i)) return;
+        const p = n.poem, s = SP[i];
+        const eff = getEff(p);
+        const gm = eff.gravityMass || 1;
+        const col = nodeColor(p);
+        const isSel = selPoem && selPoem.id === p.id;
+        const isHov = hovIdx === i;
+        const w = warmth(p);
+        const sc = starClass(p);
+
+        // ── STAR HIERARCHY ────────────────────────────────────────────────────
+        // anchor: larger, stable, bright — gravitational presence
+        // dying:  tiny, dim, barely visible — emotional residue
+        // normal: standard
+        let baseR, coreAlphaBase, haloScale;
+        if (sc === 'anchor') {
+          baseR = (isMobile ? 5 : 6.5) + gm * 2.6;
+          coreAlphaBase = 0.72;
+          haloScale = 1.8;
+        } else if (sc === 'dying') {
+          baseR = (isMobile ? 1.5 : 2) + gm * 0.8;
+          coreAlphaBase = 0.10;
+          haloScale = 0.4;
+        } else {
+          baseR = (isMobile ? 3.5 : 4.5) + gm * 1.8;
+          coreAlphaBase = 0.38;
+          haloScale = 1.0;
+        }
+
+        s.tSc = isSel ? 0 : (isHov ? 1.35 : 1.0);
+        if (s.sc < 0.02 && s.tSc > 0) s.sc = 0.06;
+        const op = s.op;
+        if (op < 0.01) return;
+
+        // ── TWINKLE VARIANCE — encodes aliveness, NOT decoration ──────────────
+        // Each star has a unique phase from its id hash.
+        // Anchor stars: slow stable pulse. Dying stars: erratic flicker.
+        // Normal: gentle subtle variance.
+        const hash = p.id.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a; }, 0);
+        const tPhase = (Math.abs(hash) % 1000) / 1000 * Math.PI * 2;
+        let twinkle = 0;
+        if (sc === 'anchor') {
+          twinkle = Math.sin(_bph * 0.6 + tPhase) * 0.06; // very slow, stable
+        } else if (sc === 'dying') {
+          // erratic: two frequencies interfere → irregular flicker
+          twinkle = (Math.sin(_bph * 2.3 + tPhase) * Math.sin(_bph * 3.7 + tPhase * 1.3)) * 0.22;
+        } else {
+          twinkle = Math.sin(_bph * 1.1 + tPhase) * 0.09;
+        }
+
+        // breathe (silence-driven, as before)
+        let bp = 0;
+        if (w > 0.1 || isHov) {
+          const silF = Math.max(0, (_sil - 0.15) / 0.85);
+          bp = Math.sin(_bph * 1.5 + tPhase) * silF * 0.4;
+        }
+
+        const cr = baseR * Math.max(0.01, s.sc) * (0.88 + w * 0.12) * (1 + twinkle);
+        const nx = n.x + s.dx, ny = n.y + s.dy;
+        const coreAlpha = (coreAlphaBase + w * (1 - coreAlphaBase)) * op * (1 + twinkle * 0.5);
+
+        // ── HALO / GLOW ───────────────────────────────────────────────────────
+        const haloA = (isHov ? 0.20 : (sc === 'anchor' ? 0.12 : sc === 'dying' ? 0.02 : 0.07) + w * 0.08)
+          * op * haloScale * (1 - _sil * 0.35);
+        if (haloA > 0.004) {
+          const haloR = cr + (sc === 'anchor' ? 18 : sc === 'dying' ? 4 : 10) + w * 6 + bp;
+          const gr = ctx.createRadialGradient(nx, ny, 0, nx, ny, haloR);
+          gr.addColorStop(0, col + hexA(haloA));
+          gr.addColorStop(1, col + '00');
+          ctx.beginPath(); ctx.arc(nx, ny, haloR, 0, Math.PI * 2);
+          ctx.fillStyle = gr; ctx.fill();
+        }
+
+        // ── CORE ──────────────────────────────────────────────────────────────
+        ctx.beginPath(); ctx.arc(nx, ny, cr + bp, 0, Math.PI * 2);
+        ctx.fillStyle = col + hexA(Math.min(1, coreAlpha));
+        ctx.fill();
+      });
+    }
+
+    // ── REVEAL NEIGHBOR — with hesitation ────────────────────────────────────
+    // Debounce: hover must persist ~280ms before neighbor surfaces.
+    // Creates natural hesitation — curiosity earns revelation.
+    let _revealTimer = null;
+    function revealNeighbor(idx) {
+      if (revealed.size >= poems.length) return;
+      clearTimeout(_revealTimer);
+      _revealTimer = setTimeout(() => {
+        if (hovIdx !== idx) return; // user moved away — no reveal
+        const n = NP[idx];
+        let best = null, bestD = Infinity;
+        NP.forEach((m, j) => {
+          if (revealed.has(j)) return;
+          const d = Math.hypot(n.x - m.x, n.y - m.y);
+          if (d < bestD) { bestD = d; best = j; }
+        });
+        const sw = getSessionWeather();
+        let threshD = isMobile ? 160 : 240;
+        if (sw.dominant === 'entropy' && sw.value > 30) threshD *= 0.9;
+
+        if (best !== null && bestD < threshD) {
+          revealed.add(best);
+          SP[best].sc = 0.04; // start very small — emerge slowly
+        }
+      }, 280);
+    }
+
+    // ── TRANSIT — HAUNT, NOT NAVIGATE (Phase 6) ───────────────────────────────
+    function maybeActivateTransit() {
+      if (_transitActive || !selPoem) return;
+      // Find this poem's cluster
+      const myCluster = _motifClusters.find(c => c.poems.includes(selPoem.id));
+      if (!myCluster) return;
+      // Weighted sibling selection: cluster continuity + linger history + motif persistence
+      const siblings = myCluster.poems.filter(id => id !== selPoem.id);
+      if (!siblings.length) return;
+      let best = null, bestScore = -1;
+      siblings.forEach(id => {
+        const p = poems.find(x => x.id === id);
+        if (!p) return;
+        const mem = MEM[id] || {};
+        const lingerScore = Math.log(1 + (mem.linger || 0)) * 0.4;
+        const freshBonus = (mem.count || 0) === 0 ? 0.3 : 0; // prefer unread
+        const fieldMatch = getEff(p).dominantField === getEff(selPoem).dominantField ? 0.2 : 0;
+        const score = lingerScore + freshBonus + fieldMatch + Math.random() * 0.1;
+        if (score > bestScore) { bestScore = score; best = p; }
+      });
+      if (!best) return;
+      _transitActive = true;
+      _transitTarget = best;
+      const ghost = document.getElementById('transit-ghost');
+      const phraseEl = document.getElementById('transit-phrase');
+      const titleEl = document.getElementById('transit-title');
+      // Stage 0 (0s): faint residue phrase appears
+      ghost.classList.add('haunting');
+      phraseEl.textContent = 'vẫn còn đây';
+      // Stage 1 (2s): pressure increases
+      _transitTimers.push(setTimeout(() => { ghost.classList.add('pressure'); }, 2000));
+      // Stage 2 (4.5s): title materializes
+      _transitTimers.push(setTimeout(() => {
+        titleEl.textContent = best.title;
+        ghost.classList.add('title-visible');
+        ghost.style.cursor = 'pointer';
+        ghost.onclick = () => { if (_transitTarget) transitTo(_transitTarget); };
+      }, 4500));
+      // Stage 3 (6s): warmth spread
+      _transitTimers.push(setTimeout(() => { ghost.classList.add('warmth'); }, 6000));
+    }
+
+    function transitTo(poem) {
+      if (!poem) return;
+      if (selPoem && _poemLinger > 0) recordLinger(selPoem.id, _poemLinger);
+      // Pass cluster forward so Reader inherits atmospheric continuity
+      const myCluster = _motifClusters.find(c => c.poems.includes(poem.id));
+      if (myCluster) {
+        try { sessionStorage.setItem('hl-inherited-cluster', myCluster.id); } catch (e) { }
+        _inheritedWeather = CLUSTER_WEATHER[myCluster.id] || null;
+      }
+      // Dissolve current poem, open next — no full page reload
+      const pt = document.getElementById('poem-text');
+      pt.style.transition = 'opacity 1.5s ease';
+      pt.style.opacity = '0';
+      setTimeout(() => {
+        pt.style.transition = '';
+        pt.style.opacity = '';
+        closePoem();
+        openPoem(poem);
+      }, 1600);
+    }
+
+    // ── POEM OPEN / CLOSE ─────────────────────────────────────────────────────
+    function openPoem(p) {
+      if (poemOpen) return;
+      poemOpen = true; selPoem = p;
+      const isReturn = readCount(p.id) > 0;
+      recordRead(p.id); touch();
+      playResonance(getEff(p).dominantField || 'entropy');
+
+      // drift neighbors away — gently, not cinematically
+      const sn = NP.find(n => n.poem.id === p.id);
+      if (sn) {
+        const driftForce = isMobile ? 14 : 21; // -30%
+        NP.forEach((n, i) => {
+          if (n.poem.id === p.id) return;
+          const dx = n.x - sn.x, dy = n.y - sn.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < 160) {
+            const f = (160 - dist) / 160 * driftForce;
+            const ang = Math.atan2(dy, dx);
+            SP[i].tDx = Math.cos(ang) * f;
+            SP[i].tDy = Math.sin(ang) * f;
+          }
+        });
+        const si = NP.findIndex(n => n.poem.id === p.id);
+        if (si >= 0) SP[si].tSc = 0;
+      }
+
+      // RETURN FEELING: if revisiting, warm nearby nodes + slow their silence
+      if (isReturn && sn) {
+        NP.forEach((n, i) => {
+          if (n.poem.id === p.id) return;
+          const dist = Math.hypot(n.x - sn.x, n.y - sn.y);
+          if (dist < 200) {
+            // ambient warmth: nearby poems remember this place was touched
+            attn[n.poem.id] = (attn[n.poem.id] || 0) + 1.5;
+          }
+        });
+        // Field silence delayed: universe remembers, doesn't rush to quiet
+        _lastAct = Date.now() + 1500;
+      }
+
+      const titleEl = document.getElementById('pt-title');
+      titleEl.textContent = p.title;
+      titleEl.style.color = nodeColor(p) + 'a6'; // a6 = 65% opacity
+      const bodyEl = document.getElementById('pt-body');
+
+      resetLens();
+      // Expose pNotes to drawFrame via module-level var
+      pNotes = [];
+      if (_criticalData && _criticalData.poem_notes) {
+        pNotes = _criticalData.poem_notes.filter(n => n.poemId.includes(p.id));
+      }
+      const cueEl = document.getElementById('resonance-cue');
+      const whisperEl = document.getElementById('whisper-note');
+      // Bug 1 fix: escape poem text FIRST, then inject spans for motifs.
+      // The raw text goes through HTML-escape before any regex substitution,
+      // so textContent-based pause-offset calc in attachScrollResistance can
+      // still read el.textContent (stripped of tags) correctly.
+      const rawText = p.content || p.body || '';
+      let textHTML = rawText.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      if (pNotes.length > 0) {
+        const note = pNotes[0];
+        const dominantField = getEff(p).dominantField || 'entropy';
+        cueEl.textContent = RESONANCE_PHRASES[dominantField] || RESONANCE_PHRASES.entropy;
+        // Whisper memory: returning readers see subtler version
+        const prevHeard = MEM[p.id] && MEM[p.id].whisperHeard;
+        if (prevHeard) {
+          document.body.classList.add('whisper-heard-before');
+          whisperEl.style.removeProperty('--whisper-opacity-cap');
+        } else {
+          document.body.classList.remove('whisper-heard-before');
+          whisperEl.style.removeProperty('--whisper-opacity-cap');
+        }
+        whisperEl.textContent = note.text;
+        // Instrument Modal: Lab Mode stays anchor-only and data-backed.
+        const hasInstrumentSignal = window.InstrumentModal && InstrumentModal.hasSignal(p.id);
+        const instrumentContext = {
+          poemId: p.id,
+          whisperText: note.text,
+          dominantField,
+          entropy: ((getEff(p).emotionalField || {}).entropy || 0),
+        };
+        const instrumentFamiliar = hasInstrumentSignal && InstrumentModal.familiarity(p.id).isFamiliar;
+        document.body.classList.toggle('instrument-familiar', instrumentFamiliar);
+        whisperEl.style.cursor = hasInstrumentSignal ? 'pointer' : '';
+        whisperEl.onclick = hasInstrumentSignal
+          ? () => InstrumentModal.open(p.id, instrumentContext)
+          : null;
+        if (note.motif && note.motif.length > 0) {
+          note.motif.forEach(m => {
+            // Escape motif string before using in regex
+            const escaped = m.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`(${escaped})`, 'gi');
+            textHTML = textHTML.replace(regex, '<span class="lens-motif">$1</span>');
+          });
+        }
+        // Show lens button immediately if poem has notes
+        document.body.classList.add('has-lens');
+      } else {
+        cueEl.textContent = '';
+        whisperEl.textContent = '';
+      }
+      bodyEl.innerHTML = textHTML;
+      bodyEl.scrollTop = 0;
+      attachScrollResistance(bodyEl);
+      // Reset drift & linger for new poem session
+      _poemLinger = 0;
+      _driftIntent = 0;
+      _driftVelocity = 0;
+      _lastPoemAct = Date.now();
+      _hasDrifted = false;
+      // Phase 6 reset
+      _whisperEarned = false;
+      _skimCount = 0;
+      _transitActive = false;
+      _transitTarget = null;
+      _transitTimers.forEach(t => clearTimeout(t)); _transitTimers = [];
+      document.body.classList.remove('whisper-earned');
+      const tg = document.getElementById('transit-ghost');
+      if (tg) { tg.className = ''; document.getElementById('transit-phrase').textContent = ''; document.getElementById('transit-title').textContent = ''; }
+      document.getElementById('poem-veil').classList.add('active');
+      if (window._isMinimalMode && window._isDirectEntry) {
+        document.getElementById('poem-text').classList.add('visible');
+        return;
+      }
+      // no setTimeout trick — just let the CSS transitions do the timing
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          document.getElementById('poem-text').classList.add('visible');
+        });
+      });
+    }
+
+    function closePoem() {
+      if (!poemOpen) return;
+      if (selPoem && _poemLinger > 0) {
+        recordLinger(selPoem.id, _poemLinger);
+        _poemLinger = 0;
+      }
+      poemOpen = false;
+      resetLens();
+      // Phase 6 reset
+      _whisperEarned = false;
+      _skimCount = 0;
+      _transitActive = false;
+      _transitTarget = null;
+      _transitTimers.forEach(t => clearTimeout(t)); _transitTimers = [];
+      document.body.classList.remove('whisper-earned', 'whisper-heard-before');
+      const tgC = document.getElementById('transit-ghost');
+      if (tgC) { tgC.className = ''; tgC.onclick = null; tgC.style.cursor = ''; }
+
+      if (document.referrer.includes('/archive')) {
+        document.body.style.transition = 'opacity 1.5s ease';
+        document.body.style.opacity = '0';
+        setTimeout(() => {
+          document.getElementById('poem-text').classList.remove('visible');
+          document.getElementById('poem-veil').classList.remove('active');
+          window.history.back();
+        }, 1500);
+        return;
+      }
+
+      document.getElementById('poem-text').classList.remove('visible');
+      document.getElementById('poem-veil').classList.remove('active');
+      SP.forEach(s => { s.tDx = 0; s.tDy = 0; });
+      const si = selPoem ? NP.findIndex(n => n.poem.id === selPoem.id) : -1;
+      if (si >= 0) SP[si].tSc = 1;
+      selPoem = null;
+      _driftIntent = 0; _driftVelocity = 0; _hasDrifted = false;
+      touch();
+    }
+
+    // ── MOUSE / TOUCH ─────────────────────────────────────────────────────────
+    const canvas = document.getElementById('c');
+    const tip = document.getElementById('tip');
+
+    function getNear(mx, my, thresh) {
+      let best = null, bestD = thresh;
+      NP.forEach((n, i) => {
+        if (!revealed.has(i)) return;
+        const s = SP[i];
+        const nx = n.x + s.dx, ny = n.y + s.dy;
+        const d = Math.hypot(nx - mx, ny - my);
+        if (d < bestD) { bestD = d; best = i; }
+      });
+      return best;
+    }
+
+    canvas.addEventListener('mousemove', e => {
+      touch();
+      const r = canvas.getBoundingClientRect();
+      const mx = e.clientX - r.left, my = e.clientY - r.top;
+      const found = getNear(mx, my, 20);
+      if (found !== hovIdx) {
+        hovIdx = found;
+        if (found !== null) revealNeighbor(found);
+        else clearTimeout(_revealTimer);
+      }
+      if (found !== null) {
+        const p = NP[found].poem;
+        startAttn(p.id);
+        // tooltip fixed whisper label
+        tip.classList.add('visible');
+        tip.textContent = p.title;
+        canvas.style.cursor = 'pointer';
+      } else {
+        tip.classList.remove('visible');
+        stopAttn();
+        canvas.style.cursor = 'default';
+      }
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      hovIdx = null; tip.classList.remove('visible'); stopAttn();
+    });
+
+    canvas.addEventListener('click', e => {
+      touch();
+      const r = canvas.getBoundingClientRect();
+      const found = getNear(e.clientX - r.left, e.clientY - r.top, 24);
+      if (found !== null) openPoem(NP[found].poem);
+    });
+
+    // Touch support
+    let touchRevealTimer = null;
+    canvas.addEventListener('touchstart', e => {
+      touch();
+      const t = e.touches[0];
+      const r = canvas.getBoundingClientRect();
+      const found = getNear(t.clientX - r.left, t.clientY - r.top, 36);
+      if (found !== null) {
+        touchRevealTimer = setTimeout(() => {
+          hovIdx = found;
+          revealNeighbor(found);
+          startAttn(NP[found].poem.id);
+        }, 180);
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchend', e => {
+      clearTimeout(touchRevealTimer);
+      if (hovIdx !== null) { openPoem(NP[hovIdx].poem); hovIdx = null; stopAttn(); }
+    }, { passive: true });
+
+    // Keyboard exit
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closePoem();
+    });
+
+    // ── ANIMATE ───────────────────────────────────────────────────────────────
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      computePositions(canvas.width, canvas.height);
+    }
+
+    function animate() {
+      const ctx = canvas.getContext('2d');
+      drawFrame(ctx, canvas.width, canvas.height);
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    animate();
+
+    // ── THRESHOLD INIT ────────────────────────────────────────────────────────
+    // Pick threshold line: first line of a poem that has text
+    // Measure px-width of a string in the threshold font context
+    function measureLineWidth(text) {
+      const el = document.getElementById('t-line');
+      const fs = parseFloat(getComputedStyle(el).fontSize) || 20;
+      // canvas measurer
+      const cv = document.createElement('canvas');
+      const cx = cv.getContext('2d');
+      cx.font = `${fs}px 'Playfair Display', serif`;
+      return cx.measureText(text).width;
+    }
+
+    // Quote cooldown memory: track which pairs were recently shown
+    let _quoteHistory = [];
+    try {
+      _quoteHistory = JSON.parse(localStorage.getItem('hanh-loan-quote-hist-v1') || '[]');
+    } catch (e) { }
+
+    function saveQuoteHistory() {
+      try { localStorage.setItem('hanh-loan-quote-hist-v1', JSON.stringify(_quoteHistory.slice(-20))); } catch (e) { }
+    }
+
+    function getThresholdLine() {
+      const withText = poems.filter(p => p.body && p.body.trim().length > 10);
+      if (!withText.length) return { html: 'em không biết mình đang chờ gì.' };
+
+      const maxW = window.innerWidth - 80;
+      const COOLDOWN = 7; // sessions before a quote can recur
+
+      const candidates = [];
+      withText.forEach(p => {
+        const lines = p.body.split('\n').map(l => l.trim());
+        for (let i = 0; i < lines.length - 1; i++) {
+          const l1 = lines[i], l2 = lines[i + 1];
+          if (l1.length < 12 || l2.length < 12) continue;
+          if (l1.toUpperCase() === l1 || l2.toUpperCase() === l2) continue;
+          const blocked = ['tặng', 'cho', 'kính tặng', 'kính dâng'];
+          if (blocked.some(b => l1.toLowerCase().startsWith(b) || l2.toLowerCase().startsWith(b))) continue;
+          if (measureLineWidth(l1) > maxW || measureLineWidth(l2) > maxW) continue;
+
+          const key = l1.slice(0, 16) + '|' + l2.slice(0, 16);
+          const histPos = _quoteHistory.lastIndexOf(key);
+          const recency = histPos < 0 ? 999 : (_quoteHistory.length - 1 - histPos);
+          if (recency < COOLDOWN) continue;
+
+          let weight = 1;
+          if (i === 0 || lines[i - 1] === '') weight += 3;
+          if (getEff(p).dominantField) weight += 2;
+          if (weight >= 5 && recency > COOLDOWN + 2) weight += 2; // seasonal bonus
+          candidates.push({ l1, l2, key, weight });
+        }
+      });
+      if (!candidates.length) return { html: 'em không biết mình đang chờ gì.' };
+      let totalW = candidates.reduce((s, c) => s + c.weight, 0);
+      let r = Math.random() * totalW;
+      for (const c of candidates) {
+        r -= c.weight;
+        if (r <= 0) { _quoteHistory.push(c.key); saveQuoteHistory(); return { html: c.l1 + '<br>' + c.l2 }; }
+      }
+      const fb = candidates[0];
+      _quoteHistory.push(fb.key); saveQuoteHistory();
+      return { html: fb.l1 + '<br>' + fb.l2 };
+    }
+
+    (function initThreshold() {
+      const runtimeFlags = window.__HL_RUNTIME_FLAGS || {};
+      const forcedMinimal = new URLSearchParams(window.location.search).get('runtime') === 'minimal';
+      const routeContext = window.__HL_ROUTE_CONTEXT || null;
+      let directId = null;
+      const path = window.location.pathname;
+      if (path.startsWith('/poem/')) {
+        directId = path.split('/poem/')[1].replace(/\/$/, '');
+      } else {
+        const urlParams = new URLSearchParams(window.location.search);
+        directId = urlParams.get('id');
+      }
+      function findPoemByIdentity(token) {
+        if (!token) return null;
+        return poems.find(p => p.id === token || p.slug === token) || null;
+      }
+      const _directPoemRaw = findPoemByIdentity(routeContext && routeContext.poemId)
+        || findPoemByIdentity(routeContext && routeContext.poemSlug)
+        || findPoemByIdentity(directId);
+      const isBlockedDirect = _directPoemRaw && typeof PendingModal !== 'undefined' && !PendingModal.isAnchor(_directPoemRaw.id);
+      
+      const _directPoem = isBlockedDirect ? null : _directPoemRaw;
+      const isDirect = !!_directPoem;
+      const visitCount = (MEM['_system_visit_count'] || 0) + 1;
+      
+      if (!isDirect) {
+        MEM['_system_visit_count'] = visitCount;
+        saveMemory();
+      }
+
+      // MVP gate: non-anchor direct link shows pending modal, does NOT open poem
+      if (isBlockedDirect) {
+        // Show threshold screen, overlay modal after brief settle
+        // User dismisses modal themselves — no redirect forced.
+        setTimeout(() => {
+          PendingModal.show(_directPoemRaw.id, _directPoemRaw.title, () => {
+            if (visitCount > 1) {
+              window.location.href = isLocalFile ? 'archive.html' : '/archive';
+            }
+          });
+        }, 600);
+      } else if (!isDirect && visitCount > 1) {
+        window.location.href = isLocalFile ? 'archive.html' : '/archive';
+        return;
+      }
+
+      window._isMinimalMode = isDirect
+        || !!runtimeFlags.reducedAtmospherics
+        || forcedMinimal
+        || /FBAN|FBAV|Zalo/i.test(navigator.userAgent)
+        || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      window._isDirectEntry = isDirect;
+      if (window._isMinimalMode) {
+        document.body.classList.add('minimal-mode');
+      }
+      if (isDirect) {
+        document.body.classList.add('direct-entry');
+      }
+
+      const th = document.getElementById('threshold');
+      let entered = false;
+      function enter(isDirectEnter = false) {
+        if (entered) return;
+        entered = true;
+        if (isDirectEnter) {
+          th.style.display = 'none';
+        } else {
+          th.classList.add('dissolve');
+          setTimeout(() => { th.style.display = 'none'; }, window._isMinimalMode ? 500 : 4000);
+        }
+        const dream = document.getElementById('dream');
+        if (isDirectEnter && window._isMinimalMode) {
+          setTimeout(() => dream.classList.add('visible'), 2400);
+        } else {
+          dream.classList.add('visible');
+        }
+        document.getElementById('surface-exit').classList.add('visible');
+        touch();
+      }
+
+      if (_directPoem) {
+        enter(true);
+        setTimeout(() => { openPoem(_directPoem); }, 50);
+      } else {
+        document.getElementById('t-line').innerHTML = getThresholdLine().html;
+        setTimeout(() => th.classList.add('ready'), 800);
+        th.addEventListener('click', () => enter());
+        th.addEventListener('touchend', e => { e.preventDefault(); enter(); }, { passive: false });
+        document.addEventListener('keydown', e => {
+          if ((e.key === 'Enter' || e.key === ' ') && !entered) enter();
+        });
+      }
+    })();
+
+
+    function attachScrollResistance(el) {
+      // Bug 1 fix: use el.innerText (or textContent) which strips HTML tags,
+      // so pause-offset calculation is correct even when bodyEl uses innerHTML.
+      const text = el.innerText || el.textContent || '';
+      const lines = text.split('\n');
+      const lineH = parseFloat(getComputedStyle(el).lineHeight) || 38;
+
+      // Rich pause zones: blank lines + short/isolated lines
+      const pauseOffsets = [];
+      const shortLineOffsets = [];
+      let cumH = 0;
+      lines.forEach((line, idx) => {
+        cumH += lineH;
+        const trimmed = line.trim();
+        if (trimmed === '') {
+          pauseOffsets.push(cumH);
+        } else if (trimmed.length > 0 && trimmed.length < 18) {
+          const prevEmpty = idx === 0 || lines[idx - 1].trim() === '';
+          const nextEmpty = idx === lines.length - 1 || lines[idx + 1].trim() === '';
+          if (prevEmpty || nextEmpty) shortLineOffsets.push(cumH);
+        }
+      });
+
+      el._pauseOffsets = pauseOffsets;
+      el._shortLineOffsets = shortLineOffsets;
+      el._lineH = lineH;
+
+      function inPauseZone(scrollTop) {
+        return pauseOffsets.some(o => Math.abs(scrollTop - o) < lineH * 0.8);
+      }
+
+      window.flashCosmicRay = function (elOrNull) {
+        const targetEl = elOrNull || el;
+        const ray = document.getElementById('scroll-ray');
+        if (ray && targetEl.scrollHeight > targetEl.clientHeight) {
+          const pct = targetEl.scrollTop / Math.max(1, targetEl.scrollHeight - targetEl.clientHeight);
+          const h = targetEl.clientHeight * 0.14;
+          ray.style.height = h + 'px';
+          ray.style.top = (pct * (targetEl.clientHeight - h)) + 'px';
+          ray.style.opacity = '0.4';
+          clearTimeout(ray._t);
+          ray._t = setTimeout(() => { ray.style.opacity = '0'; }, 90);
+        }
+      };
+
+      // Wheel: resistance only. Damps drift 70%, doesn't kill.
+      el.addEventListener('wheel', e => {
+        _lastPoemAct = Date.now();
+        _driftVelocity *= 0.3;
+        // Skim detection: fast scroll early in reading
+        if (Math.abs(e.deltaY) > 120 && _poemLinger < 15) _skimCount++;
+        const resistance = inPauseZone(el.scrollTop) ? 0.72 : 0.82;
+        e.preventDefault();
+        el.scrollTop += e.deltaY * resistance;
+        if (Math.abs(e.deltaY) > 5) { window.flashCosmicRay(el); playPressureShift(); }
+      }, { passive: false });
+
+      // Touch: mobile touch always wins drift, but softly
+      el.addEventListener('touchstart', () => { _lastPoemAct = Date.now(); _driftVelocity *= 0.2; }, { passive: true });
+      el.addEventListener('touchmove', () => {
+        _lastPoemAct = Date.now();
+        _driftVelocity = 0;
+        window.flashCosmicRay(el);
+      }, { passive: true });
+    }
+
+    document.addEventListener('keydown', () => {
+      if (poemOpen) { _lastPoemAct = Date.now(); _driftVelocity *= 0.3; window.flashCosmicRay(document.getElementById('pt-body')); }
+    });
+  </script>
+
+  <!-- Instrument Modal overlay (Lab Mode: 12 anchor poems only) -->
+  <div id="im-overlay" role="dialog" aria-modal="true" aria-label="instrument layer">
+    <div id="im-box"></div>
+  </div>
+
+  <script>
+  // ── INSTRUMENT MODAL ─────────────────────────────────────────────────────
+  (function () {
+    'use strict';
+
+    const isLocalFile = window.location.protocol === 'file:';
+    const RESIDUE_MS = 1200;
+    const SCAN_MS = 1800;
+    const MODAL_CLEAR_MS = 920;
+    const FATIGUE_WINDOW_MS = 120000;
+    const MEMORY_KEY = 'hanh-loan-instrument-memory-v1';
+    const SESSION_KEY = 'hanh-loan-instrument-session-v1';
+    const MEMORY_DECAY_MS = 14 * 24 * 60 * 60 * 1000;
+    const FAMILIAR_LINGER_MS = 12000;
+    let _mriCache = null;        // loaded once
+    let _overlayEl = null;       // #im-overlay
+    let _escHandler = null;
+    let _phaseTimers = [];
+    let _clearContentTimer = null;
+    let _activePoemId = null;
+    let _activeOpenTrace = null;
+    let _openHistory = [];
+    const INSTRUMENT_SHADOW_CAP = 80;
+    const _instrumentShadowRecords = [];
+
+    function isInstrumentShadowEnabled() {
+      if (window.__HL_DEBUG_SHADOW === true) return true;
+      try {
+        return new URLSearchParams(window.location.search).get('debug') === 'shadow';
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function instrumentShadowNow() {
+      return window.performance && typeof performance.now === 'function'
+        ? performance.now()
+        : Date.now();
+    }
+
+    function emitInstrumentShadow(eventType) {
+      if (!isInstrumentShadowEnabled()) return null;
+      const record = {
+        source: 'instrument',
+        eventType,
+        attemptedAt: instrumentShadowNow(),
+        decision: 'WOULD_ALLOW',
+        activeOwner: 'instrument',
+        silenceWindowActive: false,
+      };
+      _instrumentShadowRecords.push(record);
+      while (_instrumentShadowRecords.length > INSTRUMENT_SHADOW_CAP) {
+        _instrumentShadowRecords.shift();
+      }
+      return record;
+    }
+
+    window.__HL_SHADOW = Object.assign(window.__HL_SHADOW || {}, {
+      enabled: isInstrumentShadowEnabled,
+      recordInstrument: emitInstrumentShadow,
+      dump: () => _instrumentShadowRecords.slice(),
+      clear: () => { _instrumentShadowRecords.length = 0; },
+    });
+
+    function getOverlay() {
+      return _overlayEl || (_overlayEl = document.getElementById('im-overlay'));
+    }
+
+    function clearPhaseTimers() {
+      _phaseTimers.forEach(timer => clearTimeout(timer));
+      _phaseTimers = [];
+    }
+
+    function schedulePhase(fn, delay) {
+      const timer = setTimeout(fn, delay);
+      _phaseTimers.push(timer);
+    }
+
+    function hashString(value) {
+      let hash = 2166136261;
+      String(value || '').split('').forEach(ch => {
+        hash ^= ch.charCodeAt(0);
+        hash = Math.imul(hash, 16777619);
+      });
+      return hash >>> 0;
+    }
+
+    function loadMemory() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(MEMORY_KEY) || '{}');
+        if (!parsed || parsed.version !== 1 || !parsed.poems) return { version: 1, poems: {} };
+        return parsed;
+      } catch (e) {
+        return { version: 1, poems: {} };
+      }
+    }
+
+    function saveMemory(memory) {
+      try { localStorage.setItem(MEMORY_KEY, JSON.stringify(memory)); } catch (e) {}
+    }
+
+    function memoryEntry(memory, poemId) {
+      if (!memory.poems[poemId]) {
+        memory.poems[poemId] = { opens: 0, totalOpenMs: 0, lastOpenedAt: 0 };
+      }
+      return memory.poems[poemId];
+    }
+
+    function familiarity(poemId) {
+      const memory = loadMemory();
+      const entry = memory.poems[poemId];
+      if (!entry || !entry.lastOpenedAt) return { isFamiliar: false, level: 0, stale: false };
+      const age = Math.max(0, Date.now() - entry.lastOpenedAt);
+      if (age >= MEMORY_DECAY_MS) return { isFamiliar: false, level: 0, stale: true };
+      const earned = entry.opens >= 2 || entry.totalOpenMs >= FAMILIAR_LINGER_MS;
+      if (!earned) return { isFamiliar: false, level: 0, stale: false };
+      const level = Math.max(0, Math.min(1, 1 - age / MEMORY_DECAY_MS));
+      return { isFamiliar: level >= 0.15, level, stale: false };
+    }
+
+    function recordOpen(poemId) {
+      const memory = loadMemory();
+      const entry = memoryEntry(memory, poemId);
+      entry.opens += 1;
+      entry.lastOpenedAt = Date.now();
+      saveMemory(memory);
+      _activeOpenTrace = { poemId, startedAt: Date.now() };
+    }
+
+    function recordClose() {
+      if (!_activeOpenTrace) return;
+      const elapsed = Math.max(0, Date.now() - _activeOpenTrace.startedAt);
+      const memory = loadMemory();
+      const entry = memoryEntry(memory, _activeOpenTrace.poemId);
+      entry.totalOpenMs = Math.min(10 * FAMILIAR_LINGER_MS, (entry.totalOpenMs || 0) + elapsed);
+      entry.lastOpenedAt = Date.now();
+      saveMemory(memory);
+      _activeOpenTrace = null;
+    }
+
+    function sessionSeed() {
+      try {
+        let session = JSON.parse(sessionStorage.getItem(SESSION_KEY) || '{}');
+        if (!session.seed) {
+          session = {
+            seed: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`,
+            falseRecognitionUsed: false,
+          };
+          sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        }
+        return session;
+      } catch (e) {
+        return { seed: 'file-session', falseRecognitionUsed: true };
+      }
+    }
+
+    function claimFalseRecognition(poemId, familiar) {
+      if (familiar.isFamiliar) return false;
+      const session = sessionSeed();
+      if (session.falseRecognitionUsed) return false;
+      if (hashString(`${session.seed}:${poemId}`) % 100 >= 3) return false;
+      session.falseRecognitionUsed = true;
+      session.falseRecognitionPoemId = poemId;
+      try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch (e) {}
+      return true;
+    }
+
+    function escapeHTML(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function buildHTML(blocks) {
+      const omitted = new Set((blocks.meta && blocks.meta.omittedSections) || []);
+      const staggerMs = Math.max(0, (blocks.meta && blocks.meta.sectionStaggerMs) || 280);
+      const fadeMs = Math.max(400, (blocks.meta && blocks.meta.sectionFadeMs) || 1100);
+      const sections = [
+        { key: 'drift', label: 'FIELD MOTION',        lines: blocks.drift },
+        { key: 'pressure', label: 'STRUCTURAL WEATHER',  lines: blocks.pressure },
+        { key: 'absence', label: 'ABSENCE',             lines: blocks.absence },
+      ].filter(section => !omitted.has(section.key));
+      return sections.map((s, index) => {
+        const items = s.lines.length
+          ? s.lines.map(l => `<li>${escapeHTML(l)}</li>`).join('')
+          : `<li class="im-empty">no signal detected</li>`;
+        return `<div class="im-section" style="--im-section-fade-ms:${fadeMs}ms; transition-delay:${index * staggerMs}ms;">
+  <span class="im-label">${s.label}</span>
+  <ul class="im-body">${items}</ul>
+</div>`;
+      }).join('');
+    }
+
+    function renderResidue() {
+      const box = getOverlay().querySelector('#im-box');
+      if (!box) return false;
+      box.innerHTML = '<div class="im-residue">FIELD RESIDUE DETECTED</div>';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const residue = box.querySelector('.im-residue');
+        if (residue) residue.classList.add('im-stage-visible');
+      }));
+      return true;
+    }
+
+    function renderScan(message) {
+      const box = getOverlay().querySelector('#im-box');
+      if (!box) return;
+      box.innerHTML = `<div class="im-scan">${escapeHTML(message || 'structural compression stabilizing...')}</div>`;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const scan = box.querySelector('.im-scan');
+        if (scan) scan.classList.add('im-stage-visible');
+      }));
+    }
+
+    function renderInstrument(blocks) {
+      const box = getOverlay().querySelector('#im-box');
+      if (!box) return;
+      box.innerHTML = `<div class="im-final">${buildHTML(blocks)}</div>`;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const final = box.querySelector('.im-final');
+        if (final) final.classList.add('im-stage-visible');
+      }));
+    }
+
+    function dismiss() {
+      const ov = getOverlay();
+      if (!ov) return;
+      emitInstrumentShadow('dismiss-start');
+      clearPhaseTimers();
+      recordClose();
+      _activePoemId = null;
+      ov.classList.remove('im-visible');
+      if (_escHandler) { document.removeEventListener('keydown', _escHandler); _escHandler = null; }
+      if (_clearContentTimer) clearTimeout(_clearContentTimer);
+      _clearContentTimer = setTimeout(() => {
+        ov.querySelector('#im-box').innerHTML = '';
+        _clearContentTimer = null;
+      }, MODAL_CLEAR_MS);
+    }
+
+    function recordScanFatigue() {
+      const now = Date.now();
+      _openHistory = _openHistory.filter(t => now - t <= FATIGUE_WINDOW_MS);
+      _openHistory.push(now);
+      if (_openHistory.length >= 5) {
+        return { level: 2, extraScanMs: 1000, message: 'field residue unstable...' };
+      }
+      if (_openHistory.length >= 4) {
+        return { level: 1, extraScanMs: 520, message: 'field residue unstable...' };
+      }
+      return { level: 0, extraScanMs: 0, message: null };
+    }
+
+    function render(mriEntry, context = {}) {
+      if (!mriEntry) return false;
+      emitInstrumentShadow('modal-open-attempt');
+      const translator = window.InstrumentTranslator;
+      if (!translator) return false;
+      const fatigue = recordScanFatigue();
+      const blocks = translator.translateMRI(mriEntry, { ...context, scanFatigueLevel: fatigue.level });
+      const familiar = Number(context.familiarityLevel || 0) >= 0.15;
+      const baseResidueMs = familiar ? 700 : RESIDUE_MS;
+      const baseScanMs = familiar ? 1200 : SCAN_MS;
+      const scanMs = baseScanMs + ((blocks.meta && blocks.meta.scanDelayMs) || 0) + fatigue.extraScanMs;
+      const residueMs = baseResidueMs + ((blocks.meta && blocks.meta.residueDelayMs) || 0);
+      const scanMessage = fatigue.message || (blocks.meta && blocks.meta.scanMessage) || 'structural compression stabilizing...';
+      const ov = getOverlay();
+      clearPhaseTimers();
+      if (_clearContentTimer) {
+        clearTimeout(_clearContentTimer);
+        _clearContentTimer = null;
+      }
+      if (_escHandler) {
+        document.removeEventListener('keydown', _escHandler);
+        _escHandler = null;
+      }
+      emitInstrumentShadow('residue-start');
+      renderResidue();
+      recordOpen(context.poemId);
+      ov.classList.remove('im-visible'); // reset if already open
+      requestAnimationFrame(() => requestAnimationFrame(() => ov.classList.add('im-visible')));
+      schedulePhase(() => {
+        emitInstrumentShadow('scan-start');
+        renderScan(scanMessage);
+      }, residueMs);
+      schedulePhase(() => {
+        emitInstrumentShadow('reading-start');
+        renderInstrument(blocks);
+      }, residueMs + scanMs);
+
+      // Close: outside click
+      ov.onclick = (e) => { if (!e.target.closest('#im-box')) dismiss(); };
+      // Close: ESC
+      _escHandler = (e) => { if (e.key === 'Escape') dismiss(); };
+      document.addEventListener('keydown', _escHandler);
+      return true;
+    }
+
+    function cache() {
+      if (_mriCache) return _mriCache;
+      const inline = typeof window !== 'undefined' ? window.ANCHOR_MRI_DATA : null;
+      if (inline) _mriCache = inline;
+      return _mriCache;
+    }
+
+    function hasSignal(poemId) {
+      const data = cache();
+      return !!(data && data[poemId]);
+    }
+
+    function open(poemId, context = {}) {
+      if (typeof PendingModal !== 'undefined' && !PendingModal.isAnchor(poemId)) {
+        return false;
+      }
+      if (_activePoemId === poemId && getOverlay()?.classList.contains('im-visible')) {
+        return true;
+      }
+      _activePoemId = poemId;
+      const familiar = familiarity(poemId);
+      const falseRecognition = claimFalseRecognition(poemId, familiar);
+      const enrichedContext = {
+        ...context,
+        poemId,
+        familiarityLevel: familiar.level,
+        falseRecognition,
+      };
+
+      const cached = cache();
+      if (cached) {
+        return render(cached[poemId] || null, enrichedContext);
+      }
+      
+      if (isLocalFile) return false; // Prevent CORS error locally
+      fetch('anchor_mri.json')
+        .then(r => r.json())
+        .then(data => { _mriCache = data; render(data[poemId] || null, enrichedContext); })
+        .catch(() => {});
+      return true;
+    }
+
+    window.InstrumentModal = { open, dismiss, hasSignal, familiarity };
+  })();
+  </script>
+</body>
+
+</html>

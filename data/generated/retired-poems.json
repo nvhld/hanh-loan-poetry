@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "2.0.0",
+  "generatedAt": "2026-05-13T02:18:28.763262+00:00",
+  "sourceHash": "c97083e9046cb8ebb386cae0867a7a3d4cefb8de367a39659a6a23f13244987d",
+  "artifact": "retired-poems",
+  "count": 3,
+  "poems": [
+    {
+      "oldId": "0-010-khuc-dong-dao-ru-anh",
+      "oldSlug": "khuc-dong-dao-ru-anh",
+      "title": "KHÚC ĐỒNG DAO RU ANH",
+      "reason": "Removed from source markdown after canonical freeze."
+    },
+    {
+      "oldId": "2019-016-duoi-cot-co-lung-cu",
+      "oldSlug": "duoi-cot-co-lung-cu",
+      "title": "DƯỚI CỘT CỜ LŨNG CÚ",
+      "reason": "Removed from source markdown after canonical freeze."
+    },
+    {
+      "oldId": "2023-084-tren-may-bay-qua-ho-michigan-h",
+      "oldSlug": "tren-may-bay-qua-ho-michigan-hay-ranh-gioi",
+      "title": "TRÊN MÁY BAY QUA HỒ MICHIGAN (hay RANH GIỚI)",
+      "reason": "Removed from source markdown after canonical freeze."
+    }
+  ],
+  "redirects": [
+    {
+      "title": "THƠ TÌNH  MARINA BAY",
+      "oldId": "2019-013-tho-tinh-marina-bay",
+      "oldSlug": "tho-tinh-marina-bay",
+      "newId": "2019-012-tho-tinh-marina-bay",
+      "newSlug": "tho-tinh-marina-bay"
+    },
+    {
+      "title": "VÌ SAO ANH YÊU HÀ TĨNH",
+      "oldId": "2020-021-vi-sao-anh-yeu-ha-tinh",
+      "oldSlug": "vi-sao-anh-yeu-ha-tinh",
+      "newId": "2020-045-vi-sao-anh-yeu-ha-tinh",
+      "newSlug": "vi-sao-anh-yeu-ha-tinh"
+    },
+    {
+      "title": "RỒI ĐẾN LÚC SẼ CHẲNG CÒN NHỚ NỮA",
+      "oldId": "2022-062-roi-den-luc-se-chang-con-nho-n",
+      "oldSlug": "roi-den-luc-se-chang-con-nho-nua",
+      "newId": "2022-062-roi-den-luc-se-chang-con-nho-nua",
+      "newSlug": "roi-den-luc-se-chang-con-nho-nua"
+    },
+    {
+      "title": "THƠ TÌNH Ở BIỂN CA RI BÊ",
+      "oldId": "2023-068-tho-tinh-o-bien-ca-ri-be",
+      "oldSlug": "tho-tinh-o-bien-ca-ri-be",
+      "newId": "2023-088-tho-tinh-o-bien-ca-ri-be",
+      "newSlug": "tho-tinh-o-bien-ca-ri-be"
+    },
+    {
+      "title": "EM MỘT NGÀY",
+      "oldId": "2023-072-em-mot-ngay",
+      "oldSlug": "em-mot-ngay",
+      "newId": "2023-093-em-mot-ngay",
+      "newSlug": "em-mot-ngay"
+    },
+    {
+      "title": "NGẪU HỨNG",
+      "oldId": "2023-076-stub-76",
+      "oldSlug": "stub-76",
+      "newId": "2023-076-ngau-hung",
+      "newSlug": "ngau-hung"
+    },
+    {
+      "title": "HẠ CÁNH NƠI ANH",
+      "oldId": "2023-087-ha-canh-noi-anh",
+      "oldSlug": "ha-canh-noi-anh",
+      "newId": "2023-104-ha-canh-noi-anh",
+      "newSlug": "ha-canh-noi-anh"
+    },
+    {
+      "title": "ĐIỀU BẤT NGỜ CỦA MÙA THU",
+      "oldId": "2023-095-dieu-bat-ngo-cua-mua-thu",
+      "oldSlug": "dieu-bat-ngo-cua-mua-thu",
+      "newId": "2023-092-dieu-bat-ngo-cua-mua-thu",
+      "newSlug": "dieu-bat-ngo-cua-mua-thu"
+    },
+    {
+      "title": "BỞI EM CHÍNH HIỆN THÂN CHO HẠNH PHÚC",
+      "oldId": "2023-096-boi-em-chinh-hien-than-cho-han",
+      "oldSlug": "boi-em-chinh-hien-than-cho-hanh-phuc",
+      "newId": "2023-096-boi-em-chinh-hien-than-cho-hanh-phuc",
+      "newSlug": "boi-em-chinh-hien-than-cho-hanh-phuc"
+    },
+    {
+      "title": "THÁNG GIÊNG",
+      "oldId": "2023-099-thang-gieng",
+      "oldSlug": "thang-gieng",
+      "newId": "2023-072-thang-gieng",
+      "newSlug": "thang-gieng"
+    },
+    {
+      "title": "HẠ CÁNH NƠI ANH",
+      "oldId": "2024-104-stub-104",
+      "oldSlug": "stub-104",
+      "newId": "2023-104-ha-canh-noi-anh",
+      "newSlug": "ha-canh-noi-anh"
+    },
+    {
+      "title": "VU VƠ TRƯỚC BIỂN",
+      "oldId": "2024-106-stub-106",
+      "oldSlug": "stub-106",
+      "newId": "2024-106-vu-vo-truoc-bien",
+      "newSlug": "vu-vo-truoc-bien"
+    },
+    {
+      "title": "NÀNG II",
+      "oldId": "2024-107-stub-107",
+      "oldSlug": "stub-107",
+      "newId": "2024-107-nang-ii",
+      "newSlug": "nang-ii"
+    },
+    {
+      "title": "THƠ TÌNH THÁNG TÁM",
+      "oldId": "2024-108-stub-108",
+      "oldSlug": "stub-108",
+      "newId": "2024-108-tho-tinh-thang-tam",
+      "newSlug": "tho-tinh-thang-tam"
+    }
+  ]
+}
