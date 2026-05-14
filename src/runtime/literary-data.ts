@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { cache } from 'react'
 
-type CanonicalPoem = {
+export type CanonicalPoem = {
   id: string
   slug: string
   title: string

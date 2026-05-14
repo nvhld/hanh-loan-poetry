@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
-import LiteraryRuntimeHost from '@/runtime/LiteraryRuntimeHost'
+import Link from 'next/link'
+import { formatDateLabel, getAnchorEntries } from '@/runtime/anchor-reader'
+import { getCanonicalPoems } from '@/runtime/literary-data'
 
 export const metadata: Metadata = {
   title: 'Thư Viện Đêm — Hạnh Loan',
@@ -21,14 +23,37 @@ export const metadata: Metadata = {
   },
 }
 
-export default function ArchivePage() {
+export default async function ArchivePage() {
+  const poems = await getCanonicalPoems()
+  const anchors = getAnchorEntries(poems)
+
   return (
-    <LiteraryRuntimeHost entry="archive" routeContext={{ canonicalPath: '/archive' }}>
-      <section style={{ padding: '12dvh 24px 8dvh', maxWidth: 720 }}>
-        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(36px, 8vw, 72px)', fontWeight: 400 }}>
-          Thư Viện Đêm
-        </h1>
+    <main className="anchor-archive">
+      <div className="anchor-room-ambient" aria-hidden="true" />
+      <section className="anchor-archive-hero">
+        <p>Hạnh Loan</p>
+        <h1>12 bài anchor</h1>
+        <span>
+          Một tuyến đọc đã được khóa cho bản beta kín. Vào từng phòng, đọc trọn bài,
+          rồi đi tiếp bằng dư âm của bài trước.
+        </span>
       </section>
-    </LiteraryRuntimeHost>
+
+      <section className="anchor-archive-grid" aria-label="Danh sách 12 bài anchor">
+        {anchors.map(({ poem, profile }) => (
+          <Link
+            className={`anchor-archive-card anchor-archive-card-${profile.tone}`}
+            href={`/poem/${poem.slug}`}
+            key={poem.id}
+          >
+            <span className="anchor-card-order">{String(profile.order).padStart(2, '0')}</span>
+            <span className="anchor-card-field">{profile.fieldLabel}</span>
+            <h2>{poem.title}</h2>
+            <p>{poem.excerpt}</p>
+            <small>{formatDateLabel(poem)}</small>
+          </Link>
+        ))}
+      </section>
+    </main>
   )
 }
